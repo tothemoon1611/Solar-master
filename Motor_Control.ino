@@ -8,66 +8,86 @@ void Code_Run_V1()
   lcd.setCursor(16, 2) ; lcd.print(PanPos) ;
   while (1)
   {
-      Menu_ReadSensor();
-      if (  MenuSensor.MetalSensor == 0 && MotorTemp == 0)  // bat suon xuong
+    Menu_ReadSensor();
+    if (  MenuSensor.MetalSensor == 0 && MotorTemp == 0)  // bat suon xuong
+    {
+      MotorTemp = 1 ;
+    } else {}
+
+    if (  MenuSensor.MetalSensor == 1 && MotorTemp == 1)
+    {
+      MotorTemp = 0;
+      PanPos++ ;
+      lcd.setCursor(0, 2) ; lcd.print("Panel Position:") ; // lcd(0,2)
+      lcd.setCursor(16, 2) ; lcd.print(PanPos) ;          // lcd(16,2)
+      // bao cho ESP vi tri tam pin hien tai
+      // bao cho Ras vi tri tam pin hien tai
+      Serial.println(PanPos) ;
+      Serial2.print(PanPos) ;                      //      gui du lieu cho ESP
+    } else {}
+
+    if ( MenuSensor.LimitSW_2 == 0)
+    {
+      Motor_Cleaning_Stop() ;
+      while ( MenuSensor.LimitSW_1 == 1)
       {
-        MotorTemp = 1 ;
-      } else {}
-  
-      if (  MenuSensor.MetalSensor == 1 && MotorTemp == 1)
-      {
-        MotorTemp = 0;
-        PanPos++ ;
-        lcd.setCursor(0, 2) ; lcd.print("Panel Position:") ; // lcd(0,2)
-        lcd.setCursor(16, 2) ; lcd.print(PanPos) ;          // lcd(16,2)
-        // bao cho ESP vi tri tam pin hien tai
-        // bao cho Ras vi tri tam pin hien tai
-        Serial.println(PanPos) ;
-        Serial2.print(PanPos) ;                      //      gui du lieu cho ESP
-      } else {}
-     
-      if ( MenuSensor.LimitSW_2 == 0)
-      {
-        PanPos = 0 ;
-        Motor_Cleaning_Stop() ;
-        while ( MenuSensor.LimitSW_1 == 1)
+        Menu_ReadSensor();
+
+        if (  MenuSensor.MetalSensor == 0 && MotorTemp == 0)  // bat suon xuong
         {
-          Menu_ReadSensor();
-          Motor_Left_Start() ;
-          if (MenuSensor.LimitSW_1 == 0) {
-            out = 1 ;
-            Motor_Run_Stop() ;
-            break ;
-          } 
-          Key = keypad.getKey();
-          if ( ((int)keypad.getState() ==  PRESSED) )
+          MotorTemp = 1 ;
+        } else {}
+
+        if (  MenuSensor.MetalSensor == 1 && MotorTemp == 1)
+        {
+          MotorTemp = 0;
+          if (PanPos) PanPos-- ;
+          lcd.setCursor(0, 2) ; lcd.print("Panel Position:") ; // lcd(0,2)
+          lcd.setCursor(16, 2) ; lcd.print(PanPos) ;          // lcd(16,2)
+          // bao cho ESP vi tri tam pin hien tai
+          // bao cho Ras vi tri tam pin hien tai
+          Serial.println(PanPos) ;
+          Serial2.print(PanPos) ;                      //      gui du lieu cho ESP
+        } else {}
+
+        Motor_Left_Start() ;
+        if (MenuSensor.LimitSW_1 == 0 ) {
+          out = 1 ;
+          Motor_Run_Stop() ;
+          break ;
+        }
+        Key = keypad.getKey();
+        if ( ((int)keypad.getState() ==  PRESSED) )
+        {
+          if ( Key == BACK )
           {
-            if ( Key == BACK )
-            {
-              out = 1 ;
-              Wait_Task();
-              Motor_Run_Stop() ;
-              Motor_Cleaning_Stop() ;
-              PanPos = 0 ;
-              break ;
-            }
+            out = 1 ;
+            Wait_Task();
+            Motor_Run_Stop() ;
+            Motor_Cleaning_Stop() ;
+            PanPos = 0 ;
+            break ;
           }
         }
       }
-      Key = keypad.getKey();
-      if ( ((int)keypad.getState() ==  PRESSED) )
+    }
+    Key = keypad.getKey();
+    if ( ((int)keypad.getState() ==  PRESSED) )
+    {
+      if ( Key == BACK )
       {
-        if ( Key == BACK )
-        {
-          out = 1 ;
-          Motor_Run_Stop() ;
-          Motor_Cleaning_Stop() ;
-          PanPos = 0 ;
-          break ;
-        }
+        out = 1 ;
+        Motor_Run_Stop() ;
+        Motor_Cleaning_Stop() ;
+        PanPos = 0 ;
+        break ;
       }
-      if(out == 1 ) { out = 0 ; break ;} 
-      Wait_Task() ;
+    }
+    if (out == 1 ) {
+      out = 0 ;
+      break ;
+    }
+    Wait_Task() ;
   }
 }
 
