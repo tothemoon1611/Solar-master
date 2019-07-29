@@ -8,7 +8,7 @@ void Wifi() {
   int MaxPower = 0;
   int MinPower = 0;
   String ContentIDError = "";
-  String ContentACKID = "";
+  String ContentACKSERVER = "";
   for (;;)
   {
     if (WIFI.available())
@@ -63,16 +63,16 @@ void Wifi() {
         case IDError:
           ContentIDError = InputString;
 #ifdef DEBUGER
-          Serial.print("IDError: ");
+          Serial.print("Server Error: ");
           Serial.println(ContentIDError);
 #endif
           break;
-        case ACKIDCmd:
-          ContentACKID = InputString;
-          wifiPayload.ACK_ID = true;
+        case ACKSERVERCmd:
+          ContentACKSERVER = InputString;
+          wifiPayload.ACK_SERVER = true;
 #ifdef DEBUGER
-          Serial.print("SetupID: ");
-          Serial.println(ContentACKID);
+          Serial.print("Server connect: ");
+          Serial.println(ContentACKSERVER);
 #endif
           break;
         default:

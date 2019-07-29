@@ -25,8 +25,9 @@ struct DataMachine
 };
 
 struct WifiPayload
-{
-  bool ACK_ID;
+{ 
+  bool ACK_SERVER = false ;
+  bool ACK_NETWORK = false ;
 };
 
 //DataStr DataStr = {"", "", 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , "" , ""};
@@ -138,6 +139,7 @@ int MAXSize ;
 char ButTemp[9] ;
 int ValTemp ;
 int LcdTemp ;
+
 String TempData ;
 String SSIDData ;
 String PASSData ;
@@ -150,7 +152,7 @@ String FilePORTData = "PORTData.txt" ;
 String FileIPAddData = "IPData.txt" ;
 String FileIDData = "IDData.txt" ;
 String FileHardIDData = "HdIDData.txt" ;
-
+String FileEAlertData = "EAlertData.txt";
 //-------------------------------------Control Motor-------------------------------------//
 unsigned int PanPos = 0 ;
 bool  StartBut  = 0 ;

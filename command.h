@@ -28,7 +28,8 @@ const char WifiSSID = 0x0A;
 const char WifiPass = 0x0B;
 const char WifiIP = 0x0C;
 const char WifiPort = 0x0D;
-const char ACKIDCmd = 0x0E;
+const char ACKSERVERCmd = 0x0E;
+const char ACKNetworkCmd = 0x0F;
 
 const char updateCurrentBattery = 0x11;
 const char updateVoltageBattery = 0x12;
@@ -45,6 +46,7 @@ const char AssignedIDCmd = 0x04;
 const char DataRecCmd = 0x05;
 const char TimeoutError = 0x06;
 const char IDError = 0x07;
+const char NETWORKError = 0x08;
 
 const char setFixedID = 0x40;
 const char setMovingSpeed = 0x41;

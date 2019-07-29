@@ -61,7 +61,7 @@ void LCD_Page_3_Display()
     
     if ( (Page_Pointer[1] == 1) && (Page_Pointer[2] == 0) ) { LCD_HandControl() ;  } 
     if ( (Page_Pointer[1] == 1) && (Page_Pointer[2] == 1) ) { LCD_CameraTest() ;  } 
-    if ( (Page_Pointer[1] == 1) && (Page_Pointer[2] == 2) ) { LCD_CommuTest() ; Connect_Wifi();  } 
+    if ( (Page_Pointer[1] == 1) && (Page_Pointer[2] == 2) ) { Connect_Wifi() ;  } 
     if ( (Page_Pointer[1] == 1) && (Page_Pointer[2] == 3) ) { LCD_WorkTest() ; } 
     
     Keypad_Option() ;
@@ -89,6 +89,8 @@ void LCD_Page_4_Display()
     if (( Page_Pointer[1] == 0 ) && ( Page_Pointer[2] == 1 ) && ( Page_Pointer[3] == 1 )) { Set_PID() ;  }
     
     if (( Page_Pointer[1] == 0 ) && ( Page_Pointer[2] == 2 ) && ( Page_Pointer[3] == 0 )) { Energy_Alert() ;  }
+
+    if (( Page_Pointer[1] == 1 ) && ( Page_Pointer[2] == 2 ) && ( Page_Pointer[3] == 2 )) {  }
 
     if (( Page_Pointer[1] == 1 ) && ( Page_Pointer[2] == 3 ) && ( Page_Pointer[3] == 0 )) { Code_Run_V1() ;  }
     if (( Page_Pointer[1] == 1 ) && ( Page_Pointer[2] == 3 ) && ( Page_Pointer[3] == 1 )) {  }

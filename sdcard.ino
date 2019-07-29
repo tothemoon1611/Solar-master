@@ -46,6 +46,11 @@ bool SDformat()
     myFile = SD.open(FileHardIDData, FILE_WRITE);
     myFile.close();
   } else {}
+  if (!SD.exists(FileEAlertData))
+  {
+    myFile = SD.open(FileEAlertData, FILE_WRITE);
+    myFile.close();
+  } else {}
 
   //  if (!SD.exists("robot.csv"))
   //  {
