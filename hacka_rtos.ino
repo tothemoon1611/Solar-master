@@ -104,6 +104,7 @@ void Read_Sensor(void *pvParameters)
       Serial.print(instantCurrent, 2);
       Serial.println(String(End));
 
+
       last_time = millis();
     }
     dataMachine.MetalSensor = digitalRead(MetalSensorPin);
