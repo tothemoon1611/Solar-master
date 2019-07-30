@@ -279,43 +279,45 @@ void Connect_Wifi() {
   SDreadData(FileHardIDData) ;
   Serial.print(String(Start) + String(IDCmd) + TempData + String(End));
   WIFI.print(String(Start) + String(IDCmd) + TempData + String(End));
-  vTaskDelay((1000L * configTICK_RATE_HZ) / 1000L);
+  vTaskDelay((500L * configTICK_RATE_HZ) / 1000L);
   TempData = "" ;
 
   SDreadData(FileSSIDData) ;
   Serial.println(String(Start) + String(WifiSSID) + TempData + String(End)) ;
   WIFI.print(String(Start) + String(WifiSSID) + TempData + String(End)) ;
-  vTaskDelay((1000L * configTICK_RATE_HZ) / 1000L);
+  vTaskDelay((500L * configTICK_RATE_HZ) / 1000L);
   TempData = "" ;
 
   SDreadData(FilePASSData) ;
   Serial.println(String(Start) + String(WifiPass) + TempData + String(End)) ;
   WIFI.print(String(Start) + String(WifiPass) + TempData + String(End)) ;
-  vTaskDelay((1000L * configTICK_RATE_HZ) / 1000L);
+  vTaskDelay((500L * configTICK_RATE_HZ) / 1000L);
   TempData = "" ;
 
   SDreadData(FileIPAddData) ;
   Serial.println(String(Start) + String(WifiIP) + TempData + String(End)) ;
   WIFI.print(String(Start) + String(WifiIP) + TempData + String(End)) ;
-  vTaskDelay((1000L * configTICK_RATE_HZ) / 1000L);
+  vTaskDelay((500L * configTICK_RATE_HZ) / 1000L);
   TempData = "" ;
 
   SDreadData(FilePORTData) ;
   Serial.println(String(Start) + String(WifiPort) + TempData + String(End)) ;
   WIFI.print(String(Start) + String(WifiPort) + TempData + String(End)) ;
-  vTaskDelay((1000L * configTICK_RATE_HZ) / 1000L);
+  vTaskDelay((500L * configTICK_RATE_HZ) / 1000L);
   TempData = "" ;
   
-  lcd.clear() ; lcd.setCursor(3, 2) ; lcd.print("DONE!") ;
+  lcd.clear() ; lcd.setCursor(3, 1) ; lcd.print("Sending DONE !") ;
   vTaskDelay((1000L * configTICK_RATE_HZ) / 1000L);
   lcd.clear() ;
   int i = 5;
   bool Check  = 0 ;
   unsigned long TimeConnect = millis() ;
-  Serial.println( "MenuWifi.ACK_NETWORK = ") ; Serial.println(MenuWifi.ACK_NETWORK) ; Serial.println("xxx") ;
-  while ( MenuWifi.ACK_NETWORK != true )
+  Serial.println( "MenuWifi.ACK_NETWORK = ") ; Serial.println(MenuWifi.ACK_SERVER) ; Serial.println("xxx") ;
+  Serial.println( "wifiPayload.ACK_NETWORK = ") ; Serial.println(wifiPayload.ACK_SERVER) ; Serial.println("xxx") ;
+  
+  while ( MenuWifi.ACK_SERVER != true )
   {
-    Serial.println(MenuWifi.ACK_NETWORK) ;
+    Serial.println(MenuWifi.ACK_SERVER) ;
     Menu_WifiPayload();
     lcd.setCursor(3, 1) ; lcd.print("Please wait ...") ; lcd.setCursor(i, 2) ; lcd.print(".") ; if ( i == 12) {
       i = 5;
@@ -342,7 +344,8 @@ void Connect_Wifi() {
       lcd.setCursor(4,2) ; 
       lcd.print("Connect failed !") ;
       vTaskDelay((2000L * configTICK_RATE_HZ) / 1000L);
-//      MenuWifi.ACK_NETWORK = false ;
+      MenuWifi.ACK_SERVER = false ;
+      wifiPayload.ACK_SERVER = false ;
     }
   else{
       Check = 0 ; 
@@ -350,7 +353,8 @@ void Connect_Wifi() {
       lcd.setCursor(4,2) ; 
       lcd.print("Connected !") ;
       vTaskDelay((2000L * configTICK_RATE_HZ) / 1000L);
-//      MenuWifi.ACK_NETWORK = false ;
+      MenuWifi.ACK_SERVER = false ;
+      wifiPayload.ACK_SERVER = false ;
   }
 }
 

@@ -38,7 +38,8 @@ SemaphoreHandle_t sem;
 SemaphoreHandle_t sem2;
 
 DataMachine dataMachine;
-WifiPayload wifiPayload;
+WifiPayload wifiPayload  ;
+
 
 static void BlynkLed(void* arg) {
 
