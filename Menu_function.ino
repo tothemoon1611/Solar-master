@@ -1,5 +1,4 @@
-WifiPayload MenuWifi ;
-DataMachine MenuSensor;
+
 
 //---------------------------------CAC HAM THUC THI (FLAG) VA NHAP LIEU----------------------------------------------//
 //--NHAP LIEU----------//
@@ -345,7 +344,7 @@ void Connect_Wifi() {
       lcd.print("Connect failed !") ;
       vTaskDelay((2000L * configTICK_RATE_HZ) / 1000L);
       MenuWifi.ACK_SERVER = false ;
-      wifiPayload.ACK_SERVER = false ;
+      //wifiPayload.ACK_SERVER = false ;
     }
   else{
       Check = 0 ; 
@@ -354,7 +353,7 @@ void Connect_Wifi() {
       lcd.print("Connected !") ;
       vTaskDelay((2000L * configTICK_RATE_HZ) / 1000L);
       MenuWifi.ACK_SERVER = false ;
-      wifiPayload.ACK_SERVER = false ;
+      //wifiPayload.ACK_SERVER = false ;
   }
 }
 
@@ -492,14 +491,14 @@ void Automatic()
 
 
 void Menu_ReadSensor() {
-  if ( xSemaphoreTake( sem, ( TickType_t ) 0 ) )
+  if ( xSemaphoreTake( sem_ReadData, ( TickType_t ) 0 ) )
   {
     MenuSensor.MetalSensor = dataMachine.MetalSensor;
     MenuSensor.LimitSW_1 = dataMachine.LimitSW_1; 
     MenuSensor.LimitSW_2 = dataMachine.LimitSW_2; 
     MenuSensor.VoltageBattery = dataMachine.VoltageBattery;
     MenuSensor.CurrentBattery = dataMachine.CurrentBattery;
-    Serial.println( MenuSensor.VoltageBattery);
+    xSemaphoreGive(sem_ProcessData);
   }
 }
 
@@ -510,7 +509,6 @@ void Menu_WifiPayload()
     MenuWifi.ACK_SERVER = wifiPayload.ACK_SERVER ;
     MenuWifi.ACK_NETWORK = wifiPayload.ACK_NETWORK ;
   }
-  Serial.println( MenuWifi.ACK_SERVER) ;
 }
 
 

@@ -91,7 +91,26 @@ void Code_Run_V1()
   }
 }
 
+//-------------------------------------WORK MODE 2-------------------------------//
+void Code_Run_V2() 
+{
+  lcd.clear() ;
+  lcd.setCursor(1,1) ; lcd.print("Excute From Center") ;
+  lcd.setCursor(0,3) ; lcd.print("<BACK>") ;
+  lcd.setCursor(12,3) ; lcd.print("<ALLOW>") ;
+  Keypad_Option() ; 
+  if (BreakPage == 1) { BreakPage = 0 ; }  
+  if (OkPage == 1) 
+    { 
+     // OkPage = 0 ; Page_Pointer[2] = pointer ; break ; 
+    }
+}
 
+//void F_Code_Run_V2() 
+//{
+//  SVSetMode = "" ;
+//  if( SVSetMode == "xnxx" ) { 
+//}
 
 //-------------------------Thiet Lap Ban Dau Cho Dong Co------------------------------------------------//
 

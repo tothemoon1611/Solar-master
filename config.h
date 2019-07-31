@@ -30,6 +30,7 @@ struct WifiPayload
   bool ACK_NETWORK = false ;
 };
 
+String SVSetMode = "" ;
 //DataStr DataStr = {"", "", 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , "" , ""};
 
 Status Status = {true, false, false, true, true};
@@ -167,3 +168,10 @@ bool  StartBut  = 0 ;
 #define IN3 5
 #define IN4 6
 #define ENB 7
+//-----------------------------------Serial-------------------------------------------------
+  bool SerialRecv = false;
+  int serial_counter = 0;
+  char cmd;
+  String InputString = "";
+String DisplayString = "";
+boolean StringComplete = false;
