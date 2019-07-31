@@ -73,9 +73,11 @@ void Robot_Init(void *pvParameters) {
 /* Sensor*/
 void Read_Sensor(void *pvParameters)
 {
+  analogReadResolution(10);
   unsigned long last_time;
   for (;;)
   {
+    analogReadResolution(10);
     float Vbat   = float(analogRead(A0)) * (3.3 / 1023.0) * (9.72 / 2.18 + 1);
     float instantCurrent = (((float)analogRead(A1) - 512)  * (3.3 / 1023.0) / (66.0 / 1000)); //ACS712 Measuring Current of Battery
     //        if(abs(Vbat)<100) {
@@ -96,7 +98,7 @@ void Read_Sensor(void *pvParameters)
       WIFI.print(Vbat, 2);
       WIFI.print(String(End));
       Serial.print(String(Start) + String(updateVoltageBattery));
-      Serial.print(Vbat, 2);
+      Serial.print(analogRead(A0));
       Serial.println(String(End));
       WIFI.print(String(Start) + String(updateCurrentBattery));
       WIFI.print(instantCurrent, 2);
