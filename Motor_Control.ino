@@ -1,3 +1,4 @@
+
 void Code_Run_V1()
 {
   bool out = 0 ;
@@ -9,48 +10,41 @@ void Code_Run_V1()
   while (1)
   {
     Menu_ReadSensor();
-    if (  MenuSensor.MetalSensor == 0 && MotorTemp == 0)  // bat suon xuong
-    {
+    Menu_WifiPayload();
+    if (  MenuSensor.MetalSensor == 0 && MotorTemp == 0) {
       MotorTemp = 1 ;
-    } else {}
-
+    }
     if (  MenuSensor.MetalSensor == 1 && MotorTemp == 1)
     {
       MotorTemp = 0;
       PanPos++ ;
-      lcd.setCursor(0, 2) ; lcd.print("Panel Position:") ; // lcd(0,2)
-      lcd.setCursor(16, 2) ; lcd.print(PanPos) ;          // lcd(16,2)
-      // bao cho ESP vi tri tam pin hien tai
-      // bao cho Ras vi tri tam pin hien tai
+      lcd.setCursor(0, 2) ; lcd.print("Panel Position:") ;
+      lcd.setCursor(16, 2) ; lcd.print(PanPos) ;
       Serial.println(PanPos) ;
-      Serial2.print(PanPos) ;                      //      gui du lieu cho ESP
+      Serial2.print(PanPos) ;
     } else {}
 
     if ( MenuSensor.LimitSW_2 == 0)
     {
       Motor_Cleaning_Stop() ;
+      Motor_Left_Start() ;
       while ( MenuSensor.LimitSW_1 == 1)
       {
         Menu_ReadSensor();
-
-        if (  MenuSensor.MetalSensor == 0 && MotorTemp == 0)  // bat suon xuong
-        {
+        Menu_WifiPayload();
+        if (  MenuSensor.MetalSensor == 0 && MotorTemp == 0) {
           MotorTemp = 1 ;
-        } else {}
-
+        }
         if (  MenuSensor.MetalSensor == 1 && MotorTemp == 1)
         {
           MotorTemp = 0;
           if (PanPos) PanPos-- ;
           lcd.setCursor(0, 2) ; lcd.print("Panel Position:") ; // lcd(0,2)
           lcd.setCursor(16, 2) ; lcd.print(PanPos) ;          // lcd(16,2)
-          // bao cho ESP vi tri tam pin hien tai
-          // bao cho Ras vi tri tam pin hien tai
           Serial.println(PanPos) ;
           Serial2.print(PanPos) ;                      //      gui du lieu cho ESP
         } else {}
 
-        Motor_Left_Start() ;
         if (MenuSensor.LimitSW_1 == 0 ) {
           out = 1 ;
           Motor_Run_Stop() ;
@@ -69,6 +63,15 @@ void Code_Run_V1()
             break ;
           }
         }
+        if ( MenuWifi.Stop)
+        {
+          out = 1 ;
+          Motor_Run_Stop() ;
+          Motor_Cleaning_Stop() ;
+          MenuWifi.Mode = 0;
+          wifiPayload.Mode = 0 ;
+          break ;
+        }
       }
     }
     Key = keypad.getKey();
@@ -83,6 +86,15 @@ void Code_Run_V1()
         break ;
       }
     }
+    if ( MenuWifi.Stop)
+    {
+      //out = 1 ;
+      MenuWifi.Mode = 0;
+      wifiPayload.Mode = 0 ;
+      Motor_Run_Stop() ; 
+      Motor_Cleaning_Stop() ;
+      break ;
+    }
     if (out == 1 ) {
       out = 0 ;
       break ;
@@ -92,25 +104,69 @@ void Code_Run_V1()
 }
 
 //-------------------------------------WORK MODE 2-------------------------------//
-void Code_Run_V2() 
+void Server_SetMode()
 {
   lcd.clear() ;
-  lcd.setCursor(1,1) ; lcd.print("Excute From Center") ;
-  lcd.setCursor(0,3) ; lcd.print("<BACK>") ;
-  lcd.setCursor(12,3) ; lcd.print("<ALLOW>") ;
-  Keypad_Option() ; 
-  if (BreakPage == 1) { BreakPage = 0 ; }  
-  if (OkPage == 1) 
-    { 
-     // OkPage = 0 ; Page_Pointer[2] = pointer ; break ; 
+  lcd.setCursor(1, 1) ; lcd.print("Excute From Center") ;
+  lcd.setCursor(0, 3) ; lcd.print("<BACK>") ;
+  lcd.setCursor(13, 3) ; lcd.print("<ALLOW>") ;
+  Keypad_Option() ;
+  if (BreakPage == 1) {
+    BreakPage = 0 ;
+  }
+  if (OkPage == 1)
+  {
+    MenuWifi.Mode = 0 ;
+    wifiPayload.Mode = 0 ;
+    OkPage = 0 ;
+    lcd.clear() ;
+    lcd.setCursor(1, 1) ; lcd.print("Waiting for Command") ;
+    while (1) {
+      Menu_WifiPayload();
+      if ( MenuWifi.Mode == 2 ) {
+        lcd.clear() ;
+        lcd.setCursor(1, 0) ;
+        lcd.print("Building Map ...") ;
+        MenuWifi.Mode = 0 ;
+      }
+      if ( MenuWifi.Mode == 3 ) {
+        lcd.clear() ;
+        lcd.setCursor(1, 0) ;
+        lcd.print("Cleaning Mode... ") ;
+        Code_Run_V1() ;
+        MenuWifi.Mode = 0;
+        wifiPayload.Mode = 0 ;
+      }
+      if ( MenuWifi.Mode == 1) {
+        lcd.clear() ;
+        lcd.setCursor(1, 0) ;
+        lcd.print("Full Mode...") ;
+        MenuWifi.Mode = 0 ;
+      }
+      if ( MenuWifi.Mode == 4 ) {
+        lcd.clear() ;
+        lcd.setCursor(1, 0) ;
+        lcd.print("Monitor Mode...") ;
+
+        MenuWifi.Mode = 0 ;
+      }
+      Key = keypad.getKey();
+      if ( ((int)keypad.getState() ==  PRESSED) )
+      {
+        if ( Key == BACK )
+        {
+          break ;
+        }
+      }
+      Wait_Task() ;
     }
+  }
 }
 
-//void F_Code_Run_V2() 
-//{
-//  SVSetMode = "" ;
-//  if( SVSetMode == "xnxx" ) { 
-//}
+void F_Code_Run_V2()
+{
+
+}
 
 //-------------------------Thiet Lap Ban Dau Cho Dong Co------------------------------------------------//
 

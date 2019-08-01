@@ -10,84 +10,100 @@ void Get_Command() {
   for (;;)
   {
     Get_Serial_Wifi();
-    if (StringComplete) {
-      //   DisplayString = InputString;
-      switch (cmd) {
-        case setMovingSpeed:
-          MovingSpeed = InputString.toInt();
+    if ( xSemaphoreTake( sem_ProcessWifi, ( TickType_t ) 0 ) )
+    {
+      if (StringComplete) {
+        //   DisplayString = InputString;
+        switch (cmd) {
+          case setMovingSpeed:
+            MovingSpeed = InputString.toInt();
 #ifdef DEBUGER
-          Serial.print("Set Moving Speed: ");
-          Serial.println(MovingSpeed);
+            Serial.print("Set Moving Speed: ");
+            Serial.println(MovingSpeed);
 #endif
-          DisplayString = MovingSpeed;
-          break;
-        case setSpinnerSpeed:
+            DisplayString = MovingSpeed;
+            break;
+          case setSpinnerSpeed:
 #ifdef DEBUGER
-          Serial.print("Set Moving Speed: ");
-          Serial.println(SpinnerSpeed);
+            Serial.print("Set Moving Speed: ");
+            Serial.println(SpinnerSpeed);
 #endif
-          break;
-        case setChargeThreshold:
+            break;
+          case setChargeThreshold:
 #ifdef DEBUGER
-          Serial.print("Set Moving Speed: ");
-          Serial.println(ChargingThreshold);
+            Serial.print("Set Moving Speed: ");
+            Serial.println(ChargingThreshold);
 #endif
-          break;
-        case setMaxPower:
+            break;
+          case setMaxPower:
 #ifdef DEBUGER
-          Serial.print("Set Moving Speed: ");
-          Serial.println(MaxPower);
+            Serial.print("Set Moving Speed: ");
+            Serial.println(MaxPower);
 #endif
-          break;
-        case setMinPower:
+            break;
+          case setMinPower:
 #ifdef DEBUGER
-          Serial.print("Set Moving Speed: ");
-          Serial.println(MinPower);
+            Serial.print("Set Moving Speed: ");
+            Serial.println(MinPower);
 #endif
-          break;
-        case IDError:
-          ContentIDError = InputString;
+            break;
+          case IDError:
+            ContentIDError = InputString;
 #ifdef DEBUGER
-          Serial.print("Server Error: ");
-          Serial.println(ContentIDError);
+            Serial.print("Server Error: ");
+            Serial.println(ContentIDError);
 #endif
-          break;
-        case ACKSERVERCmd:
-          ContentACKSERVER = InputString;
-          wifiPayload.ACK_SERVER = true;
+            break;
+          case ACKSERVERCmd:
+            ContentACKSERVER = InputString;
+            wifiPayload.ACK_SERVER = true;
 #ifdef DEBUGER
-          Serial.print("Server connect: ");
-          Serial.println(ContentACKSERVER);
+            Serial.print("Server connect: ");
+            Serial.println(ContentACKSERVER);
 #endif
-          break;
-        default:
-          Serial.println("Unknown cmd!!!");
+            break;
+          case setMode:
+            wifiPayload.Mode = InputString.toInt();
+#ifdef DEBUGER
+            Serial.print("Set Mode: ");
+            Serial.println(wifiPayload.Mode);
+#endif
+            break;
+          case setStop:
+            wifiPayload.Stop = InputString.toInt();
+#ifdef DEBUGER
+            Serial.print("Set Stop: ");
+            Serial.println(wifiPayload.Stop);
+#endif
+            break;
+          default:
+            Serial.println("Unknown cmd!!!");
+        }
+        InputString = "";
+        StringComplete = false;
       }
-      // xSemaphoreGive(sem2);
-      InputString = "";
-      StringComplete = false;
+      xSemaphoreGive(sem_ReadWifi);
     }
-    xSemaphoreGive(sem2);
     vTaskDelay((10L * configTICK_RATE_HZ) / 1000L);
   }
 }
 
 
-void Get_Serial_Wifi(){
-     if (WIFI.available())
+void Get_Serial_Wifi() {
+  if (WIFI.available())
+  {
+    char inChar = (char)WIFI.read();
+    if (inChar == Start) SerialRecv = true;
+    if (inChar == End)
     {
-      char inChar = (char)WIFI.read();
-      if (inChar == Start) SerialRecv = true;
-      if (inChar == End)
-      {
-        SerialRecv = false;
-        serial_counter = 0;
-        StringComplete = true;
-      }
-      if (SerialRecv)  serial_counter++;
-      if (serial_counter == 2) cmd = inChar;
-      if (serial_counter > 2) InputString += inChar;
+      SerialRecv = false;
+      serial_counter = 0;
+      StringComplete = true;
     }
+    if (SerialRecv)  serial_counter++;
+    if (serial_counter == 2) cmd = inChar;
+    if (serial_counter > 2) InputString += inChar;
+  }
 }
 
 

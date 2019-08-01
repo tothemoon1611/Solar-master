@@ -228,9 +228,8 @@ void Network_Config()
   {
     PointerMax =  3 ;
     Page = 4 ;
-    if ( pointer == 0 ) {
-      pointer = 1 ;
-    }
+    if ( pointer == 0 ) { pointer = 1 ; }
+ 
     lcd.clear()  ;
     lcd.setCursor(4, 1) ; lcd.print("[ Config  ]") ;
     lcd.setCursor(4, 2) ; lcd.print("[ SIGN IN ]") ;
@@ -314,9 +313,9 @@ void Connect_Wifi() {
   Serial.println( "MenuWifi.ACK_NETWORK = ") ; Serial.println(MenuWifi.ACK_SERVER) ; Serial.println("xxx") ;
   Serial.println( "wifiPayload.ACK_NETWORK = ") ; Serial.println(wifiPayload.ACK_SERVER) ; Serial.println("xxx") ;
   
-  while ( MenuWifi.ACK_SERVER != true )
+  while ( wifiPayload.ACK_SERVER != true )
   {
-    Serial.println(MenuWifi.ACK_SERVER) ;
+    Serial.println(wifiPayload.ACK_SERVER) ;
     Menu_WifiPayload();
     lcd.setCursor(3, 1) ; lcd.print("Please wait ...") ; lcd.setCursor(i, 2) ; lcd.print(".") ; if ( i == 12) {
       i = 5;
@@ -343,8 +342,8 @@ void Connect_Wifi() {
       lcd.setCursor(4,2) ; 
       lcd.print("Connect failed !") ;
       vTaskDelay((2000L * configTICK_RATE_HZ) / 1000L);
-      MenuWifi.ACK_SERVER = false ;
-      //wifiPayload.ACK_SERVER = false ;
+      //MenuWifi.ACK_SERVER = false ;
+      wifiPayload.ACK_SERVER = false ;
     }
   else{
       Check = 0 ; 
@@ -352,8 +351,8 @@ void Connect_Wifi() {
       lcd.setCursor(4,2) ; 
       lcd.print("Connected !") ;
       vTaskDelay((2000L * configTICK_RATE_HZ) / 1000L);
-      MenuWifi.ACK_SERVER = false ;
-      //wifiPayload.ACK_SERVER = false ;
+      //MenuWifi.ACK_SERVER = false ;
+      wifiPayload.ACK_SERVER = false ;
   }
 }
 
@@ -504,10 +503,14 @@ void Menu_ReadSensor() {
 
 void Menu_WifiPayload()
 {
-  if ( xSemaphoreTake( sem2, ( TickType_t ) 0 ) )
+  Serial.println(MenuWifi.Mode);
+  if ( xSemaphoreTake( sem_ReadWifi, ( TickType_t ) 0 ) )
   {
     MenuWifi.ACK_SERVER = wifiPayload.ACK_SERVER ;
     MenuWifi.ACK_NETWORK = wifiPayload.ACK_NETWORK ;
+    MenuWifi.Mode = wifiPayload.Mode ;
+    MenuWifi.Stop = wifiPayload.Stop ;
+    xSemaphoreGive(sem_ProcessWifi);
   }
 }
 

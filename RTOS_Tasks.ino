@@ -18,6 +18,7 @@ void Robot_Init(void *pvParameters) {
   /*------SETUP RTC---*/
   RTC_Init();
   xSemaphoreGive( sem_ProcessData);
+  xSemaphoreGive( sem_ProcessWifi);
   for (;;)
   {
 

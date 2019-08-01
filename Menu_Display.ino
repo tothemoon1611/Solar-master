@@ -36,8 +36,8 @@ void LCD_Page_2_Display()
     {
       case 0: { LCD_ParametersSetup() ; break ; }
       case 1: { LCD_TestingMode() ; break ; }
-      case 2: { LCD_BuildMap() ; break ; }
-      case 3: { LCD_Start() ; break ; }
+      case 2: { LCD_SetWorkingMode() ; break ; }
+      case 3: { LCD_Automatic() ; break ; }
     }
     Keypad_Option() ;
     if (BreakPage == 1) { BreakPage = 0 ; break ; }
@@ -63,6 +63,8 @@ void LCD_Page_3_Display()
     if ( (Page_Pointer[1] == 1) && (Page_Pointer[2] == 1) ) { LCD_CameraTest() ;  } 
     if ( (Page_Pointer[1] == 1) && (Page_Pointer[2] == 2) ) { Connect_Wifi() ;  } 
     if ( (Page_Pointer[1] == 1) && (Page_Pointer[2] == 3) ) { LCD_WorkTest() ; } 
+
+    if ( (Page_Pointer[1] == 2) && (Page_Pointer[2] == 2) ) { Server_SetMode() ; }
     
     Keypad_Option() ;
     if (BreakPage == 1) { BreakPage = 0 ; break ; }
@@ -229,7 +231,7 @@ void Keypad_Processing()
               TimeKeypad = millis() ;
             }
         } 
-      if( (unsigned long)(millis() - TimeKeypad) > 600 )
+      if( (unsigned long)(millis() - TimeKeypad) > 500 )
         {
           lcd.setCursor(LcdTemp, 2) ;
           lcd.print(Key) ;
@@ -258,7 +260,7 @@ void Keypad_Option()
       {
         if ( Key == UP )
         {
-          Wait_Task() ;
+          vTaskDelay((50L * configTICK_RATE_HZ) / 1000L);
           if (pointer == 0) {
             pointer = 0;
           }
@@ -269,7 +271,7 @@ void Keypad_Option()
         }
         if ( Key == DOWN )
         {
-          Wait_Task() ;
+          vTaskDelay((50L * configTICK_RATE_HZ) / 1000L);
           if (pointer == ( PointerMax - 1) ) {
             pointer = PointerMax - 1 ;
           }
@@ -281,7 +283,7 @@ void Keypad_Option()
          
         if ( Key == OK )
         {
-          Wait_Task() ;
+          vTaskDelay((50L * configTICK_RATE_HZ) / 1000L);
           OkPage = 1 ;
           if (Page == PageMAX) {
             Page = PageMAX ;
@@ -293,7 +295,7 @@ void Keypad_Option()
         }
         if ( Key == BACK )
         {
-          Wait_Task() ;
+          vTaskDelay((50L * configTICK_RATE_HZ) / 1000L);
           BreakPage = 1 ;
           if (Page == 1) {
             Page = 1 ;
@@ -338,18 +340,24 @@ void LCD_TestingMode()
   }
 }
 
-void LCD_BuildMap()
+void LCD_SetWorkingMode()
 {
   lcd.clear() ;
-  lcd.setCursor(0, 0);
-  lcd.print(LCDBuildMap[0]) ;     // bat dau che do BUILD MAP
+  PointerMax = sizeof(LCDSetWorkingMode)/sizeof(int) ;
+  for ( int i = 0; i < PointerMax ; i++ )
+  {
+    lcd.setCursor(0, i);
+    lcd.print(LCDSetWorkingMode[i]) ;
+    lcd.setCursor(19, pointer);
+    lcd.print("<") ;
+  }
 }
 
-void LCD_Start()
+void LCD_Automatic()
 {
   lcd.clear() ;
   lcd.setCursor(0, 0) ;
-  lcd.print(LCDStart[0]) ;    // bat dau ham lam viec tu dong
+  lcd.print(LCDAutomatic[0]) ;    // bat dau ham lam viec tu dong
 }
 
 //--PAGE 3----------//

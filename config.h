@@ -3,7 +3,10 @@
 #define DTR 6
 #define CSpin  53
 
-String msgGPRS = "GET /update?api_key=XN6MA1R9H63Q1IZX"; // chanel 1
+#define FullMode  1
+#define BuildMap  2
+#define CleanMode  3
+#define MonitorMode  4
 
 struct Status
 {
@@ -28,6 +31,8 @@ struct WifiPayload
 { 
   bool ACK_SERVER = false ;
   bool ACK_NETWORK = false ;
+  int Mode=0;
+  bool Stop = false;
 };
 
 String SVSetMode = "" ;
@@ -40,17 +45,17 @@ LiquidCrystal_I2C lcd(0x27, 20, 4);
 
 //-----------------------------------------------Hien thi cac Page tuong ung----------------------------------------------------------------//
 //--PAGE 1--//
-char* LCDSettingMode[] = {"1.Parameters setup", "2.Testing Mode", "3.Building Map", "4.Start "} ;        
+char* LCDSettingMode[] = {"1.Parameters Setup", "2.Testing Mode", "3.Set Working Mode", "4.Automatic "} ;        
 
 //--PAGE 2--//
-char* LCDParametersSetup[] = {"1.Robot ID", "2.Motor Setup", "3.Charging Setup", "4.Update Later..."} ;     // For Parameters Setup
-char* LCDTestingMode[] = {"1.Hand Control", "2.Camera Test", "3.Commu... Test", "4.Work Test"} ;                                                     // For Testing Mode      
-char* LCDBuildMap[] = {"Update Later..."} ;                                                                         // For Build Map                                          
-char* LCDStart[] = {"Update Later..."} ;                                                                        // For Automatic 
+char* LCDParametersSetup[] = {"1.Robot ID", "2.Motor Setup", "3.Charging Setup", "4.Update Later..."} ;                                        // For Parameters Setup
+char* LCDTestingMode[] = {"1.Hand Control", "2.Camera Test", "3.Commu... Test", "4.Work Test"} ;                                               // For Testing Mode      
+char* LCDSetWorkingMode[] = {"1.Building Map", "2.Working Mode", "3.Server Control"} ;                                                         // For Build Map                                          
+char* LCDAutomatic[] = {"Update Later..."} ;                                                                                                   // For Automatic 
 
 //--PAGE 3--// 
-char* LCDRobotID[] = {"ID:", "HID:", "0.Network Config"} ;                                                                          // For Parameters Setup -> Robot Fixed ID 
-char* LCDMotorSetup[] = {"1.Moving Motor", "2.Cleaning Motor"} ;                                // For Parameters Setup -> Motor Speed       
+char* LCDRobotID[] = {"ID :", "HID:", "0.Network Config"} ;                                                                                     // For Parameters Setup -> Robot Fixed ID 
+char* LCDMotorSetup[] = {"1.Moving Motor", "2.Cleaning Motor"} ;                                                                               // For Parameters Setup -> Motor Speed       
 char* LCDChargingSetup[] = {"1.Energy Alert" } ;            // For Parameters Setup -> Charging Setup
 
 char* LCDHandControl[] = {"Update Later..."} ;                                                                // Ngay tai tai day ket noi voi tay dieu khien 

@@ -16,8 +16,6 @@
 #include "command.h"
 #include <Keypad.h>
 #include <string.h>
-#include <DueFlashStorage.h>
-DueFlashStorage dueFlashStorage;
 
 Keypad keypad = Keypad(makeKeymap(keys), rowPins, columnPins, rows, columns);
 
@@ -32,6 +30,8 @@ const uint8_t LED_PIN = 13;
 // Declare a semaphore handle.
 SemaphoreHandle_t sem_ReadData;
 SemaphoreHandle_t sem_ProcessData;
+SemaphoreHandle_t sem_ReadWifi;
+SemaphoreHandle_t sem_ProcessWifi;
 SemaphoreHandle_t sem2;
 
 DataMachine dataMachine;
@@ -56,6 +56,8 @@ void setup() {
   // initialize semaphore
   sem_ReadData = xSemaphoreCreateCounting(1, 0);
   sem_ProcessData = xSemaphoreCreateCounting(1, 0);
+  sem_ReadWifi = xSemaphoreCreateCounting(1, 0);
+  sem_ProcessWifi= xSemaphoreCreateCounting(1, 0);
   sem2 = xSemaphoreCreateCounting(1, 0);
 
 
