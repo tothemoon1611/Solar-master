@@ -19,6 +19,9 @@ void Robot_Init(void *pvParameters) {
   RTC_Init();
   xSemaphoreGive( sem_ProcessData);
   xSemaphoreGive( sem_ProcessWifi);
+  vTaskDelay((1000L * configTICK_RATE_HZ) / 1000L);
+  Init_Communication();
+
   for (;;)
   {
 
@@ -71,6 +74,7 @@ void Read_Sensor(void *pvParameters)
     if ( xSemaphoreTake( sem_ProcessData, ( TickType_t ) 0 ) )
     {
       dataMachine.MetalSensor = digitalRead(MetalSensorPin);
+      Serial.println(digitalRead(MetalSensorPin));
       dataMachine.LimitSW_1 = digitalRead(CheckWheel1);
       dataMachine.LimitSW_2 = digitalRead(CheckWheel2);
       dataMachine.VoltageBattery = Vbat;

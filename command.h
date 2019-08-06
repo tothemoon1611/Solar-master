@@ -37,7 +37,8 @@ const char updateEnergyBattery = 0x13;
 
 const char updateStatusParameter = 0x16;
 const char updateDirectionParameter = 0x17;
-const char updateLocationParameter = 0x18;
+const char updateCollumnPanelParameter = 0x18;
+const char updateStringPanelParameter = 0x19;
 
 const char updateLocationPanel = 0x20;
 const char updateStatusPanel = 0x21;

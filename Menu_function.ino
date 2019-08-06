@@ -6,10 +6,10 @@
 void Energy_Alert()
 {
   lcd.clear() ;
-  lcd.setCursor(0,1) ; lcd.print("Enery Alert:") ; 
+  lcd.setCursor(0, 1) ; lcd.print("Enery Alert:") ;
   SDreadData(FileEAlertData) ;
   lcd.print(TempData) ;
-  
+
 }
 
 
@@ -228,8 +228,10 @@ void Network_Config()
   {
     PointerMax =  3 ;
     Page = 4 ;
-    if ( pointer == 0 ) { pointer = 1 ; }
- 
+    if ( pointer == 0 ) {
+      pointer = 1 ;
+    }
+
     lcd.clear()  ;
     lcd.setCursor(4, 1) ; lcd.print("[ Config  ]") ;
     lcd.setCursor(4, 2) ; lcd.print("[ SIGN IN ]") ;
@@ -270,90 +272,62 @@ void Network_Config()
 
 void Connect_Wifi() {
   lcd.clear() ; lcd.setCursor(3, 2) ; lcd.print("Sending...") ;
-  
-//  WIFI.print(String(Start) + String(ACKIDCmd) + wifiPayload.ACK_ID + String(End));
-//  vTaskDelay((1000L * configTICK_RATE_HZ) / 1000L);
-  
-  SDreadData(FileHardIDData) ;
-  Serial.print(String(Start) + String(IDCmd) + TempData + String(End));
-  WIFI.print(String(Start) + String(IDCmd) + TempData + String(End));
-  vTaskDelay((500L * configTICK_RATE_HZ) / 1000L);
-  TempData = "" ;
 
-  SDreadData(FileSSIDData) ;
-  Serial.println(String(Start) + String(WifiSSID) + TempData + String(End)) ;
-  WIFI.print(String(Start) + String(WifiSSID) + TempData + String(End)) ;
-  vTaskDelay((500L * configTICK_RATE_HZ) / 1000L);
-  TempData = "" ;
+  //  WIFI.print(String(Start) + String(ACKIDCmd) + wifiPayload.ACK_ID + String(End));
+  //  vTaskDelay((1000L * configTICK_RATE_HZ) / 1000L);
 
-  SDreadData(FilePASSData) ;
-  Serial.println(String(Start) + String(WifiPass) + TempData + String(End)) ;
-  WIFI.print(String(Start) + String(WifiPass) + TempData + String(End)) ;
-  vTaskDelay((500L * configTICK_RATE_HZ) / 1000L);
-  TempData = "" ;
+  Init_Communication();
 
-  SDreadData(FileIPAddData) ;
-  Serial.println(String(Start) + String(WifiIP) + TempData + String(End)) ;
-  WIFI.print(String(Start) + String(WifiIP) + TempData + String(End)) ;
-  vTaskDelay((500L * configTICK_RATE_HZ) / 1000L);
-  TempData = "" ;
-
-  SDreadData(FilePORTData) ;
-  Serial.println(String(Start) + String(WifiPort) + TempData + String(End)) ;
-  WIFI.print(String(Start) + String(WifiPort) + TempData + String(End)) ;
-  vTaskDelay((500L * configTICK_RATE_HZ) / 1000L);
-  TempData = "" ;
-  
   lcd.clear() ; lcd.setCursor(3, 1) ; lcd.print("Sending DONE !") ;
-  vTaskDelay((1000L * configTICK_RATE_HZ) / 1000L);
-  lcd.clear() ;
-  int i = 5;
-  bool Check  = 0 ;
-  unsigned long TimeConnect = millis() ;
-  Serial.println( "MenuWifi.ACK_NETWORK = ") ; Serial.println(MenuWifi.ACK_SERVER) ; Serial.println("xxx") ;
-  Serial.println( "wifiPayload.ACK_NETWORK = ") ; Serial.println(wifiPayload.ACK_SERVER) ; Serial.println("xxx") ;
-  
-  while ( wifiPayload.ACK_SERVER != true )
-  {
-    Serial.println(wifiPayload.ACK_SERVER) ;
-    Menu_WifiPayload();
-    lcd.setCursor(3, 1) ; lcd.print("Please wait ...") ; lcd.setCursor(i, 2) ; lcd.print(".") ; if ( i == 12) {
-      i = 5;
-      lcd.clear() ;
-    }
-    Key = keypad.getKey();
-    if ( ((int)keypad.getState() ==  PRESSED) )
-    {
-      vTaskDelay((50L * configTICK_RATE_HZ) / 1000L);
-      if ( Key == BACK )
-      {
-        Check = 1 ;
-        break ;
-      }
-    }
-    i++ ;
-    vTaskDelay((500L * configTICK_RATE_HZ) / 1000L);
-    if ( (unsigned long) (millis() - TimeConnect) > 30000) { Check = 1 ; break ;} 
-  }
-  if(Check) 
-    {
-      Check = 0;
-      lcd.clear() ;
-      lcd.setCursor(4,2) ; 
-      lcd.print("Connect failed !") ;
-      vTaskDelay((2000L * configTICK_RATE_HZ) / 1000L);
-      //MenuWifi.ACK_SERVER = false ;
-      wifiPayload.ACK_SERVER = false ;
-    }
-  else{
-      Check = 0 ; 
-      lcd.clear() ;
-      lcd.setCursor(4,2) ; 
-      lcd.print("Connected !") ;
-      vTaskDelay((2000L * configTICK_RATE_HZ) / 1000L);
-      //MenuWifi.ACK_SERVER = false ;
-      wifiPayload.ACK_SERVER = false ;
-  }
+  //  vTaskDelay((1000L * configTICK_RATE_HZ) / 1000L);
+  //  lcd.clear() ;
+  //  int i = 5;
+  //  bool Check  = 0 ;
+  //  unsigned long TimeConnect = millis() ;
+  //  Serial.println( "MenuWifi.ACK_NETWORK = ") ; Serial.println(MenuWifi.ACK_SERVER) ; Serial.println("xxx") ;
+  //  Serial.println( "wifiPayload.ACK_NETWORK = ") ; Serial.println(wifiPayload.ACK_SERVER) ; Serial.println("xxx") ;
+  //
+  //  while ( wifiPayload.ACK_SERVER != true )
+  //  {
+  //    Serial.println(wifiPayload.ACK_SERVER) ;
+  //    Menu_WifiPayload();
+  //    lcd.setCursor(3, 1) ; lcd.print("Please wait ...") ; lcd.setCursor(i, 2) ; lcd.print(".") ; if ( i == 12) {
+  //      i = 5;
+  //      lcd.clear() ;
+  //    }
+  //    Key = keypad.getKey();
+  //    if ( ((int)keypad.getState() ==  PRESSED) )
+  //    {
+  //      vTaskDelay((50L * configTICK_RATE_HZ) / 1000L);
+  //      if ( Key == BACK )
+  //      {
+  //        Check = 1 ;
+  //        break ;
+  //      }
+  //    }
+  //    i++ ;
+  //    vTaskDelay((500L * configTICK_RATE_HZ) / 1000L);
+  //    if ( (unsigned long) (millis() - TimeConnect) > 30000) { Check = 1 ; break ;}
+  //  }
+  //  if(Check)
+  //    {
+  //      Check = 0;
+  //      lcd.clear() ;
+  //      lcd.setCursor(4,2) ;
+  //      lcd.print("Connect failed !") ;
+  //      vTaskDelay((2000L * configTICK_RATE_HZ) / 1000L);
+  //      //MenuWifi.ACK_SERVER = false ;
+  //      wifiPayload.ACK_SERVER = false ;
+  //    }
+  //  else{
+  //      Check = 0 ;
+  //      lcd.clear() ;
+  //      lcd.setCursor(4,2) ;
+  //      lcd.print("Connected !") ;
+  //      vTaskDelay((2000L * configTICK_RATE_HZ) / 1000L);
+  //      //MenuWifi.ACK_SERVER = false ;
+  //      wifiPayload.ACK_SERVER = false ;
+  //  }
 }
 
 
@@ -386,27 +360,29 @@ void Get_ID()
   Serial.println(String(Start) + String(IDCmd) + AssignedID + String(End));
   WIFI.print(String(Start) + String(IDCmd) + AssignedID + String(End));
 
-  lcd.clear() ;
-  int i = 5;
-  while (1)
-  {
-    //if( (String)Timeout) { lcd.clear() ; lcd.setCursor(2,2); lcd.print("Connected Fail !") ; break ; }
-    lcd.setCursor(3, 1) ; lcd.print("Please wait ...") ; lcd.setCursor(i, 2) ; lcd.print(".") ; if ( i == 12) {
-      i = 5;
-      lcd.clear() ;
-    }
-    Key = keypad.getKey();
-    if ( ((int)keypad.getState() ==  PRESSED) )
-    {
-      vTaskDelay((50L * configTICK_RATE_HZ) / 1000L);
-      if ( Key == BACK )
-      {
-        break ;
-      }
-    }
-    i++ ;
-    Wait_Task() ;
-  }
+//  lcd.clear() ;
+//  int i = 5;
+//  while (1)
+//  {
+//    //if( (String)Timeout) { lcd.clear() ; lcd.setCursor(2,2); lcd.print("Connected Fail !") ; break ; }
+//    lcd.setCursor(3, 1) ; lcd.print("Please wait ...") ; lcd.setCursor(i, 2) ; lcd.print(".") ; if ( i == 12) {
+//      i = 5;
+//      lcd.clear() ;
+//    }
+//    Key = keypad.getKey();
+//    if ( ((int)keypad.getState() ==  PRESSED) )
+//    {
+//      vTaskDelay((50L * configTICK_RATE_HZ) / 1000L);
+//      if ( Key == BACK )
+//      {
+//        break ;
+//      }
+//    }
+//    i++ ;
+//    Wait_Task() ;
+//  }
+
+
 }
 
 //}
@@ -486,35 +462,69 @@ void Automatic()
     Wait_Task;
   }
 }
+void Init_Communication(){
+    SDreadData(FileHardIDData) ;
+  Serial.print(String(Start) + String(IDCmd) + TempData + String(End));
+  WIFI.print(String(Start) + String(IDCmd) + TempData + String(End));
+  vTaskDelay((500L * configTICK_RATE_HZ) / 1000L);
+  TempData = "" ;
 
+  SDreadData(FileSSIDData) ;
+  Serial.println(String(Start) + String(WifiSSID) + TempData + String(End)) ;
+  WIFI.print(String(Start) + String(WifiSSID) + TempData + String(End)) ;
+  vTaskDelay((500L * configTICK_RATE_HZ) / 1000L);
+  TempData = "" ;
 
+  SDreadData(FilePASSData) ;
+  Serial.println(String(Start) + String(WifiPass) + TempData + String(End)) ;
+  WIFI.print(String(Start) + String(WifiPass) + TempData + String(End)) ;
+  vTaskDelay((500L * configTICK_RATE_HZ) / 1000L);
+  TempData = "" ;
 
+  SDreadData(FileIPAddData) ;
+  Serial.println(String(Start) + String(WifiIP) + TempData + String(End)) ;
+  WIFI.print(String(Start) + String(WifiIP) + TempData + String(End)) ;
+  vTaskDelay((500L * configTICK_RATE_HZ) / 1000L);
+  TempData = "" ;
+
+  SDreadData(FilePORTData) ;
+  Serial.println(String(Start) + String(WifiPort) + TempData + String(End)) ;
+  WIFI.print(String(Start) + String(WifiPort) + TempData + String(End)) ;
+  vTaskDelay((500L * configTICK_RATE_HZ) / 1000L);
+  TempData = "" ;
+}
 void Menu_ReadSensor() {
   if ( xSemaphoreTake( sem_ReadData, ( TickType_t ) 0 ) )
   {
     MenuSensor.MetalSensor = dataMachine.MetalSensor;
-    MenuSensor.LimitSW_1 = dataMachine.LimitSW_1; 
-    MenuSensor.LimitSW_2 = dataMachine.LimitSW_2; 
+    MenuSensor.LimitSW_1 = dataMachine.LimitSW_1;
+    MenuSensor.LimitSW_2 = dataMachine.LimitSW_2;
     MenuSensor.VoltageBattery = dataMachine.VoltageBattery;
     MenuSensor.CurrentBattery = dataMachine.CurrentBattery;
+
     xSemaphoreGive(sem_ProcessData);
   }
 }
 
 void Menu_WifiPayload()
 {
-  Serial.println(MenuWifi.Mode);
   if ( xSemaphoreTake( sem_ReadWifi, ( TickType_t ) 0 ) )
   {
     MenuWifi.ACK_SERVER = wifiPayload.ACK_SERVER ;
     MenuWifi.ACK_NETWORK = wifiPayload.ACK_NETWORK ;
     MenuWifi.Mode = wifiPayload.Mode ;
     MenuWifi.Stop = wifiPayload.Stop ;
+    MenuWifi.Continue = wifiPayload.Continue;
+    if (MenuWifi.Continue) {
+      Run = !Run;
+      Serial.print("RUN: ");
+      Serial.println(Run);
+      MenuWifi.Continue = 0;
+      wifiPayload.Continue = 0 ;
+    }
     xSemaphoreGive(sem_ProcessWifi);
   }
 }
-
-
 
 void Wait_Task()
 {

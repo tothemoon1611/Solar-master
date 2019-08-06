@@ -7,12 +7,12 @@
 //#define SETTIME
 
 #include <FreeRTOS_ARM.h>
-#include <SPI.h>
-#include <SD.h>
 #include "DS3231.h"
 #include <LiquidCrystal_I2C.h>
-#include "config.h"
+#include <SPI.h>
+#include <SD.h>
 #include <Wire.h>
+#include "config.h"
 #include "command.h"
 #include <Keypad.h>
 #include <string.h>
@@ -52,14 +52,12 @@ void setup() {
   CAMERA.begin(9600); // cong giao tiep Raspberry
   Motor_Setup() ;
 
-
   // initialize semaphore
   sem_ReadData = xSemaphoreCreateCounting(1, 0);
   sem_ProcessData = xSemaphoreCreateCounting(1, 0);
   sem_ReadWifi = xSemaphoreCreateCounting(1, 0);
   sem_ProcessWifi= xSemaphoreCreateCounting(1, 0);
   sem2 = xSemaphoreCreateCounting(1, 0);
-
 
   s2 = xTaskCreate(BlynkLed, NULL, configMINIMAL_STACK_SIZE, NULL, 1, NULL);
 

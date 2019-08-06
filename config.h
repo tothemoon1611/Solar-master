@@ -33,8 +33,11 @@ struct WifiPayload
   bool ACK_NETWORK = false ;
   int Mode=0;
   bool Stop = false;
+  bool Continue = false;
 };
 
+bool Run = 0;
+int StrPanel = 0;
 String SVSetMode = "" ;
 //DataStr DataStr = {"", "", 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , "" , ""};
 
@@ -121,8 +124,8 @@ char keys[rows][columns] =
   {'*', '0', '#', 'D'},
 };
  
-byte rowPins[rows] = {22, 24, 26, 28}; 
-byte columnPins[columns] = {30, 32, 34, 36};
+byte rowPins[rows] = {23, 25, 27, 29}; 
+byte columnPins[columns] = {31, 33, 35, 37};
  
 
 
@@ -163,9 +166,9 @@ String FileEAlertData = "EAlertData.txt";
 unsigned int PanPos = 0 ;
 bool  StartBut  = 0 ;
 
-#define MetalSensorPin 8 
-#define CheckWheel1 9
-#define CheckWheel2 10
+#define MetalSensorPin 39 
+#define CheckWheel1 41
+#define CheckWheel2 43
 
 #define ENA 2
 #define IN1 3

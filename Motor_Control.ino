@@ -1,49 +1,26 @@
-
+bool Sensor_Temp;
 void Code_Run_V1()
 {
   bool out = 0 ;
-  bool MotorTemp = 0 ;
-  Motor_Right_Start() ;
-  Motor_Cleaning_Start() ;
   lcd.setCursor(0, 2) ; lcd.print("Panel Position:") ;
   lcd.setCursor(16, 2) ; lcd.print(PanPos) ;
-  while (1)
+  while (!out)
   {
+    Motor_Right_Start() ;
+    Motor_Cleaning_Start() ;
     Menu_ReadSensor();
     Menu_WifiPayload();
-    if (  MenuSensor.MetalSensor == 0 && MotorTemp == 0) {
-      MotorTemp = 1 ;
-    }
-    if (  MenuSensor.MetalSensor == 1 && MotorTemp == 1)
-    {
-      MotorTemp = 0;
-      PanPos++ ;
-      lcd.setCursor(0, 2) ; lcd.print("Panel Position:") ;
-      lcd.setCursor(16, 2) ; lcd.print(PanPos) ;
-      Serial.println(PanPos) ;
-      Serial2.print(PanPos) ;
-    } else {}
+    Menu_incPanelPos();
 
     if ( MenuSensor.LimitSW_2 == 0)
     {
-      Motor_Cleaning_Stop() ;
-      Motor_Left_Start() ;
       while ( MenuSensor.LimitSW_1 == 1)
       {
+        Motor_Cleaning_Stop() ;
+        Motor_Left_Start() ;
         Menu_ReadSensor();
         Menu_WifiPayload();
-        if (  MenuSensor.MetalSensor == 0 && MotorTemp == 0) {
-          MotorTemp = 1 ;
-        }
-        if (  MenuSensor.MetalSensor == 1 && MotorTemp == 1)
-        {
-          MotorTemp = 0;
-          if (PanPos) PanPos-- ;
-          lcd.setCursor(0, 2) ; lcd.print("Panel Position:") ; // lcd(0,2)
-          lcd.setCursor(16, 2) ; lcd.print(PanPos) ;          // lcd(16,2)
-          Serial.println(PanPos) ;
-          Serial2.print(PanPos) ;                      //      gui du lieu cho ESP
-        } else {}
+        Menu_decPanelPos();
 
         if (MenuSensor.LimitSW_1 == 0 ) {
           out = 1 ;
@@ -88,21 +65,136 @@ void Code_Run_V1()
     }
     if ( MenuWifi.Stop)
     {
-      //out = 1 ;
+      out = 1 ;
       MenuWifi.Mode = 0;
       wifiPayload.Mode = 0 ;
-      Motor_Run_Stop() ; 
+      Motor_Run_Stop() ;
       Motor_Cleaning_Stop() ;
       break ;
     }
-    if (out == 1 ) {
-      out = 0 ;
-      break ;
-    }
+
     Wait_Task() ;
   }
 }
+//-------------------------------------WORK MODE 2-------------------------------//
 
+void Code_Run_V2()
+{
+  bool out = 0 ;
+  lcd.setCursor(0, 2) ; lcd.print("Panel Position:") ;
+  lcd.setCursor(16, 2) ; lcd.print(PanPos) ;
+  while (!out)
+  {
+    Motor_Right_Start() ;
+    Motor_Cleaning_Start() ;
+    Menu_ReadSensor();
+    Menu_WifiPayload();
+    Menu_incPanelPos();
+    Run_Mode();
+
+    if ( MenuSensor.LimitSW_2 == 0)
+    {
+      while ( MenuSensor.LimitSW_1 == 1)
+      {
+        Motor_Cleaning_Stop() ;
+        Motor_Left_Start() ;
+        Menu_ReadSensor();
+        Menu_WifiPayload();
+        Menu_decPanelPos();
+        Run_Mode();
+
+        if (MenuSensor.LimitSW_1 == 0 ) {
+          out = 1 ;
+          Motor_Run_Stop() ;
+          break ;
+        }
+        Key = keypad.getKey();
+        if ( ((int)keypad.getState() ==  PRESSED) )
+        {
+          if ( Key == BACK )
+          {
+            out = 1 ;
+            Wait_Task();
+            Motor_Run_Stop() ;
+            Motor_Cleaning_Stop() ;
+            PanPos = 0 ;
+            break ;
+          }
+        }
+        if ( MenuWifi.Stop)
+        {
+          out = 1 ;
+          Motor_Run_Stop() ;
+          Motor_Cleaning_Stop() ;
+          MenuWifi.Mode = 0;
+          wifiPayload.Mode = 0 ;
+          break ;
+        }
+      }
+    }
+    Key = keypad.getKey();
+    if ( ((int)keypad.getState() ==  PRESSED) )
+    {
+      if ( Key == BACK )
+      {
+        out = 1 ;
+        Motor_Run_Stop() ;
+        Motor_Cleaning_Stop() ;
+        PanPos = 0 ;
+        break ;
+      }
+    }
+    if ( MenuWifi.Stop)
+    {
+      out = 1 ;
+      MenuWifi.Mode = 0;
+      wifiPayload.Mode = 0 ;
+      Motor_Run_Stop() ;
+      Motor_Cleaning_Stop() ;
+      break ;
+    }
+
+    Wait_Task() ;
+  }
+}
+void Run_Mode() {
+  while (Run) {
+    Menu_WifiPayload();
+    Motor_Run_Stop() ;
+    Motor_Cleaning_Stop() ;
+    Wait_Task();
+  }
+}
+
+void Menu_incPanelPos() {
+
+  if (  MenuSensor.MetalSensor == 0 && Sensor_Temp == 0) Sensor_Temp = 1 ;
+  if (  MenuSensor.MetalSensor == 1 && Sensor_Temp == 1)
+  {
+    Sensor_Temp = 0;
+    PanPos++ ;
+    lcd.setCursor(0, 2) ; lcd.print("Panel Position:") ;
+    lcd.setCursor(16, 2) ; lcd.print(PanPos) ;
+    Serial.println(PanPos) ;
+    UpdatetoESP(String(updateCollumnPanelParameter), String(PanPos));
+    UpdatetoESP(String(updateStringPanelParameter), String(StrPanel));
+  }
+}
+
+void Menu_decPanelPos() {
+
+  if (  MenuSensor.MetalSensor == 0 && Sensor_Temp == 0) Sensor_Temp = 1 ;
+  if (  MenuSensor.MetalSensor == 1 && Sensor_Temp == 1)
+  {
+    Sensor_Temp = 0;
+    if (PanPos) PanPos-- ;
+    lcd.setCursor(0, 2) ; lcd.print("Panel Position:") ;
+    lcd.setCursor(16, 2) ; lcd.print(PanPos) ;
+    Serial.println(PanPos) ;
+    UpdatetoESP(String(updateCollumnPanelParameter), String(PanPos));
+    UpdatetoESP(String(updateStringPanelParameter), String(StrPanel));
+  }
+}
 //-------------------------------------WORK MODE 2-------------------------------//
 void Server_SetMode()
 {
@@ -133,7 +225,7 @@ void Server_SetMode()
         lcd.clear() ;
         lcd.setCursor(1, 0) ;
         lcd.print("Cleaning Mode... ") ;
-        Code_Run_V1() ;
+        Code_Run_V2() ;
         MenuWifi.Mode = 0;
         wifiPayload.Mode = 0 ;
       }
@@ -163,10 +255,7 @@ void Server_SetMode()
   }
 }
 
-void F_Code_Run_V2()
-{
 
-}
 
 //-------------------------Thiet Lap Ban Dau Cho Dong Co------------------------------------------------//
 

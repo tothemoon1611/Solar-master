@@ -76,6 +76,13 @@ void Get_Command() {
             Serial.println(wifiPayload.Stop);
 #endif
             break;
+          case setContinue:
+            wifiPayload.Continue = InputString.toInt();
+#ifdef DEBUGER
+            Serial.print("Set Continue: ");
+            Serial.println(wifiPayload.Continue);
+#endif
+            break;
           default:
             Serial.println("Unknown cmd!!!");
         }
@@ -111,14 +118,13 @@ void RTC_Init() {
   rtc.begin();
 #ifdef SETTIME
   rtc.setDOW(SATURDAY);     // Set Day-of-Week to SUNDAY
-  rtc.setTime(20, 21, 0);    // Set the time to 00:00:00 (24hr format)
-  rtc.setDate(13, 7, 2019);   // Set the date to January 1st, 2014
+  rtc.setTime(15, 31, 0);    // Set the time to 00:00:00 (24hr format)
+  rtc.setDate(5, 8, 2019);   // Set the date to January 1st, 2014
 #endif
   t = rtc.getTime();
 #ifdef DEBUGER
   Serial.println("TIME: " + String(t.hour) + ":" + String(t.min));
 #endif
-
 }
 void readVolt()
 {
@@ -128,6 +134,6 @@ void readCurrent()
 {
   float  instantCurrent = float(analogRead(A1) - 2048) * (3.3 / 4095.0) / (66.0 / 1000); //ACS712 Measuring Current of Battery
 }
-void UpdatetoSlave(String Command, String data) {
+void UpdatetoESP(String Command, String data) {
   WIFI.print(String(Start) + Command + data + String(End));
 }
