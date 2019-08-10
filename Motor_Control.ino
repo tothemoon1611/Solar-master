@@ -168,14 +168,14 @@ void Run_Mode() {
 
 void Menu_incPanelPos() {
 
-  if (  MenuSensor.MetalSensor == 0 && Sensor_Temp == 0) Sensor_Temp = 1 ;
+  if (  MenuSensor.MetalSensor == 0 && Sensor_Temp == 0) Sensor_Temp = 1  ;
   if (  MenuSensor.MetalSensor == 1 && Sensor_Temp == 1)
   {
     Sensor_Temp = 0;
     PanPos++ ;
     lcd.setCursor(0, 2) ; lcd.print("Panel Position:") ;
     lcd.setCursor(16, 2) ; lcd.print(PanPos) ;
-    Serial.println(PanPos) ;
+    //Serial.println(PanPos) ;
     UpdatetoESP(String(updateCollumnPanelParameter), String(PanPos));
     UpdatetoESP(String(updateStringPanelParameter), String(StrPanel));
   }
@@ -190,7 +190,7 @@ void Menu_decPanelPos() {
     if (PanPos) PanPos-- ;
     lcd.setCursor(0, 2) ; lcd.print("Panel Position:") ;
     lcd.setCursor(16, 2) ; lcd.print(PanPos) ;
-    Serial.println(PanPos) ;
+    //Serial.println(PanPos) ;
     UpdatetoESP(String(updateCollumnPanelParameter), String(PanPos));
     UpdatetoESP(String(updateStringPanelParameter), String(StrPanel));
   }
@@ -265,52 +265,48 @@ void Motor_Setup()
   pinMode(CheckWheel2, INPUT_PULLUP) ;   // duong-nau, am-xanh
   pinMode(CheckWheel1, INPUT_PULLUP) ;   // duong-nau, am-xanh
 
-  pinMode(IN1, OUTPUT) ;
-  pinMode(IN2, OUTPUT) ;
-  pinMode(IN3, OUTPUT) ;
-  pinMode(IN4, OUTPUT) ;
-  pinMode(ENA, OUTPUT) ;
-  pinMode(ENB, OUTPUT) ;
+  pinMode(DIR4, OUTPUT) ;               
+  pinMode(DIR3, OUTPUT) ;
+  pinMode(PWM4, OUTPUT) ;
+  pinMode(PWM3, OUTPUT) ;
+//  pinMode(ENA, OUTPUT) ;
+//  pinMode(ENB, OUTPUT) ;
+  digitalWrite(PWM4, HIGH) ;
+  digitalWrite(PWM3, HIGH) ;
 }
 
 
 //--------------------------------------------Dieu Khien Dong Co------------------------------------------------//
 void Motor_Right_Start()
 {
-  analogWrite(ENA, 255); // Send PWM signal to motor A
-  digitalWrite(IN1, LOW);
-  digitalWrite(IN2, HIGH);
+  digitalWrite(DIR4, HIGH) ;
+  analogWrite(PWM4, 0) ;
 }
 
 
 void Motor_Left_Start()
 {
-  analogWrite(ENA, 255); // Send PWM signal to motor A
-  // Set Motor RUN Left
-  digitalWrite(IN1, HIGH);
-  digitalWrite(IN2, LOW);
+  digitalWrite(DIR4, LOW) ;
+  analogWrite(PWM4, 0) ;
 }
 
 
 void Motor_Run_Stop()
 {
-  analogWrite(ENA, 255);
-  digitalWrite(IN1, LOW);
-  digitalWrite(IN2, LOW);
+  //digitalWrite(22, HIGH) ;
+  analogWrite(PWM4, 255) ;
 }
 
 
 void Motor_Cleaning_Start()
 {
-  analogWrite(ENB, 255); // Send PWM signal to motor A
-  digitalWrite(IN3, LOW);
-  digitalWrite(IN4, HIGH);
+  digitalWrite(DIR3, HIGH) ;
+  analogWrite(PWM3, 0) ;
 }
 
 
 void Motor_Cleaning_Stop()
 {
-  analogWrite(ENB, 0); // Send PWM signal to motor A
-  digitalWrite(IN3, LOW);
-  digitalWrite(IN4, LOW);
+  digitalWrite(DIR3, HIGH) ;
+  analogWrite(PWM3, 255) ;
 }

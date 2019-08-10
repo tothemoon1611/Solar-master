@@ -1,5 +1,5 @@
-#define SIM Serial1
-#define WIFI Serial2
+#define SIM Serial2
+#define WIFI Serial1
 #define CAMERA Serial3
 #define Monitor SerialUSB
 
@@ -51,6 +51,8 @@ void setup() {
   WIFI.begin(9600); // cong giao tiep NodeMCU
   CAMERA.begin(9600); // cong giao tiep Raspberry
   Motor_Setup() ;
+  pinMode(A0, OUTPUT) ;
+ // pinMode(A0, OUTPUT) ;
 
   // initialize semaphore
   sem_ReadData = xSemaphoreCreateCounting(1, 0);

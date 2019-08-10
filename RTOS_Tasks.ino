@@ -74,9 +74,10 @@ void Read_Sensor(void *pvParameters)
     if ( xSemaphoreTake( sem_ProcessData, ( TickType_t ) 0 ) )
     {
       dataMachine.MetalSensor = digitalRead(MetalSensorPin);
-      Serial.println(digitalRead(MetalSensorPin));
       dataMachine.LimitSW_1 = digitalRead(CheckWheel1);
       dataMachine.LimitSW_2 = digitalRead(CheckWheel2);
+      Serial.println(dataMachine.LimitSW_1);
+      Serial.println(dataMachine.LimitSW_2);
       dataMachine.VoltageBattery = Vbat;
       dataMachine.CurrentBattery = instantCurrent;
       xSemaphoreGive(sem_ReadData);

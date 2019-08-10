@@ -20,37 +20,50 @@ bool SDformat()
   {
     myFile = SD.open(FileSSIDData, FILE_WRITE);
     myFile.close();
-  } else {}
+  } 
   if (!SD.exists(FilePASSData))
   {
     myFile = SD.open(FilePASSData, FILE_WRITE);
     myFile.close();
-  } else {}
+  } 
   if (!SD.exists(FileIPAddData))
   {
     myFile = SD.open(FileIPAddData, FILE_WRITE);
     myFile.close();
-  } else {}
+  } 
   if (!SD.exists(FilePORTData))
   {
     myFile = SD.open(FilePORTData, FILE_WRITE);
     myFile.close();
-  } else {}
+  }
   if (!SD.exists(FileIDData))
   {
     myFile = SD.open(FileIDData, FILE_WRITE);
     myFile.close();
-  } else {}
+  }
   if (!SD.exists(FileHardIDData))
   {
     myFile = SD.open(FileHardIDData, FILE_WRITE);
     myFile.close();
-  } else {}
+  } 
   if (!SD.exists(FileEAlertData))
   {
+    Serial.println("Initialzing " + FileEAlertData) ;
     myFile = SD.open(FileEAlertData, FILE_WRITE);
     myFile.close();
-  } else {}
+  } else {Serial.println("Existed " + FileEAlertData) ;}
+  if (!SD.exists(FilePWMMovData))
+  {
+    Serial.println("Initialzing " + FilePWMMovData) ;
+    myFile = SD.open(FilePWMMovData, FILE_WRITE);
+    myFile.close();
+  } else {Serial.println("Existed " + FilePWMMovData) ; }
+  if (!SD.exists(FilePWMCleData))
+  {
+    Serial.println("Initialzing " + FilePWMCleData) ;
+    myFile = SD.open(FilePWMCleData, FILE_WRITE);
+    myFile.close();
+  } else {Serial.println("Existed " + FilePWMCleData) ; }
 
   //  if (!SD.exists("robot.csv"))
   //  {

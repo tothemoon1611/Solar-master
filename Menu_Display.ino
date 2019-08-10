@@ -24,7 +24,6 @@ void LCD_Page_1_Display()
 }
 
 
-
 void LCD_Page_2_Display()
 {
   lcd.clear() ;
@@ -60,7 +59,7 @@ void LCD_Page_3_Display()
     if ( (Page_Pointer[1] == 0) && (Page_Pointer[2] == 2) ) { LCD_ChargingSetup() ;  } 
     
     if ( (Page_Pointer[1] == 1) && (Page_Pointer[2] == 0) ) { LCD_HandControl() ;  } 
-    if ( (Page_Pointer[1] == 1) && (Page_Pointer[2] == 1) ) { LCD_CameraTest() ;  } 
+    if ( (Page_Pointer[1] == 1) && (Page_Pointer[2] == 1) ) {  LCD_CameraTest() ; } 
     if ( (Page_Pointer[1] == 1) && (Page_Pointer[2] == 2) ) { Connect_Wifi() ;  } 
     if ( (Page_Pointer[1] == 1) && (Page_Pointer[2] == 3) ) { LCD_WorkTest() ; } 
 
@@ -75,20 +74,19 @@ void LCD_Page_3_Display()
 }
 
 
-
-
 void LCD_Page_4_Display()
 {
   lcd.clear() ;
   pointer = 0 ;
   while (1)
   {
+  
     lcd.clear() ;
     if (( Page_Pointer[1] == 0 ) && ( Page_Pointer[2] == 0 ) && ( Page_Pointer[3] == 0 )) { Get_ID() ;  }
     if (( Page_Pointer[1] == 0 ) && ( Page_Pointer[2] == 0 ) && ( Page_Pointer[3] == 2 )) { Network_Config() ; break ; }
     
-    if (( Page_Pointer[1] == 0 ) && ( Page_Pointer[2] == 1 ) && ( Page_Pointer[3] == 0 )) { Set_PID() ;  }
-    if (( Page_Pointer[1] == 0 ) && ( Page_Pointer[2] == 1 ) && ( Page_Pointer[3] == 1 )) { Set_PID() ;  }
+    if (( Page_Pointer[1] == 0 ) && ( Page_Pointer[2] == 1 ) && ( Page_Pointer[3] == 0 )) { Set_PID_orPWM() ;  }  // Moving 
+    if (( Page_Pointer[1] == 0 ) && ( Page_Pointer[2] == 1 ) && ( Page_Pointer[3] == 1 )) { Set_PID_orPWM() ;  }  // Cleaning
     
     if (( Page_Pointer[1] == 0 ) && ( Page_Pointer[2] == 2 ) && ( Page_Pointer[3] == 0 )) { Energy_Alert() ;  }
 
@@ -100,12 +98,14 @@ void LCD_Page_4_Display()
     if (( Page_Pointer[1] == 1 ) && ( Page_Pointer[2] == 3 ) && ( Page_Pointer[3] == 3 )) {  }
    
     Keypad_Option() ;
+    
     if (BreakPage == 1) { BreakPage = 0 ; break ; }
     if (OkPage == 1) { OkPage = 0 ; Page_Pointer[4] = pointer ; break ; }
     Wait_Task();
   }
   
 }
+
 
 //-----------------------------------------------------------HAM XU LY PAGE & NHAP LIEU---------------------------------------//
 void Page_Processing()

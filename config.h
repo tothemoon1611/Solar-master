@@ -1,7 +1,7 @@
 #define SIM Serial1
 #define SIM_RESET 7
 #define DTR 6
-#define CSpin  53
+#define CSpin  38
 
 #define FullMode  1
 #define BuildMap  2
@@ -84,22 +84,6 @@ float Value = 0 ;                                                     // Gia tri
 int State ;                                                           // Co tac dung cho Encoder
 int LastState ;                                                       // Co tac dung cho Encoder
 
-String PIDKpMovSpd ;
-String PIDKiMovSpd ;
-String PIDKdMovSpd ;
-String PWMMovSpd ;
-
-String PIDKpRolSpd ;
-String PIDKiRolSpd ;
-String PIDKdRolSpd ;
-String PWMRolSpd ;
-
-String PIDKpCleSpd ;
-String PIDKiCleSpd ;
-String PIDKdCleSpd ;
-String PWMCleSpd ;
-
-unsigned int EnerAlert = 15 ;             // muc Pin canh bao, can phai nap sac 
 //////////////////////////////////// LCD ////////////////////////////////////////////////////
 const byte rows = 4; 
 const byte columns = 4; 
@@ -154,28 +138,42 @@ String SSIDData ;
 String PASSData ;
 String PORTData ;
 String IPAddData ;
+String EnerALert ; 
 
-String FileSSIDData = "SSIDData.txt" ;
-String FilePASSData = "PASSData.txt" ;
-String FilePORTData = "PORTData.txt" ;
-String FileIPAddData = "IPData.txt" ;
-String FileIDData = "IDData.txt" ;
-String FileHardIDData = "HdIDData.txt" ;
-String FileEAlertData = "EAlertData.txt";
+
+String FileSSIDData   = "SSIDData.txt" ;
+String FilePASSData   = "PASSData.txt" ;
+String FilePORTData   = "PORTData.txt" ;
+String FileIPAddData  = "IPData.txt" ;
+String FileIDData     = "IDData.txt" ;
+String FileHardIDData = "HdIDData.txt"  ;
+String FileEAlertData = "EAlert.txt" ;
+String FilePWMMovData = "PWMMov.txt" ;
+String FilePWMCleData = "PWMCle.txt" ;
+
+String PIDKpMovSpd ;
+String PIDKiMovSpd ;
+String PIDKdMovSpd ;
+String PWMMovSpd ;
+
+String PIDKpCleSpd ;
+String PIDKiCleSpd ;
+String PIDKdCleSpd ;
+String PWMCleSpd ;
+
 //-------------------------------------Control Motor-------------------------------------//
+
 unsigned int PanPos = 0 ;
 bool  StartBut  = 0 ;
 
-#define MetalSensorPin 39 
-#define CheckWheel1 41
-#define CheckWheel2 43
+#define MetalSensorPin 45
+#define CheckWheel1 9
+#define CheckWheel2 8
 
-#define ENA 2
-#define IN1 3
-#define IN2 4
-#define IN3 5
-#define IN4 6
-#define ENB 7
+#define DIR4 22
+#define DIR3 26
+#define PWM4 5 
+#define PWM3 4
 //-----------------------------------Serial-------------------------------------------------
   bool SerialRecv = false;
   int serial_counter = 0;
