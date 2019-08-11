@@ -12,7 +12,7 @@ const int typeControl = 8;
 const int typeMode = 9;
 const int typeIDError = 10;
 const int typeHandshake = 20;
-
+const int typeServerError = 34 ;
 
 /*--------------------UPDATE TO SERVER------------------------------*/
 const int typeupdateID = 29;

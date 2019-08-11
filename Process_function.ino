@@ -83,6 +83,9 @@ void Get_Command() {
             Serial.println(wifiPayload.Continue);
 #endif
             break;
+          case typeServerError:{
+            ERROR_Processing() ;
+            break;       }     
           default:
             Serial.println("Unknown cmd!!!");
         }
@@ -112,6 +115,29 @@ void Get_Serial_Wifi() {
     if (serial_counter > 2) InputString += inChar;
   }
 }
+
+
+void ERROR_Processing() 
+{
+  Motor_Run_Stop() ; 
+  Motor_Cleaning_Stop() ; 
+  bool Error = 0 ;
+  MenuWifi.ACK_SERVER = false ;
+  wifiPayload.ACK_SERVER = false ;
+  unsigned long WifiTimeout = millis() ;
+  while( wifiPayload.ACK_SERVER != true ) 
+    {
+      lcd.setCursor(2,1) ;
+      lcd.print("Disconnected to SV") ;
+      lcd.setCursor(2,2) ;
+      lcd.print("Retrying... ") ;
+      if ( (unsigned long) (millis() - WifiTimeout) > 60000) { Error = 1 ; break ; }
+    }
+   if( Error == 0 ) { return Code_Run_V1() ; } 
+   else{ Page_Processing() ; }  // can xu ly loi ngay tai day 
+}
+
+
 
 
 void RTC_Init() {

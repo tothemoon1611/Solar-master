@@ -1,6 +1,17 @@
 bool Sensor_Temp;
+int Accelerate = 255 ;
+int DelaySpeed = 1 ;
+
 void Code_Run_V1()
 {
+  SDreadData(FilePWMMovData) ;
+  PWMMovSpd = TempData ;
+  TempData = "" ;
+  SDreadData(FilePWMCleData) ;
+  PWMCleSpd = TempData ;
+  TempData = "" ;
+//  MovSpeed = (int)(PWMMovSpd.toInt())  ;
+//  CleSpeed = (int)(PWMCleSpd.toInt())  ;
   bool out = 0 ;
   lcd.setCursor(0, 2) ; lcd.print("Panel Position:") ;
   lcd.setCursor(16, 2) ; lcd.print(PanPos) ;
@@ -14,9 +25,12 @@ void Code_Run_V1()
 
     if ( MenuSensor.LimitSW_2 == 0)
     {
+      Motor_Run_Stop() ;
+      Motor_Cleaning_Stop() ;
+      Accelerate = 255 ;
+      Serial.println("LimitSW_2" + digitalRead(CheckWheel2)) ;
       while ( MenuSensor.LimitSW_1 == 1)
       {
-        Motor_Cleaning_Stop() ;
         Motor_Left_Start() ;
         Menu_ReadSensor();
         Menu_WifiPayload();
@@ -25,6 +39,7 @@ void Code_Run_V1()
         if (MenuSensor.LimitSW_1 == 0 ) {
           out = 1 ;
           Motor_Run_Stop() ;
+          Accelerate = 255 ;
           break ;
         }
         Key = keypad.getKey();
@@ -72,14 +87,18 @@ void Code_Run_V1()
       Motor_Cleaning_Stop() ;
       break ;
     }
-
-    Wait_Task() ;
   }
 }
 //-------------------------------------WORK MODE 2-------------------------------//
 
 void Code_Run_V2()
 {
+  SDreadData(FilePWMMovData) ;
+  PWMMovSpd = TempData ;
+  TempData = "" ;
+  SDreadData(FilePWMCleData) ;
+  PWMCleSpd = TempData ;
+  TempData = "" ;
   bool out = 0 ;
   lcd.setCursor(0, 2) ; lcd.print("Panel Position:") ;
   lcd.setCursor(16, 2) ; lcd.print(PanPos) ;
@@ -94,9 +113,10 @@ void Code_Run_V2()
 
     if ( MenuSensor.LimitSW_2 == 0)
     {
+      Motor_Run_Stop() ;
+      Motor_Cleaning_Stop() ;
       while ( MenuSensor.LimitSW_1 == 1)
       {
-        Motor_Cleaning_Stop() ;
         Motor_Left_Start() ;
         Menu_ReadSensor();
         Menu_WifiPayload();
@@ -154,48 +174,11 @@ void Code_Run_V2()
       break ;
     }
 
-    Wait_Task() ;
-  }
-}
-void Run_Mode() {
-  while (Run) {
-    Menu_WifiPayload();
-    Motor_Run_Stop() ;
-    Motor_Cleaning_Stop() ;
-    Wait_Task();
+    //Wait_Task() ;
   }
 }
 
-void Menu_incPanelPos() {
-
-  if (  MenuSensor.MetalSensor == 0 && Sensor_Temp == 0) Sensor_Temp = 1  ;
-  if (  MenuSensor.MetalSensor == 1 && Sensor_Temp == 1)
-  {
-    Sensor_Temp = 0;
-    PanPos++ ;
-    lcd.setCursor(0, 2) ; lcd.print("Panel Position:") ;
-    lcd.setCursor(16, 2) ; lcd.print(PanPos) ;
-    //Serial.println(PanPos) ;
-    UpdatetoESP(String(updateCollumnPanelParameter), String(PanPos));
-    UpdatetoESP(String(updateStringPanelParameter), String(StrPanel));
-  }
-}
-
-void Menu_decPanelPos() {
-
-  if (  MenuSensor.MetalSensor == 0 && Sensor_Temp == 0) Sensor_Temp = 1 ;
-  if (  MenuSensor.MetalSensor == 1 && Sensor_Temp == 1)
-  {
-    Sensor_Temp = 0;
-    if (PanPos) PanPos-- ;
-    lcd.setCursor(0, 2) ; lcd.print("Panel Position:") ;
-    lcd.setCursor(16, 2) ; lcd.print(PanPos) ;
-    //Serial.println(PanPos) ;
-    UpdatetoESP(String(updateCollumnPanelParameter), String(PanPos));
-    UpdatetoESP(String(updateStringPanelParameter), String(StrPanel));
-  }
-}
-//-------------------------------------WORK MODE 2-------------------------------//
+// --- CHE DO NHAN LENH DIEU KHIEN TU SERVER --- //
 void Server_SetMode()
 {
   lcd.clear() ;
@@ -255,6 +238,48 @@ void Server_SetMode()
   }
 }
 
+//---------------------------------------------------------------------------------------------------
+
+void Run_Mode() {
+  while (Run) {
+    Menu_WifiPayload();
+    Motor_Run_Stop() ;
+    Motor_Cleaning_Stop() ;
+    Wait_Task();
+  }
+}
+
+void Menu_incPanelPos() {
+
+  if (  MenuSensor.MetalSensor == 0 && Sensor_Temp == 0) Sensor_Temp = 1  ;
+  if (  MenuSensor.MetalSensor == 1 && Sensor_Temp == 1)
+  {
+    Sensor_Temp = 0;
+    PanPos++ ;
+    lcd.setCursor(0, 2) ; lcd.print("Panel Position:") ;
+    lcd.setCursor(16, 2) ; lcd.print(PanPos) ;
+    //Serial.println(PanPos) ;
+    UpdatetoESP(String(updateCollumnPanelParameter), String(PanPos));
+    UpdatetoESP(String(updateStringPanelParameter), String(StrPanel));
+  }
+}
+
+void Menu_decPanelPos() {
+
+  if (  MenuSensor.MetalSensor == 0 && Sensor_Temp == 0) Sensor_Temp = 1 ;
+  if (  MenuSensor.MetalSensor == 1 && Sensor_Temp == 1)
+  {
+    Sensor_Temp = 0;
+    if (PanPos) PanPos-- ;
+    lcd.setCursor(0, 2) ; lcd.print("Panel Position:") ;
+    lcd.setCursor(16, 2) ; lcd.print(PanPos) ;
+    //Serial.println(PanPos) ;
+    UpdatetoESP(String(updateCollumnPanelParameter), String(PanPos));
+    UpdatetoESP(String(updateStringPanelParameter), String(StrPanel));
+  }
+}
+
+
 
 
 //-------------------------Thiet Lap Ban Dau Cho Dong Co------------------------------------------------//
@@ -265,12 +290,12 @@ void Motor_Setup()
   pinMode(CheckWheel2, INPUT_PULLUP) ;   // duong-nau, am-xanh
   pinMode(CheckWheel1, INPUT_PULLUP) ;   // duong-nau, am-xanh
 
-  pinMode(DIR4, OUTPUT) ;               
+  pinMode(DIR4, OUTPUT) ;
   pinMode(DIR3, OUTPUT) ;
   pinMode(PWM4, OUTPUT) ;
   pinMode(PWM3, OUTPUT) ;
-//  pinMode(ENA, OUTPUT) ;
-//  pinMode(ENB, OUTPUT) ;
+  //  pinMode(ENA, OUTPUT) ;
+  //  pinMode(ENB, OUTPUT) ;
   digitalWrite(PWM4, HIGH) ;
   digitalWrite(PWM3, HIGH) ;
 }
@@ -280,33 +305,59 @@ void Motor_Setup()
 void Motor_Right_Start()
 {
   digitalWrite(DIR4, HIGH) ;
-  analogWrite(PWM4, 0) ;
+  if (Accelerate > (255 - (int)(PWMMovSpd.toInt())) ) 
+    {
+      Accelerate-- ;
+      if (Accelerate < 255 - (int)(PWMMovSpd.toInt()) ) { Accelerate = 255 - (int)(PWMMovSpd.toInt()) ; }
+    }
+   analogWrite(PWM4, Accelerate) ;
+   vTaskDelay((1L * configTICK_RATE_HZ) / 1000L)  ;  
 }
 
 
 void Motor_Left_Start()
 {
   digitalWrite(DIR4, LOW) ;
-  analogWrite(PWM4, 0) ;
+  if (Accelerate > 255 - (int)(PWMMovSpd.toInt()) ) 
+    {
+      Accelerate-- ;
+      if (Accelerate < 255 - (int)(PWMMovSpd.toInt()) ) { Accelerate = 255 - (int)(PWMMovSpd.toInt()) ; }
+    }
+   analogWrite(PWM4, Accelerate) ;
+   vTaskDelay((1L * configTICK_RATE_HZ) / 1000L)  ;  
 }
 
 
 void Motor_Run_Stop()
 {
-  //digitalWrite(22, HIGH) ;
-  analogWrite(PWM4, 255) ;
+  for (int i = 0; i < 255 ; i++)
+  {
+    analogWrite(PWM4, i ) ;
+    vTaskDelay((1L * configTICK_RATE_HZ) / 1000L)  ;
+  }
 }
 
 
 void Motor_Cleaning_Start()
 {
   digitalWrite(DIR3, HIGH) ;
-  analogWrite(PWM3, 0) ;
+  if (Accelerate > 255 - (int)(PWMCleSpd.toInt()) ) 
+    {
+    Accelerate--;
+    if (Accelerate < 255 - (int)(PWMCleSpd.toInt()) ) {
+      Accelerate = 255 - (int)(PWMCleSpd.toInt()) ;
+    }
+  }
+  analogWrite(PWM3, Accelerate) ;
+  vTaskDelay((1L * configTICK_RATE_HZ) / 1000L)  ;
 }
 
 
 void Motor_Cleaning_Stop()
 {
-  digitalWrite(DIR3, HIGH) ;
-  analogWrite(PWM3, 255) ;
+  for (int j = 0; j < 255 ; j++)
+  {
+    analogWrite(PWM3, j ) ;
+    vTaskDelay((1L * configTICK_RATE_HZ) / 1000L)  ;
+  }
 }
