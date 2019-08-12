@@ -12,14 +12,13 @@ const int typeControl = 8;
 const int typeMode = 9;
 const int typeIDError = 10;
 const int typeHandshake = 20;
-const int typeServerError = 34 ;
 
 /*--------------------UPDATE TO SERVER------------------------------*/
 const int typeupdateID = 29;
 const int typeupdateBattery = 30;
 const int typeupdateMachineStatus = 31;
 const int typeupdatePanel = 32;
-
+const int typeupdateError = 33 ;
 /*--------------------UPDATE TO WIFI SLAVE ------------------------------*/
 const char IDCmd = 0x01;
 const char DataCmd = 0x02;
@@ -45,9 +44,10 @@ const char updateStatusPanel = 0x21;
 /*--------------------UPDATE WIFI TO MASTER------------------------------*/
 const char AssignedIDCmd = 0x04;
 const char DataRecCmd = 0x05;
-const char TimeoutError = 0x06;
-const char IDError = 0x07;
-const char NETWORKError = 0x08;
+const char TimeoutError = 0x30;
+const char IDError = 0x31;
+const char NetworkError = 0x32;
+const char ServerError = 0x33 ;
 
 const char setFixedID = 0x40;
 const char setMovingSpeed = 0x41;

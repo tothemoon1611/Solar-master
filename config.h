@@ -34,6 +34,7 @@ struct WifiPayload
   int Mode=0;
   bool Stop = false;
   bool Continue = false;
+  bool ErrorNetwork = false;
 };
 
 bool Run = 0;

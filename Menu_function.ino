@@ -608,6 +608,7 @@ void Menu_WifiPayload()
     MenuWifi.Mode = wifiPayload.Mode ;
     MenuWifi.Stop = wifiPayload.Stop ;
     MenuWifi.Continue = wifiPayload.Continue;
+    MenuWifi.ErrorNetwork = wifiPayload.ErrorNetwork;
     if (MenuWifi.Continue) {
       Run = !Run;
       Serial.print("RUN: ");
@@ -615,7 +616,35 @@ void Menu_WifiPayload()
       MenuWifi.Continue = 0;
       wifiPayload.Continue = 0 ;
     }
+    if (MenuWifi.ErrorNetwork) ERROR_Processing() ;
     xSemaphoreGive(sem_ProcessWifi);
+  }
+}
+
+void ERROR_Processing()
+{
+  Motor_Run_Stop() ;
+  Motor_Cleaning_Stop() ;
+  bool Error = 0 ;
+  MenuWifi.ACK_SERVER = false ;
+  wifiPayload.ACK_SERVER = false ;
+  unsigned long WifiTimeout = millis() ;
+  while ( wifiPayload.ACK_SERVER != true )
+  {
+    lcd.setCursor(2, 1) ;
+    lcd.print("Disconnected to SV") ;
+    lcd.setCursor(2, 2) ;
+    lcd.print("Retrying... ") ;
+    if ( (unsigned long) (millis() - WifiTimeout) > 60000) {
+      Error = 1 ;
+      break ;
+    }
+  }
+  if ( Error == 0 ) {
+    return Code_Run_V1() ;
+  }
+  else {
+    Page_Processing() ;  // can xu ly loi ngay tai day
   }
 }
 
