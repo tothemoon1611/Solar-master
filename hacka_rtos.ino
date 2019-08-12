@@ -1,4 +1,3 @@
-// modified on 16h 12/8/2019
 #define SIM Serial2
 #define WIFI Serial1
 #define CAMERA Serial3
@@ -17,9 +16,10 @@
 #include "command.h"
 #include <Keypad.h>
 #include <string.h>
+#include <PS2X_lib.h>  //for v1.6
 
 Keypad keypad = Keypad(makeKeymap(keys), rowPins, columnPins, rows, columns);
-
+PS2X ps2x; // create PS2 Controller Class
 
 bool ReadMetalSensor;
 DS3231  rtc(SDA1, SCL1);
@@ -34,7 +34,6 @@ SemaphoreHandle_t sem_ProcessData;
 SemaphoreHandle_t sem_ReadWifi;
 SemaphoreHandle_t sem_ProcessWifi;
 SemaphoreHandle_t sem2;
-SemaphoreHandle_t sem_Encoder;
 
 DataMachine dataMachine;
 WifiPayload wifiPayload  ;
@@ -43,9 +42,7 @@ DataMachine MenuSensor;
 
 // wifiPayload.ACK_SERVER = false ;
 
-void interruptHandler() {
-  xSemaphoreGiveFromISR(sem_Encoder, NULL);
-}
+
 
 //------------------------------------------------------------------------------
 void setup() {
@@ -56,31 +53,24 @@ void setup() {
   CAMERA.begin(9600); // cong giao tiep Raspberry
   Motor_Setup() ;
   pinMode(A0, OUTPUT) ;
-  // pinMode(A0, OUTPUT) ;
+ // pinMode(A0, OUTPUT) ;
 
   // initialize semaphore
   sem_ReadData = xSemaphoreCreateCounting(1, 0);
   sem_ProcessData = xSemaphoreCreateCounting(1, 0);
   sem_ReadWifi = xSemaphoreCreateCounting(1, 0);
-  sem_ProcessWifi = xSemaphoreCreateCounting(1, 0);
+  sem_ProcessWifi= xSemaphoreCreateCounting(1, 0);
   sem2 = xSemaphoreCreateCounting(1, 0);
-  sem_Encoder = xSemaphoreCreateBinary();
-
-  const byte interruptPin = 43;
-  pinMode(interruptPin, INPUT_PULLUP);
-  attachInterrupt(digitalPinToInterrupt(interruptPin), interruptHandler, RISING);
 
   s2 = xTaskCreate(BlynkLed, NULL, configMINIMAL_STACK_SIZE, NULL, 1, NULL);
 
-  xTaskCreate(Robot_Init, NULL, configMINIMAL_STACK_SIZE + 200, NULL, 4, NULL);
+  xTaskCreate(Serial_wifi, NULL, configMINIMAL_STACK_SIZE, NULL, 1, NULL);
 
-  xTaskCreate(Serial_wifi, NULL, configMINIMAL_STACK_SIZE, NULL, 2, NULL);
+  xTaskCreate(Robot_Init, NULL, configMINIMAL_STACK_SIZE + 200, NULL, 4, NULL);
 
   xTaskCreate(Menu, NULL, configMINIMAL_STACK_SIZE + 200, NULL, 2, NULL);
 
   xTaskCreate(Read_Sensor, NULL, configMINIMAL_STACK_SIZE, NULL, 3, NULL);
-
-  xTaskCreate(task_Encoder, NULL, configMINIMAL_STACK_SIZE, NULL, 1, NULL);
 
   // start schedulers
   vTaskStartScheduler();
@@ -90,15 +80,6 @@ void setup() {
 //------------------------------------------------------------------------------
 // WARNING idle loop has a very small stack (configMINIMAL_STACK_SIZE)
 // loop must never block
-void task_Encoder(void * pvParameters) {
-  int numToDisplay = 0;
-  while (1) {
-    if (xSemaphoreTake(sem_Encoder, portMAX_DELAY) == pdPASS) {
-      numToDisplay++;
-      Serial.println(numToDisplay);
-    }
-  }
-}
 void loop() {
   // Not used.
 }

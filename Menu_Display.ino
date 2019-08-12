@@ -58,7 +58,7 @@ void LCD_Page_3_Display()
     if ( (Page_Pointer[1] == 0) && (Page_Pointer[2] == 1) ) { LCD_MotorSetup() ; } 
     if ( (Page_Pointer[1] == 0) && (Page_Pointer[2] == 2) ) { LCD_ChargingSetup() ;  } 
     
-    if ( (Page_Pointer[1] == 1) && (Page_Pointer[2] == 0) ) { LCD_HandControl() ;  } 
+    if ( (Page_Pointer[1] == 1) && (Page_Pointer[2] == 0) ) { Gamepad_Control() ;  } 
     if ( (Page_Pointer[1] == 1) && (Page_Pointer[2] == 1) ) {  LCD_CameraTest() ; } 
     if ( (Page_Pointer[1] == 1) && (Page_Pointer[2] == 2) ) { Connect_Wifi() ;  } 
     if ( (Page_Pointer[1] == 1) && (Page_Pointer[2] == 3) ) { LCD_WorkTest() ; } 

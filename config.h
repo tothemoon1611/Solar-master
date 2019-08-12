@@ -34,7 +34,7 @@ struct WifiPayload
   int Mode=0;
   bool Stop = false;
   bool Continue = false;
-  bool ErrorNetwork = false;
+  bool NetworkError = false;
 };
 
 bool Run = 0;
@@ -168,8 +168,8 @@ unsigned int PanPos = 0 ;
 bool  StartBut  = 0 ;
 
 #define MetalSensorPin 45
-#define CheckWheel1 9
-#define CheckWheel2 8
+#define CheckWheel1 47
+#define CheckWheel2 49
 
 #define DIR4 22
 #define DIR3 26
@@ -182,3 +182,21 @@ bool  StartBut  = 0 ;
   String InputString = "";
 String DisplayString = "";
 boolean StringComplete = false;
+
+//----------------------------------Gamepad------------------------------------------//
+//#define PS2_DAT        42  //14    mac dien tro treo len nguon tu 1k - 10k
+//#define PS2_CMD        40  //15
+//#define PS2_SEL        46  //16
+//#define PS2_CLK        44  //17
+// cac chan  cua game pad  o config truc tiep trong thu vien. luoon
+
+//#define pressures   true
+#define pressures   false
+//#define rumble      true
+#define rumble      false
+
+
+
+int error = 0;
+byte type = 0;
+byte vibrate = 0;

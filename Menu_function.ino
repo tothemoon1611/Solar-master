@@ -5,38 +5,38 @@ void Init_Communication() ;
 
 void Energy_Alert()
 {
-  while(1) 
+  while (1)
+  {
+    lcd.clear() ;
+    pointer = 0;
+    lcd.setCursor(0, 0) ; lcd.print(">Energy Alert:") ;
+    lcd.setCursor(19, 0) ; lcd.print("%") ;
+    SDreadData(FileEAlertData) ;
+    Serial.print(" Energy Alert" + TempData) ;
+    lcd.setCursor(15, 0) ;
+    lcd.print(TempData) ; TempData = "" ;
+    Keypad_Option() ;
+    if (OkPage == 1)
     {
+      OkPage = 0 ;
       lcd.clear() ;
-      pointer = 0;
-      lcd.setCursor(0, 0) ; lcd.print(">Energy Alert:") ;
-      lcd.setCursor(19, 0) ; lcd.print("%") ;
-      SDreadData(FileEAlertData) ;
-      Serial.print(" Energy Alert" + TempData) ;
-      lcd.setCursor(15,0) ; 
-      lcd.print(TempData) ; TempData = "" ;
-      Keypad_Option() ;
-      if(OkPage == 1) 
-        {
-          OkPage = 0 ;
-          lcd.clear() ;
-          lcd.setCursor(0, 0); lcd.print("Energy Alert Level:") ;
-          lcd.setCursor(0, 1); lcd.print("Warning at: (0-100)") ;
-          lcd.setCursor(19, 2); lcd.print("%") ;
-          lcd.setCursor(0, 3); lcd.print("<-") ; lcd.setCursor(18, 3); lcd.print("->") ;
-          Keypad_Set_Value() ; 
-          EnerALert  = TempData ;
-          SDsaveData(EnerALert, FileEAlertData) ;
-          TempData = "" ;
-          break ;    
-        }
-       if(BreakPage == 1) 
-        {
-          BreakPage = 0 ;  
-          break ;
-        }
-       vTaskDelay((50L * configTICK_RATE_HZ) / 1000L) ; 
+      lcd.setCursor(0, 0); lcd.print("Energy Alert Level:") ;
+      lcd.setCursor(0, 1); lcd.print("Warning at: (0-100)") ;
+      lcd.setCursor(19, 2); lcd.print("%") ;
+      lcd.setCursor(0, 3); lcd.print("<-") ; lcd.setCursor(18, 3); lcd.print("->") ;
+      Keypad_Set_Value() ;
+      EnerALert  = TempData ;
+      SDsaveData(EnerALert, FileEAlertData) ;
+      TempData = "" ;
+      break ;
     }
+    if (BreakPage == 1)
+    {
+      BreakPage = 0 ;
+      break ;
+    }
+    vTaskDelay((50L * configTICK_RATE_HZ) / 1000L) ;
+  }
 }
 
 
@@ -146,68 +146,91 @@ void Set_PID()
 
 }
 
-void Set_PWM() 
+void Set_PWM()
 {
   lcd.clear() ;
   pointer = 0;
-  while(1) 
+  while (1)
+  {
+    lcd.clear() ;
+    lcd.setCursor(0, 0) ; lcd.print(">Set PWM:") ;
+    lcd.setCursor(19, 0) ; lcd.print("%") ;
+    if (( Page_Pointer[1] == 0 ) && ( Page_Pointer[2] == 1 ) && ( Page_Pointer[3] == 0 )) {
+      SDreadData(FilePWMMovData) ;  // hien thi gia tri PWM cua dong co moving da luu truoc do
+      lcd.setCursor(15, 0) ;
+      lcd.print(TempData) ;
+      TempData = "" ;
+    }
+    if (( Page_Pointer[1] == 0 ) && ( Page_Pointer[2] == 1 ) && ( Page_Pointer[3] == 1 )) {
+      SDreadData(FilePWMCleData) ;  // hien thi gia tri PWM cua dong co cleaning da luu truoc do
+      lcd.setCursor(15, 0) ;
+      lcd.print(TempData) ;
+      TempData = "" ;
+    }
+    Keypad_Option() ;
+    if (OkPage == 1)
     {
+      OkPage = 0 ;
       lcd.clear() ;
-      lcd.setCursor(0, 0) ; lcd.print(">Set PWM:") ;
-      lcd.setCursor(19, 0) ; lcd.print("%") ;
-      if (( Page_Pointer[1] == 0 ) && ( Page_Pointer[2] == 1 ) && ( Page_Pointer[3] == 0 )) { SDreadData(FilePWMMovData) ; lcd.setCursor(15,0) ; lcd.print(TempData) ; TempData = "" ; } // hien thi gia tri PWM cua dong co moving da luu truoc do
-      if (( Page_Pointer[1] == 0 ) && ( Page_Pointer[2] == 1 ) && ( Page_Pointer[3] == 1 )) { SDreadData(FilePWMCleData) ; lcd.setCursor(15,0) ; lcd.print(TempData) ; TempData = "" ; } // hien thi gia tri PWM cua dong co cleaning da luu truoc do
-      Keypad_Option() ;
-      if(OkPage == 1) 
-        {
-          OkPage = 0 ;
-          lcd.clear() ;
-          lcd.setCursor(0, 0); lcd.print("PWM Moving Motor:") ;
-          lcd.setCursor(4, 1); lcd.print("Set PWM = ") ;
-          lcd.setCursor(19, 2); lcd.print("%") ;
-          lcd.setCursor(0, 3); lcd.print("<-") ; lcd.setCursor(18, 3); lcd.print("->") ;
-          Keypad_Set_Value() ; 
-          if (( Page_Pointer[1] == 0 ) && ( Page_Pointer[2] == 1 ) && ( Page_Pointer[3] == 0 )) // luu gia tri PWM cua dong co Moving vao the nho 
-            {
-              PWMMovSpd  = TempData ;
-              SDsaveData(PWMMovSpd, FilePWMMovData) ;
-              TempData = "" ;
-            }
-          if (( Page_Pointer[1] == 0 ) && ( Page_Pointer[2] == 1 ) && ( Page_Pointer[3] == 1 )) // luu gia tri PWM cua dong co Moving vao the nho 
-            {
-              PWMCleSpd  = TempData ;
-              SDsaveData(PWMCleSpd, FilePWMCleData) ;
-              TempData = "" ;
-            }            
-        }
-       if(BreakPage == 1) 
-        {
-          BreakPage = 0 ;  
-          break ;
-        }
-         vTaskDelay((50L * configTICK_RATE_HZ) / 1000L) ; 
+      lcd.setCursor(0, 0); lcd.print("PWM Moving Motor:") ;
+      lcd.setCursor(4, 1); lcd.print("Set PWM = ") ;
+      lcd.setCursor(19, 2); lcd.print("%") ;
+      lcd.setCursor(0, 3); lcd.print("<-") ; lcd.setCursor(18, 3); lcd.print("->") ;
+      Keypad_Set_Value() ;
+      if (( Page_Pointer[1] == 0 ) && ( Page_Pointer[2] == 1 ) && ( Page_Pointer[3] == 0 )) // luu gia tri PWM cua dong co Moving vao the nho
+      {
+        PWMMovSpd  = TempData ;
+        SDsaveData(PWMMovSpd, FilePWMMovData) ;
+        TempData = "" ;
+      }
+      if (( Page_Pointer[1] == 0 ) && ( Page_Pointer[2] == 1 ) && ( Page_Pointer[3] == 1 )) // luu gia tri PWM cua dong co Moving vao the nho
+      {
+        PWMCleSpd  = TempData ;
+        SDsaveData(PWMCleSpd, FilePWMCleData) ;
+        TempData = "" ;
+      }
+    }
+    if (BreakPage == 1)
+    {
+      BreakPage = 0 ;
+      break ;
+    }
+    vTaskDelay((50L * configTICK_RATE_HZ) / 1000L) ;
   }
-  
+
 }
 
 
-void Set_PID_orPWM() 
+void Set_PID_orPWM()
 {
   char* SetPID_PWM[2] = { "1.Set PWM", "2.Set PID" } ;
   PointerMax =  2 ;
   Page = 5 ;
   lcd.clear() ;
   pointer = 0 ;
-  while(1) 
-    {
-      lcd.clear() ;
-      for( int i = 0; i < 2; i++ ) { lcd.setCursor(0,i) ; lcd.print(SetPID_PWM[i]) ; lcd.setCursor(19, pointer) ; lcd.print("<") ; }
-      Keypad_Option() ;
-      if(OkPage == 1 && pointer == 0) { OkPage = 0 ; Set_PWM() ; }   
-      if(OkPage == 1 && pointer == 1) { OkPage = 0 ; Set_PID() ; }   
-      if(BreakPage == 1) {  break ;} 
-      vTaskDelay((10L * configTICK_RATE_HZ) / 1000L) ; 
+  while (1)
+  {
+    lcd.clear() ;
+    for ( int i = 0; i < 2; i++ ) {
+      lcd.setCursor(0, i) ;
+      lcd.print(SetPID_PWM[i]) ;
+      lcd.setCursor(19, pointer) ;
+      lcd.print("<") ;
     }
+    Keypad_Option() ;
+    if (OkPage == 1 && pointer == 0) {
+      OkPage = 0 ;
+      Set_PWM() ;
+    }
+    if (OkPage == 1 && pointer == 1) {
+      OkPage = 0 ;
+      Set_PID() ;
+    }
+    if (BreakPage == 1) {
+      break ;
+    }
+    vTaskDelay((10L * configTICK_RATE_HZ) / 1000L) ;
+  }
 }
 
 
@@ -364,63 +387,67 @@ void Connect_Wifi() {
   lcd.clear() ; lcd.setCursor(3, 2) ; lcd.print("Sending...") ;
   Init_Communication();
   lcd.clear() ; lcd.setCursor(3, 1) ; lcd.print("Sending DONE !") ;
-    vTaskDelay((1000L * configTICK_RATE_HZ) / 1000L);
-    lcd.clear() ;
-    int i = 5;
-    bool Check  = 0 ;
-    unsigned long TimeConnect = millis() ;
-    Serial.println( "MenuWifi.ACK_NETWORK = ") ; Serial.println(MenuWifi.ACK_SERVER) ; Serial.println("xxx") ;
-    Serial.println( "wifiPayload.ACK_NETWORK = ") ; Serial.println(wifiPayload.ACK_SERVER) ; Serial.println("xxx") ;
-     Menu_WifiPayload();
-    while ( MenuWifi.ACK_SERVER != true )
-    {
-      Menu_WifiPayload();
-      Serial.println("wifiPayload.ACK_SERVER = " + wifiPayload.ACK_SERVER) ;
-      Serial.println("MenuWifi.ACK_SERVER = " + MenuWifi.ACK_SERVER) ;
-      lcd.setCursor(3, 1) ; lcd.print("Please wait ...") ; lcd.setCursor(i, 2) ; lcd.print(".") ; if ( i == 12) { Init_Communication(); 
-        i = 5;
-        lcd.clear() ;
-      }
-      Key = keypad.getKey();
-      if ( ((int)keypad.getState() ==  PRESSED) )
-      {
-        vTaskDelay((50L * configTICK_RATE_HZ) / 1000L);
-        if ( Key == BACK )
-        {
-          Check = 1 ;
-          break ;
-        }
-      }
-      i++ ;
-      vTaskDelay((500L * configTICK_RATE_HZ) / 1000L);
-      if ( (unsigned long) (millis() - TimeConnect) > 30000) { Check = 1 ; break ;}
-     } 
-    if(Check == 1)
-      {
-        Check = 0;
-        lcd.clear() ;
-        lcd.setCursor(4,2) ;
-        lcd.print("Connect failed !") ;
-//        if ( xSemaphoreTake( sem_ReadWifi, ( TickType_t ) 0 ) )
-//          {
-            MenuWifi.ACK_SERVER = false ;
-            //wifiPayload.ACK_SERVER = false ;
-//            xSemaphoreGive(sem_ProcessWifi);
-//          }
-      }
-    else{
-        Check = 0 ;
-        lcd.clear() ;
-        lcd.setCursor(4,2) ;
-        lcd.print("Connected !") ;
-        vTaskDelay((2000L * configTICK_RATE_HZ) / 1000L);
-//        if ( xSemaphoreTake( sem_ReadWifi, ( TickType_t ) 0 ) )
-//          {
-            MenuWifi.ACK_SERVER = false ;
-            //wifiPayload.ACK_SERVER = false ;
-//            xSemaphoreGive(sem_ProcessWifi);
-//          }
+  vTaskDelay((1000L * configTICK_RATE_HZ) / 1000L);
+  lcd.clear() ;
+  int i = 5;
+  bool Check  = 0 ;
+  unsigned long TimeConnect = millis() ;
+  Serial.println( "MenuWifi.ACK_NETWORK = ") ; Serial.println(MenuWifi.ACK_SERVER) ; Serial.println("xxx") ;
+  Serial.println( "wifiPayload.ACK_NETWORK = ") ; Serial.println(wifiPayload.ACK_SERVER) ; Serial.println("xxx") ;
+  Menu_WifiPayload();
+  while ( MenuWifi.ACK_SERVER != true )
+  {
+    Menu_WifiPayload();
+    Serial.println("wifiPayload.ACK_SERVER = " + wifiPayload.ACK_SERVER) ;
+    Serial.println("MenuWifi.ACK_SERVER = " + MenuWifi.ACK_SERVER) ;
+    lcd.setCursor(3, 1) ; lcd.print("Please wait ...") ; lcd.setCursor(i, 2) ; lcd.print(".") ; if ( i == 12) {
+      Init_Communication();
+      i = 5;
+      lcd.clear() ;
     }
+    Key = keypad.getKey();
+    if ( ((int)keypad.getState() ==  PRESSED) )
+    {
+      vTaskDelay((50L * configTICK_RATE_HZ) / 1000L);
+      if ( Key == BACK )
+      {
+        Check = 1 ;
+        break ;
+      }
+    }
+    i++ ;
+    vTaskDelay((500L * configTICK_RATE_HZ) / 1000L);
+    if ( (unsigned long) (millis() - TimeConnect) > 30000) {
+      Check = 1 ;
+      break ;
+    }
+  }
+  if (Check == 1)
+  {
+    Check = 0;
+    lcd.clear() ;
+    lcd.setCursor(4, 2) ;
+    lcd.print("Connect failed !") ;
+    //        if ( xSemaphoreTake( sem_ReadWifi, ( TickType_t ) 0 ) )
+    //          {
+    MenuWifi.ACK_SERVER = false ;
+    //wifiPayload.ACK_SERVER = false ;
+    //            xSemaphoreGive(sem_ProcessWifi);
+    //          }
+  }
+  else {
+    Check = 0 ;
+    lcd.clear() ;
+    lcd.setCursor(4, 2) ;
+    lcd.print("Connected !") ;
+    vTaskDelay((2000L * configTICK_RATE_HZ) / 1000L);
+    //        if ( xSemaphoreTake( sem_ReadWifi, ( TickType_t ) 0 ) )
+    //          {
+    MenuWifi.ACK_SERVER = false ;
+    //wifiPayload.ACK_SERVER = false ;
+    //            xSemaphoreGive(sem_ProcessWifi);
+    //          }
+  }
 }
 
 
@@ -453,27 +480,27 @@ void Get_ID()
   Serial.println(String(Start) + String(IDCmd) + AssignedID + String(End));
   WIFI.print(String(Start) + String(IDCmd) + AssignedID + String(End));
 
-//  lcd.clear() ;
-//  int i = 5;
-//  while (1)
-//  {
-//    //if( (String)Timeout) { lcd.clear() ; lcd.setCursor(2,2); lcd.print("Connected Fail !") ; break ; }
-//    lcd.setCursor(3, 1) ; lcd.print("Please wait ...") ; lcd.setCursor(i, 2) ; lcd.print(".") ; if ( i == 12) {
-//      i = 5;
-//      lcd.clear() ;
-//    }
-//    Key = keypad.getKey();
-//    if ( ((int)keypad.getState() ==  PRESSED) )
-//    {
-//      vTaskDelay((50L * configTICK_RATE_HZ) / 1000L);
-//      if ( Key == BACK )
-//      {
-//        break ;
-//      }
-//    }
-//    i++ ;
-//    Wait_Task() ;
-//  }
+  //  lcd.clear() ;
+  //  int i = 5;
+  //  while (1)
+  //  {
+  //    //if( (String)Timeout) { lcd.clear() ; lcd.setCursor(2,2); lcd.print("Connected Fail !") ; break ; }
+  //    lcd.setCursor(3, 1) ; lcd.print("Please wait ...") ; lcd.setCursor(i, 2) ; lcd.print(".") ; if ( i == 12) {
+  //      i = 5;
+  //      lcd.clear() ;
+  //    }
+  //    Key = keypad.getKey();
+  //    if ( ((int)keypad.getState() ==  PRESSED) )
+  //    {
+  //      vTaskDelay((50L * configTICK_RATE_HZ) / 1000L);
+  //      if ( Key == BACK )
+  //      {
+  //        break ;
+  //      }
+  //    }
+  //    i++ ;
+  //    Wait_Task() ;
+  //  }
 
 
 }
@@ -555,8 +582,8 @@ void Automatic()
     Wait_Task;
   }
 }
-void Init_Communication(){
-    SDreadData(FileHardIDData) ;
+void Init_Communication() {
+  SDreadData(FileHardIDData) ;
   Serial.print(String(Start) + String(IDCmd) + TempData + String(End));
   WIFI.print(String(Start) + String(IDCmd) + TempData + String(End));
   vTaskDelay((500L * configTICK_RATE_HZ) / 1000L);
@@ -608,7 +635,7 @@ void Menu_WifiPayload()
     MenuWifi.Mode = wifiPayload.Mode ;
     MenuWifi.Stop = wifiPayload.Stop ;
     MenuWifi.Continue = wifiPayload.Continue;
-    MenuWifi.ErrorNetwork = wifiPayload.ErrorNetwork;
+    MenuWifi.NetworkError = wifiPayload.NetworkError;
     if (MenuWifi.Continue) {
       Run = !Run;
       Serial.print("RUN: ");
@@ -616,7 +643,7 @@ void Menu_WifiPayload()
       MenuWifi.Continue = 0;
       wifiPayload.Continue = 0 ;
     }
-    if (MenuWifi.ErrorNetwork) ERROR_Processing() ;
+    if (MenuWifi.NetworkError) ERROR_Processing() ;
     xSemaphoreGive(sem_ProcessWifi);
   }
 }

@@ -238,6 +238,142 @@ void Server_SetMode()
   }
 }
 
+
+//-----------------DIEU KHIEN BANG GAMEPAD ----------------------//
+void Gamepad_Control() 
+{ 
+   Motor_Setup() ;
+   vTaskDelay((300L * configTICK_RATE_HZ) / 1000L)  ;   //added delay to give wireless ps2 module some time to startup, before configuring it
+   
+  //CHANGES for v1.6 HERE!!! **************PAY ATTENTION*************
+  
+  //setup pins and settings: GamePad(clock, command, attention, data, Pressures?, Rumble?) check for error
+  error = ps2x.config_gamepad(pressures, rumble);
+  
+  if(error == 0){
+    Serial.print("Found Controller, configured successful ");
+    Serial.print("pressures = ");
+  if (pressures)
+    Serial.println("true ");
+  else
+    Serial.println("false");
+  Serial.print("rumble = ");
+  if (rumble)
+    Serial.println("true)");
+  else
+    Serial.println("false");
+    Serial.println("Try out all the buttons, X will vibrate the controller, faster as you press harder;");
+    Serial.println("holding L1 or R1 will print out the analog stick values.");
+    Serial.println("Note: Go to www.billporter.info for updates and to report bugs.");
+  }  
+  else if(error == 1)
+    Serial.println("No controller found, check wiring, see readme.txt to enable debug. visit www.billporter.info for troubleshooting tips");
+   
+  else if(error == 2)
+    Serial.println("Controller found but not accepting commands. see readme.txt to enable debug. Visit www.billporter.info for troubleshooting tips");
+
+  else if(error == 3)
+    Serial.println("Controller refusing to enter Pressures mode, may not support it. ");
+  
+//  Serial.print(ps2x.Analog(1), HEX);
+  
+  type = ps2x.readType(); 
+  switch(type) {
+    case 0:
+      Serial.print("Unknown Controller type found ");
+      break;
+    case 1:
+      Serial.print("DualShock Controller found ");
+      break;
+    case 2:
+      Serial.print("GuitarHero Controller found ");
+      break;
+  case 3:
+      Serial.print("Wireless Sony DualShock Controller found ");
+      break;
+   }
+  bool RightRun = true ;
+  bool LeftRun = true ; 
+  Accelerate = 255 ;
+  while(1) 
+    {
+      if(error == 1) //skip loop if no controller found
+      return; 
+      ps2x.read_gamepad(false, vibrate); //read controller and set large motor to spin at 'vibrate' speed
+      
+      if(ps2x.Button(PSB_START))         //will be TRUE as long as button is pressed
+        Serial.println("Start is being held");
+      if(ps2x.Button(PSB_SELECT))
+        Serial.println("Select is being held");      
+      if(ps2x.Button(PSB_PAD_RIGHT)){
+        Serial.print("Right held this hard: ");
+        Serial.println(ps2x.Analog(PSAB_PAD_RIGHT), DEC);
+        if( LeftRun == true ) { while( Accelerate < 256){ Accelerate++ ; analogWrite(PWM4, Accelerate) ; vTaskDelay((2L * configTICK_RATE_HZ) / 1000L)  ;   } } // ham lai, de dao chieu quay
+        Accelerate = Accelerate - 10 ;  // thoi gian tang toc
+        if(Accelerate < 0) { Accelerate = 0 ; } 
+        digitalWrite(DIR4, HIGH) ;
+        RightRun = true ; LeftRun = false ;         
+      }
+      if(ps2x.Button(PSB_PAD_LEFT)){
+        Serial.print("LEFT held this hard: ");
+        Serial.println(ps2x.Analog(PSAB_PAD_LEFT), DEC);
+        if( RightRun == true ) { while( Accelerate < 256){ Accelerate++ ; analogWrite(PWM4, Accelerate) ; vTaskDelay((2L * configTICK_RATE_HZ) / 1000L)  ;  } }  // ham lai de dao chieu quay
+        Accelerate = Accelerate - 10 ;   // thoi gian tang toc
+        if(Accelerate < 0) { Accelerate = 0 ; } 
+        digitalWrite(DIR4, LOW) ;
+        RightRun = false ; LeftRun = true ;
+      }
+  
+      vibrate = ps2x.Analog(PSAB_CROSS);  //this will set the large motor vibrate speed based on how hard you press the blue (X) button
+      if (ps2x.NewButtonState()) {        //will be TRUE if any button changes state (on to off, or off to on)
+        if(ps2x.Button(PSB_L1))
+          Serial.println("L3 pressed");
+        if(ps2x.Button(PSB_R1))
+          Serial.println("R3 pressed");
+        if(ps2x.Button(PSB_L2))
+          Serial.println("L2 pressed");
+        if(ps2x.Button(PSB_R2))
+          Serial.println("R2 pressed");
+        if(ps2x.Button(PSB_TRIANGLE))
+          Serial.println("Triangle pressed");        
+      }
+  
+      if(ps2x.ButtonPressed(PSB_CIRCLE))               //will be TRUE if button was JUST pressed
+        Serial.println("Circle just pressed");
+      if(ps2x.NewButtonState(PSB_CROSS))               //will be TRUE if button was JUST pressed OR released
+        Serial.println("X just changed");
+      if(ps2x.ButtonReleased(PSB_SQUARE))              //will be TRUE if button was JUST released
+        Serial.println("Square just released");     
+  
+      if(ps2x.Button(PSB_L3) || ps2x.Button(PSB_R3)) { //print stick values if either is TRUE
+        Serial.print("Stick Values:");
+        Serial.print(ps2x.Analog(PSS_LY), DEC); //Left stick, Y axis. Other options: LX, RY, RX  
+        Serial.print(",");
+        Serial.print(ps2x.Analog(PSS_LX), DEC); 
+        Serial.print(",");
+        Serial.print(ps2x.Analog(PSS_RY), DEC); 
+        Serial.print(",");
+        Serial.println(ps2x.Analog(PSS_RX), DEC); 
+      }
+     Accelerate++ ; 
+     if(Accelerate > 255 ) { Accelerate = 255 ; }
+     analogWrite(PWM4, Accelerate) ;  
+     Key = keypad.getKey();
+     if ( ((int)keypad.getState() ==  PRESSED) )
+      {
+        if ( Key == BACK )
+        {
+          while( Accelerate < 256){ Accelerate++ ; analogWrite(PWM4, Accelerate) ; vTaskDelay((2L * configTICK_RATE_HZ) / 1000L)  ;  } 
+          Motor_Cleaning_Stop() ;
+          break ;
+        }
+      }     
+     vTaskDelay((1L * configTICK_RATE_HZ) / 1000L)  ;  
+    }
+}
+
+
+
 //---------------------------------------------------------------------------------------------------
 
 void Run_Mode() {
