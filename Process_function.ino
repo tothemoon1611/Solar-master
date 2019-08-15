@@ -139,7 +139,6 @@ void Get_Serial_Wifi() {
   if (WIFI.available())
   {
     char inChar = (char)WIFI.read();
-    Serial.println(inChar);
     if (inChar == Start) SerialRecv = true;
     if (inChar == End)
     {
@@ -157,7 +156,6 @@ void Get_Serial_Encoder() {
   if (EncoderSerial.available())
   {
     char inChar_EncoderSerial = (char)EncoderSerial.read();
-    Serial.println(inChar_EncoderSerial);
     if (inChar_EncoderSerial == Start) SerialRecv_EncoderSerial = true;
     if (inChar_EncoderSerial == End)
     {
