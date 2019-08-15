@@ -1,7 +1,7 @@
-#define SIM Serial2
 #define WIFI Serial1
-#define CAMERA Serial3
-#define Monitor SerialUSB
+#define SIM Serial2
+#define EncoderSerial Serial3 
+//#define CAMERA Serial4
 
 #define DEBUGER
 //#define SETTIME
@@ -16,7 +16,8 @@
 #include "command.h"
 #include <Keypad.h>
 #include <string.h>
-#include <PS2X_lib.h>  //for v1.6
+#include "PS2X_lib.h"
+#include "soft_uart.h"
 
 Keypad keypad = Keypad(makeKeymap(keys), rowPins, columnPins, rows, columns);
 PS2X ps2x; // create PS2 Controller Class
@@ -43,28 +44,46 @@ DataMachine MenuSensor;
 // wifiPayload.ACK_SERVER = false ;
 
 
+// Use the Arduino core to set-up the unused USART2 on Serial4
+RingBuffer rx_buffer5;
+RingBuffer tx_buffer5;
+USARTClass Serial4(USART2, USART2_IRQn, ID_USART2, &rx_buffer5, &tx_buffer5);
+//void serialEvent4() __attribute__((weak));
+//void serialEvent4() { }
+
+void USART2_Handler(void)   // Interrupt handler for UART2
+{
+  Serial4.IrqHandler();     // In turn calls on the Serial2 interrupt handler
+}
+
 
 //------------------------------------------------------------------------------
 void setup() {
   portBASE_TYPE s1, s2;
 
   Serial.begin(9600); // Monitor
-  WIFI.begin(9600); // cong giao tiep NodeMCU
-  CAMERA.begin(9600); // cong giao tiep Raspberry
+  EncoderSerial.begin(9600); // cong giao tiep NodeMCU
+  WIFI.begin(9600); // cong giao tiep NodeMCU 
+//  CAMERA.begin(9600); // cong giao tiep Raspberry
+  SerialUSB.begin(9600); // Monitor
+  PIO_Configure(PIOB, PIO_PERIPH_A, PIO_PB20A_TXD2 | PIO_PB21A_RXD2, PIO_DEFAULT);
+  Serial4.begin(9600);
   Motor_Setup() ;
   pinMode(A0, OUTPUT) ;
- // pinMode(A0, OUTPUT) ;
+  // pinMode(A0, OUTPUT) ;
 
   // initialize semaphore
   sem_ReadData = xSemaphoreCreateCounting(1, 0);
   sem_ProcessData = xSemaphoreCreateCounting(1, 0);
   sem_ReadWifi = xSemaphoreCreateCounting(1, 0);
-  sem_ProcessWifi= xSemaphoreCreateCounting(1, 0);
+  sem_ProcessWifi = xSemaphoreCreateCounting(1, 0);
   sem2 = xSemaphoreCreateCounting(1, 0);
 
   s2 = xTaskCreate(BlynkLed, NULL, configMINIMAL_STACK_SIZE, NULL, 1, NULL);
 
-  xTaskCreate(Serial_wifi, NULL, configMINIMAL_STACK_SIZE, NULL, 1, NULL);
+ xTaskCreate(Serial_wifi, NULL, configMINIMAL_STACK_SIZE, NULL, 1, NULL);
+
+  xTaskCreate(Serial_Encoder, NULL, configMINIMAL_STACK_SIZE, NULL, 1, NULL);
 
   xTaskCreate(Robot_Init, NULL, configMINIMAL_STACK_SIZE + 200, NULL, 4, NULL);
 

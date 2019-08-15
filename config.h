@@ -1,4 +1,3 @@
-#define SIM Serial1
 #define SIM_RESET 7
 #define DTR 6
 #define CSpin  38
@@ -28,10 +27,10 @@ struct DataMachine
 };
 
 struct WifiPayload
-{ 
+{
   bool ACK_SERVER = false ;
   bool ACK_NETWORK = false ;
-  int Mode=0;
+  int Mode = 0;
   bool Stop = false;
   bool Continue = false;
   bool NetworkError = false;
@@ -49,57 +48,57 @@ LiquidCrystal_I2C lcd(0x27, 20, 4);
 
 //-----------------------------------------------Hien thi cac Page tuong ung----------------------------------------------------------------//
 //--PAGE 1--//
-char* LCDSettingMode[] = {"1.Parameters Setup", "2.Testing Mode", "3.Set Working Mode", "4.Automatic "} ;        
+char* LCDSettingMode[] = {"1.Parameters Setup", "2.Testing Mode", "3.Set Working Mode", "4.Automatic "} ;
 
 //--PAGE 2--//
 char* LCDParametersSetup[] = {"1.Robot ID", "2.Motor Setup", "3.Charging Setup", "4.Update Later..."} ;                                        // For Parameters Setup
-char* LCDTestingMode[] = {"1.Hand Control", "2.Camera Test", "3.Commu... Test", "4.Work Test"} ;                                               // For Testing Mode      
-char* LCDSetWorkingMode[] = {"1.Building Map", "2.Working Mode", "3.Server Control"} ;                                                         // For Build Map                                          
-char* LCDAutomatic[] = {"Update Later..."} ;                                                                                                   // For Automatic 
+char* LCDTestingMode[] = {"1.Hand Control", "2.Camera Test", "3.Commu... Test", "4.Work Test"} ;                                               // For Testing Mode
+char* LCDSetWorkingMode[] = {"1.Building Map", "2.Working Mode", "3.Server Control"} ;                                                         // For Build Map
+char* LCDAutomatic[] = {"Update Later..."} ;                                                                                                   // For Automatic
 
-//--PAGE 3--// 
-char* LCDRobotID[] = {"ID :", "HID:", "0.Network Config"} ;                                                                                     // For Parameters Setup -> Robot Fixed ID 
-char* LCDMotorSetup[] = {"1.Moving Motor", "2.Cleaning Motor"} ;                                                                               // For Parameters Setup -> Motor Speed       
+//--PAGE 3--//
+char* LCDRobotID[] = {"ID :", "HID:", "0.Network Config"} ;                                                                                     // For Parameters Setup -> Robot Fixed ID
+char* LCDMotorSetup[] = {"1.Moving Motor", "2.Cleaning Motor"} ;                                                                               // For Parameters Setup -> Motor Speed
 char* LCDChargingSetup[] = {"1.Energy Alert" } ;            // For Parameters Setup -> Charging Setup
 
-char* LCDHandControl[] = {"Update Later..."} ;                                                                // Ngay tai tai day ket noi voi tay dieu khien 
-char* LCDCameraTest[] = {"Update Later..."} ;  
-char* LCDCommuTest[] = {"Update Later..."} ;  
-char* LCDWorkTest[] = {"1.W_Test 1", "2.W_Test 2", "3.W_Test 3", "4.W_Test 4"} ;                               // For Testing Mode ->Auto Testing 
-                                                                    
+char* LCDHandControl[] = {"Update Later..."} ;                                                                // Ngay tai tai day ket noi voi tay dieu khien
+char* LCDCameraTest[] = {"Update Later..."} ;
+char* LCDCommuTest[] = {"Update Later..."} ;
+char* LCDWorkTest[] = {"1.W_Test 1", "2.W_Test 2", "3.W_Test 3", "4.W_Test 4"} ;                               // For Testing Mode ->Auto Testing
 
-//--PAGE 4--// 
-char* LCDMovingMotor[] = {"1.PID_Kp", "2.PID_Ki", "3.PID_Kd", "4.PWM" } ;                                           // For Parameters Setup -> Motor Speed -> Moving Speed 
+
+//--PAGE 4--//
+char* LCDMovingMotor[] = {"1.PID_Kp", "2.PID_Ki", "3.PID_Kd", "4.PWM" } ;                                           // For Parameters Setup -> Motor Speed -> Moving Speed
 char* LCDCleaningMotor[] = {"1.PID_Kp", "2.PID_Ki", "3.PID_Kd", "4.PWM" } ;                                         // For Parameters Setup -> Motor Speed -> Cleaning Speed                                       // For Parameters Setup -> Motor Speed -> Rolling Speed
 
 
 //------------------------------------Khai bao tat ca cac bien-------------------------------------------------------------------------------//
 unsigned int Page = 1 ;                                               // Khoi tao Page ban dau mac dinh
-unsigned int Page_Pointer[10] ;                                       // Luu lai vi tri con tro truoc do da chon 
+unsigned int Page_Pointer[10] ;                                       // Luu lai vi tri con tro truoc do da chon
 bool BreakPage = 0 ;                                                  // Co tac dung khi nhan nut BACK
-bool OkPage = 0 ;                                                     // Co tac dung khi nhan nut OK   
-unsigned int pointer   ;                                              // Vi tri cua con tro trong menu 
+bool OkPage = 0 ;                                                     // Co tac dung khi nhan nut OK
+unsigned int pointer   ;                                              // Vi tri cua con tro trong menu
 unsigned int PointerMax = 4 ;
 
-float Value = 0 ;                                                     // Gia tri ban dau cua Encoder 
+float Value = 0 ;                                                     // Gia tri ban dau cua Encoder
 int State ;                                                           // Co tac dung cho Encoder
 int LastState ;                                                       // Co tac dung cho Encoder
 
 //////////////////////////////////// LCD ////////////////////////////////////////////////////
-const byte rows = 4; 
-const byte columns = 4; 
- 
-int holdDelay = 700; 
-int n = 3; // 
-int state = 0; 
+const byte rows = 4;
+const byte columns = 4;
+
+int holdDelay = 700;
+int n = 3; //
+int state = 0;
 
 #define PageMAX 4
-#define UP 'A' 
-#define DOWN 'B' 
+#define UP 'A'
+#define DOWN 'B'
 #define OK 'C'
-#define BACK 'D' 
-#define BACKSPACE '*' 
-#define HOME '#'  
+#define BACK 'D'
+#define BACKSPACE '*'
+#define HOME '#'
 
 char keys[rows][columns] =
 {
@@ -108,10 +107,10 @@ char keys[rows][columns] =
   {'7', '8', '9', 'C'},
   {'*', '0', '#', 'D'},
 };
- 
-byte rowPins[rows] = {23, 25, 27, 29}; 
+
+byte rowPins[rows] = {23, 25, 27, 29};
 byte columnPins[columns] = {31, 33, 35, 37};
- 
+
 
 
 
@@ -127,7 +126,7 @@ char ButNINE[9] = { '9', 'w', 'x', 'y', 'z', 'W', 'X', 'Y', 'Z' } ;
 char ButZERO[2] = { '0', ' ' } ;
 
 unsigned long TimeKeypad ;
-char Key = 0; 
+char Key = 0;
 char x ;
 int MAXSize ;
 char ButTemp[9] ;
@@ -139,7 +138,7 @@ String SSIDData ;
 String PASSData ;
 String PORTData ;
 String IPAddData ;
-String EnerALert ; 
+String EnerALert ;
 
 
 String FileSSIDData   = "SSIDData.txt" ;
@@ -167,21 +166,26 @@ String PWMCleSpd ;
 unsigned int PanPos = 0 ;
 bool  StartBut  = 0 ;
 
-#define MetalSensorPin 45
+#define MetalSensorPin 43
 #define CheckWheel1 47
 #define CheckWheel2 49
 
 #define DIR4 22
 #define DIR3 26
-#define PWM4 5 
-#define PWM3 4
+#define PWM4 11
+#define PWM3 10
 //-----------------------------------Serial-------------------------------------------------
-  bool SerialRecv = false;
-  int serial_counter = 0;
-  char cmd;
-  String InputString = "";
-String DisplayString = "";
+bool SerialRecv = false;
+int serial_counter = 0;
+char cmd;
+String InputString = "";
 boolean StringComplete = false;
+
+bool SerialRecv_EncoderSerial = false;
+int serial_counter_EncoderSerial = 0;
+char cmd_EncoderSerial;
+String InputString_EncoderSerial = "";
+boolean StringComplete_EncoderSerial = false;
 
 //----------------------------------Gamepad------------------------------------------//
 //#define PS2_DAT        42  //14    mac dien tro treo len nguon tu 1k - 10k

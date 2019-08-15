@@ -528,7 +528,6 @@ void Automatic()
   while (1) {
     //  lcd.setCursor(0, 1) ;
     //  lcd.print("Current: ") ;
-    DisplayLCD = DisplayString;
     lcd.setCursor(10, 1) ;
     lcd.print(DisplayLCD) ;
     DisplayLCD = "";

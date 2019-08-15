@@ -1,4 +1,4 @@
-void Get_Command() {
+void Get_Wifi_Command() {
 
   int MovingSpeed = 0;
   int ChargingThreshold = 0;
@@ -9,6 +9,10 @@ void Get_Command() {
   String ContentACKSERVER = "";
   for (;;)
   {
+    
+    Serial4.print(123456789);
+    Serial.print(123456789);
+    vTaskDelay((500L * configTICK_RATE_HZ) / 1000L);
     Get_Serial_Wifi();
 
     if (StringComplete) {
@@ -25,7 +29,6 @@ void Get_Command() {
             Serial.print("Set Moving Speed: ");
             Serial.println(MovingSpeed);
 #endif
-            DisplayString = MovingSpeed;
             break;
           case setSpinnerSpeed:
 #ifdef DEBUGER
@@ -105,11 +108,38 @@ void Get_Command() {
   }
 }
 
+void Get_Encoder_Command() {
+  for (;;)
+  {
+    Get_Serial_Encoder();
+    if (StringComplete_EncoderSerial) {
+#ifdef DEBUGER
+      Serial.print("Recv Wifi Slave: ");
+      Serial.println(InputString_EncoderSerial);
+#endif
+      switch (cmd_EncoderSerial) {
+        case setEncoder:
+#ifdef DEBUGER
+          Serial.print("Set Encoder: ");
+          Serial.println(InputString_EncoderSerial);
+#endif
+          break;
+        default:
+          Serial.println("Unknown cmd!!!");
+      }
+    }
+    InputString_EncoderSerial = "";
+    StringComplete_EncoderSerial = false;
+    vTaskDelay((10L * configTICK_RATE_HZ) / 1000L);
+  }
+}
+
 
 void Get_Serial_Wifi() {
   if (WIFI.available())
   {
     char inChar = (char)WIFI.read();
+    Serial.println(inChar);
     if (inChar == Start) SerialRecv = true;
     if (inChar == End)
     {
@@ -123,6 +153,23 @@ void Get_Serial_Wifi() {
   }
 }
 
+void Get_Serial_Encoder() {
+  if (EncoderSerial.available())
+  {
+    char inChar_EncoderSerial = (char)EncoderSerial.read();
+    Serial.println(inChar_EncoderSerial);
+    if (inChar_EncoderSerial == Start) SerialRecv_EncoderSerial = true;
+    if (inChar_EncoderSerial == End)
+    {
+      SerialRecv_EncoderSerial = false;
+      serial_counter_EncoderSerial = 0;
+      StringComplete_EncoderSerial = true;
+    }
+    if (SerialRecv_EncoderSerial)  serial_counter_EncoderSerial++;
+    if (serial_counter_EncoderSerial == 2) cmd_EncoderSerial = inChar_EncoderSerial;
+    if (serial_counter_EncoderSerial > 2) InputString_EncoderSerial += inChar_EncoderSerial;
+  }
+}
 
 void RTC_Init() {
   rtc.begin();
@@ -136,6 +183,7 @@ void RTC_Init() {
   Serial.println("TIME: " + String(t.hour) + ":" + String(t.min));
 #endif
 }
+
 void readVolt()
 {
   float    Vbat   = float(analogRead(A0)) * (5.0 / 4095.0) * (10 / 2 + 1);

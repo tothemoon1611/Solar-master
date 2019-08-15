@@ -91,7 +91,12 @@ void Read_Sensor(void *pvParameters)
 /* Gui du lieu den Module Wifi*/
 void Serial_wifi(void *pvParameters)
 {
-  Get_Command();
+  Get_Wifi_Command();
+  //Get_Encoder_Command();
+}
+void Serial_Encoder(void *pvParameters)
+{
+  Get_Encoder_Command();
 }
 //------------------------------------------------------------------------------
 /* Gui du lieu den Module Wifi*/
