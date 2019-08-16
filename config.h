@@ -24,6 +24,7 @@ struct DataMachine
   bool LimitSW_2;
   float VoltageBattery;
   float CurrentBattery;
+  int Encoder;
 };
 
 struct WifiPayload

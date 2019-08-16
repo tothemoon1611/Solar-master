@@ -39,8 +39,8 @@ void Read_Sensor(void *pvParameters)
   for (;;)
   {
     analogReadResolution(10);
-    float Vbat   = float(analogRead(A0)) * (3.3 / 1023.0) * (9.72 / 2.18 + 1);
-    float instantCurrent = (((float)analogRead(A1) - 512)  * (3.3 / 1023.0) / (66.0 / 1000)); //ACS712 Measuring Current of Battery
+    float Vbat   = float(analogRead(A6)) * (3.3 / 1023.0) * (11.2 / 1.2);
+    float instantCurrent = (((float)analogRead(A7)*5.3 - 512*5)  /1023 / (66.0 / 1000)); //ACS712 Measuring Current of Battery
     //        if(abs(Vbat)<100) {
     //          Serial.print("Voltage: ");
     //          Serial.println(analogRead(A0));
@@ -76,8 +76,8 @@ void Read_Sensor(void *pvParameters)
       dataMachine.MetalSensor = digitalRead(MetalSensorPin);
       dataMachine.LimitSW_1 = digitalRead(CheckWheel1);
       dataMachine.LimitSW_2 = digitalRead(CheckWheel2);
-      Serial.println(dataMachine.LimitSW_1);
-      Serial.println(dataMachine.LimitSW_2);
+//      Serial.println(dataMachine.LimitSW_1);
+//      Serial.println(dataMachine.LimitSW_2);
       dataMachine.VoltageBattery = Vbat;
       dataMachine.CurrentBattery = instantCurrent;
       xSemaphoreGive(sem_ReadData);

@@ -1,5 +1,6 @@
 bool Sensor_Temp;
 int Accelerate = 255 ;
+int AccelerateCLE = 255 ;
 int DelaySpeed = 1 ;
 
 void Code_Run_V1()
@@ -10,8 +11,6 @@ void Code_Run_V1()
   SDreadData(FilePWMCleData) ;
   PWMCleSpd = TempData ;
   TempData = "" ;
-//  MovSpeed = (int)(PWMMovSpd.toInt())  ;
-//  CleSpeed = (int)(PWMCleSpd.toInt())  ;
   bool out = 0 ;
   lcd.setCursor(0, 2) ; lcd.print("Panel Position:") ;
   lcd.setCursor(16, 2) ; lcd.print(PanPos) ;
@@ -28,7 +27,9 @@ void Code_Run_V1()
       Motor_Run_Stop() ;
       Motor_Cleaning_Stop() ;
       Accelerate = 255 ;
-      Serial.println("LimitSW_2" + digitalRead(CheckWheel2)) ;
+      AccelerateCLE = 255 ;
+      //Serial.println("LimitSW_2" + digitalRead(CheckWheel2)) ;
+      lcd.setCursor(0, 2) ; lcd.print("Panel Position:") ;
       while ( MenuSensor.LimitSW_1 == 1)
       {
         Motor_Left_Start() ;
@@ -37,33 +38,33 @@ void Code_Run_V1()
         Menu_decPanelPos();
 
         if (MenuSensor.LimitSW_1 == 0 ) {
-          out = 1 ;
-          Motor_Run_Stop() ;
-          Accelerate = 255 ;
-          break ;
-        }
-        Key = keypad.getKey();
-        if ( ((int)keypad.getState() ==  PRESSED) )
-        {
-          if ( Key == BACK )
-          {
             out = 1 ;
-            Wait_Task();
             Motor_Run_Stop() ;
-            Motor_Cleaning_Stop() ;
-            PanPos = 0 ;
+            Accelerate = 255 ;
             break ;
           }
-        }
+        Key = keypad.getKey();
+        if ( ((int)keypad.getState() ==  PRESSED) )
+          {
+            if ( Key == BACK )
+            {
+              out = 1 ;
+              Wait_Task();
+              Motor_Run_Stop() ;
+              Motor_Cleaning_Stop() ;
+              PanPos = 0 ;
+              break ;
+            }
+          }
         if ( MenuWifi.Stop)
-        {
-          out = 1 ;
-          Motor_Run_Stop() ;
-          Motor_Cleaning_Stop() ;
-          MenuWifi.Mode = 0;
-          wifiPayload.Mode = 0 ;
-          break ;
-        }
+          {
+            out = 1 ;
+            Motor_Run_Stop() ;
+            Motor_Cleaning_Stop() ;
+            MenuWifi.Mode = 0;
+            wifiPayload.Mode = 0 ;
+            break ;
+          }
       }
     }
     Key = keypad.getKey();
@@ -294,7 +295,9 @@ void Gamepad_Control()
    }
   bool RightRun = true ;
   bool LeftRun = true ; 
+  bool CleTrigger = 0 ;
   Accelerate = 255 ;
+  AccelerateCLE = 255 ;
   while(1) 
     {
       if(error == 1) //skip loop if no controller found
@@ -334,8 +337,15 @@ void Gamepad_Control()
           Serial.println("L2 pressed");
         if(ps2x.Button(PSB_R2))
           Serial.println("R2 pressed");
-        if(ps2x.Button(PSB_TRIANGLE))
-          Serial.println("Triangle pressed");        
+        if(ps2x.Button(PSB_TRIANGLE)) // kich hoat dong co lau chui
+          {
+            vTaskDelay((20L * configTICK_RATE_HZ) / 1000L)  ;
+            if(CleTrigger == 0){ 
+              while( AccelerateCLE > 0){ Motor_Cleaning_Start() ; CleTrigger = 1 ; AccelerateCLE-- ; vTaskDelay((1L * configTICK_RATE_HZ) / 1000L)  ; } }
+            else { Motor_Cleaning_Stop() ; AccelerateCLE = 255 ; CleTrigger = 0 ;} 
+            Serial.println("Triangle pressed");
+                   
+          }
       }
   
       if(ps2x.ButtonPressed(PSB_CIRCLE))               //will be TRUE if button was JUST pressed
@@ -386,29 +396,31 @@ void Run_Mode() {
 }
 
 void Menu_incPanelPos() {
-
+  lcd.setCursor(16, 2) ; lcd.print(MenuSensor.Encoder) ;
   if (  MenuSensor.MetalSensor == 0 && Sensor_Temp == 0) Sensor_Temp = 1  ;
   if (  MenuSensor.MetalSensor == 1 && Sensor_Temp == 1)
-  {
-    Sensor_Temp = 0;
-    PanPos++ ;
-    lcd.setCursor(0, 2) ; lcd.print("Panel Position:") ;
-    lcd.setCursor(16, 2) ; lcd.print(PanPos) ;
-    //Serial.println(PanPos) ;
-    UpdatetoESP(String(updateCollumnPanelParameter), String(PanPos));
-    UpdatetoESP(String(updateStringPanelParameter), String(StrPanel));
-  }
+    {
+      Sensor_Temp = 0;
+      PanPos++ ;
+      lcd.setCursor(0, 2) ; lcd.print("Panel Position:") ;
+      //lcd.setCursor(16, 2) ; lcd.print(PanPos) ;
+      lcd.setCursor(16, 2) ; lcd.print(MenuSensor.Encoder) ;
+      //Serial.println(PanPos) ;
+      UpdatetoESP(String(updateCollumnPanelParameter), String(PanPos));
+      UpdatetoESP(String(updateStringPanelParameter), String(StrPanel));
+    }
 }
 
 void Menu_decPanelPos() {
-
+    lcd.setCursor(16, 2) ; lcd.print(MenuSensor.Encoder) ;
   if (  MenuSensor.MetalSensor == 0 && Sensor_Temp == 0) Sensor_Temp = 1 ;
   if (  MenuSensor.MetalSensor == 1 && Sensor_Temp == 1)
   {
     Sensor_Temp = 0;
     if (PanPos) PanPos-- ;
     lcd.setCursor(0, 2) ; lcd.print("Panel Position:") ;
-    lcd.setCursor(16, 2) ; lcd.print(PanPos) ;
+    //lcd.setCursor(16, 2) ; lcd.print(PanPos) ;
+    lcd.setCursor(16, 2) ; lcd.print(MenuSensor.Encoder) ;
     //Serial.println(PanPos) ;
     UpdatetoESP(String(updateCollumnPanelParameter), String(PanPos));
     UpdatetoESP(String(updateStringPanelParameter), String(StrPanel));
@@ -416,7 +428,9 @@ void Menu_decPanelPos() {
 }
 
 
-
+void Building_Map() 
+{     
+}
 
 //-------------------------Thiet Lap Ban Dau Cho Dong Co------------------------------------------------//
 
@@ -477,14 +491,14 @@ void Motor_Run_Stop()
 void Motor_Cleaning_Start()
 {
   digitalWrite(DIR3, HIGH) ;
-  if (Accelerate > 255 - (int)(PWMCleSpd.toInt()) ) 
+  if (AccelerateCLE > 255 - (int)(PWMCleSpd.toInt()) ) 
     {
-    Accelerate--;
-    if (Accelerate < 255 - (int)(PWMCleSpd.toInt()) ) {
-      Accelerate = 255 - (int)(PWMCleSpd.toInt()) ;
+    AccelerateCLE--;
+    if (AccelerateCLE < 255 - (int)(PWMCleSpd.toInt()) ) {
+      AccelerateCLE = 255 - (int)(PWMCleSpd.toInt()) ;
     }
   }
-  analogWrite(PWM3, Accelerate) ;
+  analogWrite(PWM3, AccelerateCLE) ;
   vTaskDelay((1L * configTICK_RATE_HZ) / 1000L)  ;
 }
 

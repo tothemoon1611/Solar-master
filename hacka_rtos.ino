@@ -17,7 +17,6 @@
 #include <Keypad.h>
 #include <string.h>
 #include "PS2X_lib.h"
-#include "soft_uart.h"
 
 Keypad keypad = Keypad(makeKeymap(keys), rowPins, columnPins, rows, columns);
 PS2X ps2x; // create PS2 Controller Class
@@ -35,6 +34,7 @@ SemaphoreHandle_t sem_ProcessData;
 SemaphoreHandle_t sem_ReadWifi;
 SemaphoreHandle_t sem_ProcessWifi;
 SemaphoreHandle_t sem2;
+SemaphoreHandle_t sem_ReadEncoder;
 
 DataMachine dataMachine;
 WifiPayload wifiPayload  ;
@@ -77,6 +77,7 @@ void setup() {
   sem_ProcessData = xSemaphoreCreateCounting(1, 0);
   sem_ReadWifi = xSemaphoreCreateCounting(1, 0);
   sem_ProcessWifi = xSemaphoreCreateCounting(1, 0);
+  sem_ReadEncoder = xSemaphoreCreateCounting(1, 0);
   sem2 = xSemaphoreCreateCounting(1, 0);
 
   s2 = xTaskCreate(BlynkLed, NULL, configMINIMAL_STACK_SIZE, NULL, 1, NULL);

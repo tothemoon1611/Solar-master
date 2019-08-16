@@ -9,9 +9,6 @@ void Get_Wifi_Command() {
   String ContentACKSERVER = "";
   for (;;)
   {
-    
-    Serial4.print(123456789);
-    Serial.print(123456789);
     vTaskDelay((500L * configTICK_RATE_HZ) / 1000L);
     Get_Serial_Wifi();
 
@@ -114,22 +111,26 @@ void Get_Encoder_Command() {
     Get_Serial_Encoder();
     if (StringComplete_EncoderSerial) {
 #ifdef DEBUGER
-      Serial.print("Recv Wifi Slave: ");
+      Serial.print("Recv Encoder Slave: ");
       Serial.println(InputString_EncoderSerial);
 #endif
       switch (cmd_EncoderSerial) {
         case setEncoder:
 #ifdef DEBUGER
           Serial.print("Set Encoder: ");
-          Serial.println(InputString_EncoderSerial);
+          
+          dataMachine.Encoder = InputString_EncoderSerial.toInt();
+          Serial.print(dataMachine.Encoder);
 #endif
           break;
         default:
           Serial.println("Unknown cmd!!!");
       }
+      InputString_EncoderSerial = "";
+      StringComplete_EncoderSerial = false;
+      xSemaphoreGive(sem_ReadEncoder);
     }
-    InputString_EncoderSerial = "";
-    StringComplete_EncoderSerial = false;
+
     vTaskDelay((10L * configTICK_RATE_HZ) / 1000L);
   }
 }

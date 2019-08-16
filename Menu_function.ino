@@ -582,6 +582,7 @@ void Automatic()
   }
 }
 void Init_Communication() {
+  TempData = "" ;
   SDreadData(FileHardIDData) ;
   Serial.print(String(Start) + String(IDCmd) + TempData + String(End));
   WIFI.print(String(Start) + String(IDCmd) + TempData + String(End));
@@ -620,8 +621,12 @@ void Menu_ReadSensor() {
     MenuSensor.LimitSW_2 = dataMachine.LimitSW_2;
     MenuSensor.VoltageBattery = dataMachine.VoltageBattery;
     MenuSensor.CurrentBattery = dataMachine.CurrentBattery;
-
+    
     xSemaphoreGive(sem_ProcessData);
+  }
+    if ( xSemaphoreTake( sem_ReadEncoder, ( TickType_t ) 0 ) )
+  {
+  MenuSensor.Encoder = dataMachine.Encoder;
   }
 }
 
