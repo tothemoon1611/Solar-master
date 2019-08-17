@@ -61,15 +61,9 @@ void Read_Sensor(void *pvParameters)
       WIFI.print(String(Start) + String(updateVoltageBattery));
       WIFI.print(Vbat, 2);
       WIFI.print(String(End));
-      Serial.print(String(Start) + String(updateVoltageBattery));
-      Serial.print(Vbat, 2);
-      Serial.println(String(End));
       WIFI.print(String(Start) + String(updateCurrentBattery));
       WIFI.print(instantCurrent, 2);
       WIFI.print(String(End));
-      Serial.print(String(Start) + String(updateCurrentBattery));
-      Serial.print(instantCurrent, 2);
-      Serial.println(String(End));
 
 
       last_time = millis();

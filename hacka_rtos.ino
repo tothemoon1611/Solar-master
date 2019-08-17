@@ -1,7 +1,7 @@
 #define WIFI Serial1
 #define SIM Serial2
 #define EncoderSerial Serial3 
-//#define CAMERA Serial4
+#define CAMERA Serial4
 
 #define DEBUGER
 //#define SETTIME

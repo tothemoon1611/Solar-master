@@ -9,16 +9,12 @@ void Get_Wifi_Command() {
   String ContentACKSERVER = "";
   for (;;)
   {
-    vTaskDelay((500L * configTICK_RATE_HZ) / 1000L);
     Get_Serial_Wifi();
-
     if (StringComplete) {
 #ifdef DEBUGER
       Serial.print("Recv Wifi Slave: ");
       Serial.println(InputString);
 #endif
-      if ( xSemaphoreTake( sem_ProcessWifi, ( TickType_t ) 0 ) )
-      {
         switch (cmd) {
           case setMovingSpeed:
             MovingSpeed = InputString.toInt();
@@ -95,7 +91,6 @@ void Get_Wifi_Command() {
           default:
             Serial.println("Unknown cmd!!!");
         }
-      }
       InputString = "";
       StringComplete = false;
 
@@ -174,8 +169,8 @@ void RTC_Init() {
   rtc.begin();
 #ifdef SETTIME
   rtc.setDOW(SATURDAY);     // Set Day-of-Week to SUNDAY
-  rtc.setTime(15, 31, 0);    // Set the time to 00:00:00 (24hr format)
-  rtc.setDate(5, 8, 2019);   // Set the date to January 1st, 2014
+  rtc.setTime(14, 29, 0);    // Set the time to 00:00:00 (24hr format)
+  rtc.setDate(17, 8, 2019);   // Set the date to January 1st, 2014
 #endif
   t = rtc.getTime();
 #ifdef DEBUGER
