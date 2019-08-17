@@ -10,22 +10,22 @@
 struct Status
 {
   volatile bool NetworkOn ;
-  volatile bool StatusLed;
-  volatile bool Sleep;
+  volatile bool StatusLed ;
+  volatile bool Sleep ;
   bool SDCard ;
-  bool StatusSendData;
+  bool StatusSendData ;
 
 };
 
 struct DataMachine
 {
-  bool MetalSensor;
-  bool LimitSW_1;
-  bool LimitSW_2;
-  float VoltageBattery;
-  float CurrentBattery;
-  int Encoder;
-};
+  bool MetalSensor ;
+  bool LimitSW_1 ;
+  bool LimitSW_2 ;
+  float VoltageBattery ;
+  float CurrentBattery ;
+  int Encoder ;
+} ;
 
 struct WifiPayload
 {
@@ -78,7 +78,7 @@ unsigned int Page = 1 ;                                               // Khoi ta
 unsigned int Page_Pointer[10] ;                                       // Luu lai vi tri con tro truoc do da chon
 bool BreakPage = 0 ;                                                  // Co tac dung khi nhan nut BACK
 bool OkPage = 0 ;                                                     // Co tac dung khi nhan nut OK
-unsigned int pointer   ;                                              // Vi tri cua con tro trong menu
+unsigned int pointer  ;                                              // Vi tri cua con tro trong menu
 unsigned int PointerMax = 4 ;
 
 float Value = 0 ;                                                     // Gia tri ban dau cua Encoder
@@ -205,3 +205,7 @@ boolean StringComplete_EncoderSerial = false;
 int error = 0;
 byte type = 0;
 byte vibrate = 0;
+
+#define StaLedGREEN A0 
+#define StaLedRED A1
+#define Speaker A2

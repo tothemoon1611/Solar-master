@@ -4,9 +4,13 @@ static void BlynkLed(void* arg) {
 
   while (1) {
     // Turn LED on.
-    digitalWrite(LED_PIN, HIGH);
+//    digitalWrite(LED_PIN, HIGH);
+//    vTaskDelay((2000L * configTICK_RATE_HZ) / 1000L);
+//    digitalWrite(LED_PIN, LOW);
+//    vTaskDelay((2000L * configTICK_RATE_HZ) / 1000L);
+    digitalWrite(StaLedGREEN, HIGH);
     vTaskDelay((2000L * configTICK_RATE_HZ) / 1000L);
-    digitalWrite(LED_PIN, LOW);
+    digitalWrite(StaLedGREEN, LOW);
     vTaskDelay((2000L * configTICK_RATE_HZ) / 1000L);
   }
 }
@@ -24,7 +28,6 @@ void Robot_Init(void *pvParameters) {
 
   for (;;)
   {
-
     vTaskDelay((1000L * configTICK_RATE_HZ) / 1000L);
   }
 }

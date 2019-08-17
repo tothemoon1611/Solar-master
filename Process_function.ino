@@ -58,7 +58,7 @@ void Get_Wifi_Command() {
             Serial.println(ContentIDError);
 #endif
             break;
-          case ACKSERVERCmd:
+          case ACKSERVERCmd:                            // giao tiep voi wifi
             ContentACKSERVER = InputString;
             wifiPayload.ACK_SERVER = true;
 #ifdef DEBUGER

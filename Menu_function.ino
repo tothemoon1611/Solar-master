@@ -375,7 +375,7 @@ void Network_Config()
         if (OkPage == 1) {
           OkPage = 0 ;
           Connect_Wifi() ;
-        } //  Get_ID() ; }
+        } 
       }
     }
     Wait_Task();
@@ -383,71 +383,80 @@ void Network_Config()
 }
 
 
-void Connect_Wifi() {
-  lcd.clear() ; lcd.setCursor(3, 2) ; lcd.print("Sending...") ;
-  Init_Communication();
-  lcd.clear() ; lcd.setCursor(3, 1) ; lcd.print("Sending DONE !") ;
-  vTaskDelay((1000L * configTICK_RATE_HZ) / 1000L);
-  lcd.clear() ;
-  int i = 5;
-  bool Check  = 0 ;
-  unsigned long TimeConnect = millis() ;
-  Serial.println( "MenuWifi.ACK_NETWORK = ") ; Serial.println(MenuWifi.ACK_SERVER) ; Serial.println("xxx") ;
-  Serial.println( "wifiPayload.ACK_NETWORK = ") ; Serial.println(wifiPayload.ACK_SERVER) ; Serial.println("xxx") ;
-  Menu_WifiPayload();
-  while ( MenuWifi.ACK_SERVER != true )
-  {
+void Connect_Wifi() 
+{
+    lcd.clear() ; lcd.setCursor(3, 2) ; lcd.print("Sending...") ;
+    Init_Communication();
+    lcd.clear() ; lcd.setCursor(3, 1) ; lcd.print("Sending DONE !") ;
+    vTaskDelay((1000L * configTICK_RATE_HZ) / 1000L);
+    lcd.clear() ;
+    int i = 5;
+    bool Check  = 0 ;
+    unsigned long TimeConnect = millis() ;
+  //  Serial.println( "MenuWifi.ACK_NETWORK = ") ; Serial.println(MenuWifi.ACK_SERVER) ; Serial.println("xxx") ;
+  //  Serial.println( "wifiPayload.ACK_NETWORK = ") ; Serial.println(wifiPayload.ACK_SERVER) ; Serial.println("xxx") ;
     Menu_WifiPayload();
-    Serial.println("wifiPayload.ACK_SERVER = " + wifiPayload.ACK_SERVER) ;
-    Serial.println("MenuWifi.ACK_SERVER = " + MenuWifi.ACK_SERVER) ;
-    lcd.setCursor(3, 1) ; lcd.print("Please wait ...") ; lcd.setCursor(i, 2) ; lcd.print(".") ; if ( i == 12) {
-      Init_Communication();
-      i = 5;
-      lcd.clear() ;
-    }
-    Key = keypad.getKey();
-    if ( ((int)keypad.getState() ==  PRESSED) )
-    {
-      vTaskDelay((50L * configTICK_RATE_HZ) / 1000L);
-      if ( Key == BACK )
-      {
-        Check = 1 ;
-        break ;
-      }
-    }
-    i++ ;
-    vTaskDelay((500L * configTICK_RATE_HZ) / 1000L);
-    if ( (unsigned long) (millis() - TimeConnect) > 30000) {
-      Check = 1 ;
-      break ;
-    }
-  }
-  if (Check == 1)
-  {
-    Check = 0;
-    lcd.clear() ;
-    lcd.setCursor(4, 2) ;
-    lcd.print("Connect failed !") ;
-    //        if ( xSemaphoreTake( sem_ReadWifi, ( TickType_t ) 0 ) )
-    //          {
-    MenuWifi.ACK_SERVER = false ;
-    //wifiPayload.ACK_SERVER = false ;
-    //            xSemaphoreGive(sem_ProcessWifi);
-    //          }
-  }
-  else {
-    Check = 0 ;
-    lcd.clear() ;
-    lcd.setCursor(4, 2) ;
-    lcd.print("Connected !") ;
-    vTaskDelay((2000L * configTICK_RATE_HZ) / 1000L);
-    //        if ( xSemaphoreTake( sem_ReadWifi, ( TickType_t ) 0 ) )
-    //          {
-    MenuWifi.ACK_SERVER = false ;
-    //wifiPayload.ACK_SERVER = false ;
-    //            xSemaphoreGive(sem_ProcessWifi);
-    //          }
-  }
+      while ( MenuWifi.ACK_SERVER != true )
+        {
+          Menu_WifiPayload()
+          lcd.setCursor(3, 1) ; lcd.print("Please wait ...") ; lcd.setCursor(i, 2) ; lcd.print(".") ; if ( i == 12) {
+            Init_Communication();
+            i = 5;
+            lcd.clear() ;
+          }
+          Key = keypad.getKey();
+          if ( ((int)keypad.getState() ==  PRESSED) )
+          {
+            vTaskDelay((50L * configTICK_RATE_HZ) / 1000L);
+            if ( Key == BACK )
+            {
+              Check = 1 ;
+              break ;
+            }
+          }
+          i++ ;
+          vTaskDelay((500L * configTICK_RATE_HZ) / 1000L);
+          if ( (unsigned long) (millis() - TimeConnect) > 30000) {
+            Check = 1 ;
+            break ;
+          }
+        }
+     
+        if (Check == 1)
+        {
+          Check = 0;
+          lcd.clear() ;
+          lcd.setCursor(4, 2) ;
+          lcd.print("Connect failed !") ;
+          for( int i = 0; i < 5 ; i++ ) {
+          digitalWrite(StaLedRED, HIGH);
+          vTaskDelay((200L * configTICK_RATE_HZ) / 1000L);
+          digitalWrite(StaLedRED, LOW);
+          vTaskDelay((200L * configTICK_RATE_HZ) / 1000L); }
+          if ( xSemaphoreTake( sem_ReadData, ( TickType_t ) 0 ) )
+            {
+              MenuWifi.ACK_SERVER = false ;
+              wifiPayload.ACK_SERVER = false ;
+              xSemaphoreGive(sem_ProcessWifi);
+            }
+        }
+        else {
+          Check = 0 ;
+          lcd.clear() ;
+          lcd.setCursor(4, 2) ;
+          lcd.print("Connected !") ;
+          for( int i = 0; i < 5 ; i++ ) {
+          digitalWrite(StaLedGREEN, HIGH);
+          vTaskDelay((200L * configTICK_RATE_HZ) / 1000L);
+          digitalWrite(StaLedGREEN, LOW);
+          vTaskDelay((200L * configTICK_RATE_HZ) / 1000L); }
+          if ( xSemaphoreTake( sem_ReadData, ( TickType_t ) 0 ) )
+            {
+              MenuWifi.ACK_SERVER = false ;
+              wifiPayload.ACK_SERVER = false ;
+              xSemaphoreGive(sem_ProcessWifi);
+            }
+        }
 }
 
 
@@ -521,66 +530,9 @@ void Build_Map()
 
 void Automatic()
 {
-  lcd.clear() ;
-  lcd.setCursor(0, 1) ;
-  lcd.print("Speed: ") ;
-  String DisplayLCD = "";
-  while (1) {
-    //  lcd.setCursor(0, 1) ;
-    //  lcd.print("Current: ") ;
-    lcd.setCursor(10, 1) ;
-    lcd.print(DisplayLCD) ;
-    DisplayLCD = "";
-    if (digitalRead(UP) == 0)
-    {
-      Wait_Task() ;
-      if (pointer == 0) {
-        pointer = 0;
-      }
-      else {
-        pointer-- ;
-      }
-      break ;
-    }
-    if (digitalRead(DOWN) == 0)
-    {
-      Wait_Task() ;
-      if (pointer == 3) {
-        pointer = 3;
-      }
-      else {
-        pointer++ ;
-      }
-      break ;
-    }
-    if (digitalRead(OK) == 0)
-    {
-      Wait_Task() ;
-      OkPage = 1 ;
-      if (Page == PageMAX) {
-        Page = PageMAX ;
-      }
-      else {
-        Page++;
-      }
-      break ;
-    }
-    if (digitalRead(BACK) == 0)
-    {
-      Wait_Task() ;
-      BreakPage = 1 ;
-      if (Page == 1) {
-        Page = 1 ;
-      }
-      else {
-        Page--;
-      } ;
-      //pointer = Page_Pointer[Page] ;
-      break ;
-    }
-    Wait_Task;
-  }
+  
 }
+
 void Init_Communication() {
   TempData = "" ;
   SDreadData(FileHardIDData) ;
@@ -613,6 +565,8 @@ void Init_Communication() {
   vTaskDelay((500L * configTICK_RATE_HZ) / 1000L);
   TempData = "" ;
 }
+
+
 void Menu_ReadSensor() {
   if ( xSemaphoreTake( sem_ReadData, ( TickType_t ) 0 ) )
   {
@@ -649,7 +603,7 @@ void Menu_WifiPayload()
     }
     if (MenuWifi.NetworkError) ERROR_Processing() ;
     xSemaphoreGive(sem_ProcessWifi);
-  }
+}
 }
 
 void ERROR_Processing()
