@@ -64,6 +64,12 @@ bool SDformat()
     myFile = SD.open(FilePWMCleData, FILE_WRITE);
     myFile.close();
   } else {Serial.println("Existed " + FilePWMCleData) ; }
+  if (!SD.exists(FilePanPosData))
+  {
+    Serial.println("Initialzing " + FilePanPosData) ;
+    myFile = SD.open(FilePanPosData, FILE_WRITE);
+    myFile.close();
+  } else {Serial.println("Existed " + FilePanPosData) ; }
 
   //  if (!SD.exists("robot.csv"))
   //  {

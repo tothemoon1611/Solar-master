@@ -151,6 +151,7 @@ String FileHardIDData = "HdIDData.txt"  ;
 String FileEAlertData = "EAlert.txt" ;
 String FilePWMMovData = "PWMMov.txt" ;
 String FilePWMCleData = "PWMCle.txt" ;
+String FilePanPosData = "PanPos.txt" ;
 
 String PIDKpMovSpd ;
 String PIDKiMovSpd ;
@@ -214,4 +215,7 @@ byte vibrate = 0;
 
 #define StaLedGREEN A0 
 #define StaLedRED A1
-#define Speaker A2
+#define Speaker 9 
+
+
+#define PausePin 39

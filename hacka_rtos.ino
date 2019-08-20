@@ -71,7 +71,8 @@ void setup() {
   Serial4.begin(9600);
   Motor_Setup() ;
   pinMode(A0, OUTPUT) ;
-  // pinMode(A0, OUTPUT) ;
+  pinMode(9, OUTPUT) ;
+
 
   // initialize semaphore
   sem_ReadData = xSemaphoreCreateCounting(1, 0);

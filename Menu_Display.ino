@@ -64,7 +64,7 @@ void LCD_Page_3_Display()
     if ( (Page_Pointer[1] == 1) && (Page_Pointer[2] == 3) ) { LCD_WorkTest() ; } 
 
     if ( (Page_Pointer[1] == 2) && (Page_Pointer[2] == 2) ) { Server_SetMode() ; }
-    
+    if ( (Page_Pointer[1] == 2) && (Page_Pointer[2] == 0) ) { Building_Map() ; } 
     Keypad_Option() ;
     if (BreakPage == 1) { BreakPage = 0 ; break ; }
     if (OkPage == 1) { OkPage = 0 ; Page_Pointer[3] = pointer ; break ; }
@@ -169,17 +169,25 @@ void Keypad_Set_Value()
                 Serial.println(TempData) ;
                 lcd.setCursor(0, 2) ;
                 lcd.print(TempData) ;
-                Wait_Task() ;
+                digitalWrite(Speaker,HIGH) ;
+                vTaskDelay((100L * configTICK_RATE_HZ) / 1000L); 
+                digitalWrite(Speaker,LOW) ;
                 OkPage = 1 ;  
                 break ;
               }
             case BACK :  
               {
+                digitalWrite(Speaker,HIGH) ;
+                vTaskDelay((50L * configTICK_RATE_HZ) / 1000L); 
+                digitalWrite(Speaker,LOW) ;
                 BreakPage = 1 ; 
                 break ;
               }
             case BACKSPACE : 
               {
+                digitalWrite(Speaker,HIGH) ;
+                vTaskDelay((30L * configTICK_RATE_HZ) / 1000L); 
+                digitalWrite(Speaker,LOW) ;
                 LcdTemp--  ;
                 lcd.setCursor(LcdTemp, 2) ;
                 lcd.print(' ') ;
@@ -200,26 +208,23 @@ void Keypad_Set_Value()
 
 
 void Keypad_Processing() 
-  {
+{
     Serial.println(Key) ;
     ValTemp = 0 ;
     lcd.setCursor(LcdTemp, 2) ;
     lcd.print(Key) ;
-    Wait_Task() ;
+    digitalWrite(Speaker,HIGH) ;
+    vTaskDelay((50L * configTICK_RATE_HZ) / 1000L); 
+    digitalWrite(Speaker,LOW) ;
     TimeKeypad = millis() ;
     while(1) 
     {
       char KeyContinue = keypad.getKey();
       if ( ((int)keypad.getState() ==  PRESSED) ) 
         {
-//          if( (KeyContinue != x ) )            // ngay tai day xu ly khi dang thao tac nut nay ma nhan sang nut khac.
-//            { 
-//              Serial.print(" Slected  : ") ;
-//              Serial.println(Key) ;
-//              Serial.println("") ;
-//              break ;
-//            }
-        
+          digitalWrite(Speaker,HIGH) ;
+          vTaskDelay((20L * configTICK_RATE_HZ) / 1000L); 
+          digitalWrite(Speaker,LOW) ;
           if( (KeyContinue == x ) )
             {
               if( ValTemp < MAXSize -1 ) { ValTemp++ ; } 
@@ -241,7 +246,6 @@ void Keypad_Processing()
           lcd.setCursor(0, 2) ;
           lcd.print(TempData) ;
           LcdTemp++;
-//          Serial.println(Key) ;
           Serial.println("") ;
           break ; 
         }
@@ -258,9 +262,12 @@ void Keypad_Option()
     Key = keypad.getKey();
     if ( ((int)keypad.getState() ==  PRESSED) )
       {
+        digitalWrite(Speaker,HIGH) ;
+        vTaskDelay((50L * configTICK_RATE_HZ) / 1000L); 
+        digitalWrite(Speaker,LOW) ;
         if ( Key == UP )
         {
-          vTaskDelay((50L * configTICK_RATE_HZ) / 1000L);
+          //vTaskDelay((50L * configTICK_RATE_HZ) / 1000L);
           if (pointer == 0) {
             pointer = 0;
           }
@@ -271,7 +278,7 @@ void Keypad_Option()
         }
         if ( Key == DOWN )
         {
-          vTaskDelay((50L * configTICK_RATE_HZ) / 1000L);
+          //vTaskDelay((50L * configTICK_RATE_HZ) / 1000L);
           if (pointer == ( PointerMax - 1) ) {
             pointer = PointerMax - 1 ;
           }
@@ -283,7 +290,7 @@ void Keypad_Option()
          
         if ( Key == OK )
         {
-          vTaskDelay((50L * configTICK_RATE_HZ) / 1000L);
+         // vTaskDelay((50L * configTICK_RATE_HZ) / 1000L);
           OkPage = 1 ;
           if (Page == PageMAX) {
             Page = PageMAX ;
@@ -295,7 +302,7 @@ void Keypad_Option()
         }
         if ( Key == BACK )
         {
-          vTaskDelay((50L * configTICK_RATE_HZ) / 1000L);
+         // vTaskDelay((50L * configTICK_RATE_HZ) / 1000L);
           BreakPage = 1 ;
           if (Page == 1) {
             Page = 1 ;
@@ -310,6 +317,7 @@ void Keypad_Option()
       Wait_Task() ;
   }
 }
+
 //-----------------------------------------------CAC HAM DUOI DAY DUNG DE HIEN THI CAC BIEN CHAR* RA LCD---------------------------------------------------//
 
 

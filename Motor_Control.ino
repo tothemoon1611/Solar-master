@@ -1,4 +1,7 @@
 bool Sensor_Temp;
+int PanPosTemp = 0 ;
+unsigned int PanPosMax = 0 ;
+
 int Accelerate = 255 ;
 int AccelerateCLE = 255 ;
 int DelaySpeed = 1 ;
@@ -438,17 +441,19 @@ void Run_Mode() {
   }
 }
 
-void Menu_incPanelPos() {
-  lcd.setCursor(16, 2) ; lcd.print(MenuSensor.Encoder) ;
+void Menu_incPanelPos() 
+{
+  if( PanPos != MenuSensor.Encoder)
+    {  
+      PanPos = MenuSensor.Encoder ;
+      lcd.setCursor(16, 2) ; lcd.print(PanPos) ;
+      SDsaveData((String)PanPos, FilePanPosData) ;
+    }
   if (  MenuSensor.MetalSensor == 0 && Sensor_Temp == 0) Sensor_Temp = 1  ;
   if (  MenuSensor.MetalSensor == 1 && Sensor_Temp == 1)
   {
-    Sensor_Temp = 0;
-    PanPos++ ;
-    lcd.setCursor(0, 2) ; lcd.print("Panel Position:") ;
-    //lcd.setCursor(16, 2) ; lcd.print(PanPos) ;
-    lcd.setCursor(16, 2) ; lcd.print(MenuSensor.Encoder) ;
-    //Serial.println(PanPos) ;
+    Sensor_Temp = 0 ;
+    EncoderSerial.print(String(Start) + String(NextPanel) + String(End)) ; // IR phat hien tam pin moi
     UpdatetoESP(String(updateCollumnPanelParameter), String(PanPos));
     UpdatetoESP(String(updateStringPanelParameter), String(StrPanel));
   }
@@ -456,16 +461,16 @@ void Menu_incPanelPos() {
 
 void Menu_decPanelPos()
 {
-  lcd.setCursor(16, 2) ; lcd.print(MenuSensor.Encoder) ;
+  //lcd.setCursor(16, 2) ; lcd.print(MenuSensor.Encoder) ;
   if (  MenuSensor.MetalSensor == 0 && Sensor_Temp == 0) Sensor_Temp = 1 ;
   if (  MenuSensor.MetalSensor == 1 && Sensor_Temp == 1)
   {
     Sensor_Temp = 0;
-    if (PanPos) PanPos-- ;
+    if (PanPos != 0) PanPos-- ;
     lcd.clear() ;
     lcd.setCursor(0, 2) ; lcd.print("Panel Position:") ;
-    //lcd.setCursor(16, 2) ; lcd.print(PanPos) ;
-    lcd.setCursor(16, 2) ; lcd.print(MenuSensor.Encoder) ;
+    lcd.setCursor(16, 2) ; lcd.print(PanPos) ;
+    //lcd.setCursor(16, 2) ; lcd.print(MenuSensor.Encoder) ;
     Serial.println(PanPos) ;
     UpdatetoESP(String(updateCollumnPanelParameter), String(PanPos));
     UpdatetoESP(String(updateStringPanelParameter), String(StrPanel));
@@ -475,6 +480,40 @@ void Menu_decPanelPos()
 
 void Building_Map()
 {
+  SDreadData(FilePWMMovData) ;
+  PWMMovSpd = TempData ;
+  TempData = "" ;
+  Accelerate = 255 ;
+  EncoderSerial.print(String(Start) + String(ResetEncoder) + String(End)) ; // yeu cau reset encoder  
+  MenuSensor.Encoder = 0  ;
+  Menu_ReadSensor();
+  PanPosMax = 0 ;
+  lcd.setCursor(0, 2) ; lcd.print("Panel Position:") ;
+  lcd.setCursor(16, 2) ; lcd.print(PanPos) ;
+  while( MenuSensor.LimitSW_2 != 0 )
+    {   
+      Motor_Right_Start() ;
+      Menu_incPanelPos() ;
+      Menu_ReadSensor();
+      Menu_WifiPayload();
+      PanPosMax = PanPos ;
+      WIFI.print(PanPosMax) ;
+      Serial.println(PanPosMax) ;
+      vTaskDelay((1L * configTICK_RATE_HZ) / 1000L)  ;
+    }
+  Motor_Run_Stop() ;
+  Accelerate = 255 ;  
+  while( MenuSensor.LimitSW_1 != 0 ) 
+    {
+      Motor_Left_Start() ;
+      Menu_decPanelPos() ; 
+      Menu_ReadSensor(); 
+      Menu_WifiPayload();
+      if( PanPos == 9) { lcd.clear() ; lcd.setCursor(0, 2) ; lcd.print("Panel Position:") ; lcd.print(PanPos) ;}
+      if(PanPos < 0 ) { PanPosMax = PanPosMax - PanPos ; WIFI.print(PanPosMax) ; Serial.println(PanPosMax) ;}
+      vTaskDelay((1L * configTICK_RATE_HZ) / 1000L)  ;
+    }
+  Motor_Run_Stop() ;  
 }
 
 //-------------------------Thiet Lap Ban Dau Cho Dong Co------------------------------------------------//
@@ -484,7 +523,8 @@ void Motor_Setup()
   pinMode(MetalSensorPin, INPUT_PULLUP) ;   // duong-nau, am-xanh
   pinMode(CheckWheel2, INPUT_PULLUP) ;   // duong-nau, am-xanh
   pinMode(CheckWheel1, INPUT_PULLUP) ;   // duong-nau, am-xanh
-
+  pinMode(PausePin, INPUT_PULLUP) ;
+  
   pinMode(DIR4, OUTPUT) ;
   pinMode(DIR3, OUTPUT) ;
   pinMode(PWM4, OUTPUT) ;
