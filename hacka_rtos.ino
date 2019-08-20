@@ -35,6 +35,7 @@ SemaphoreHandle_t sem_ReadWifi;
 SemaphoreHandle_t sem_ProcessWifi;
 SemaphoreHandle_t sem2;
 SemaphoreHandle_t sem_ReadEncoder;
+SemaphoreHandle_t sem_ReadCAMERA;
 
 DataMachine dataMachine;
 WifiPayload wifiPayload  ;
@@ -78,6 +79,7 @@ void setup() {
   sem_ReadWifi = xSemaphoreCreateCounting(1, 0);
   sem_ProcessWifi = xSemaphoreCreateCounting(1, 0);
   sem_ReadEncoder = xSemaphoreCreateCounting(1, 0);
+  sem_ReadCAMERA = xSemaphoreCreateCounting(1, 0);
   sem2 = xSemaphoreCreateCounting(1, 0);
 
   s2 = xTaskCreate(BlynkLed, NULL, configMINIMAL_STACK_SIZE, NULL, 1, NULL);

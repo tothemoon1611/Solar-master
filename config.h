@@ -188,6 +188,12 @@ char cmd_EncoderSerial;
 String InputString_EncoderSerial = "";
 boolean StringComplete_EncoderSerial = false;
 
+bool SerialRecv_CAMERA = false;
+int serial_counter_CAMERA = 0;
+char cmd_CAMERA;
+String InputString_CAMERA = "";
+boolean StringComplete_CAMERA = false;
+
 //----------------------------------Gamepad------------------------------------------//
 //#define PS2_DAT        42  //14    mac dien tro treo len nguon tu 1k - 10k
 //#define PS2_CMD        40  //15

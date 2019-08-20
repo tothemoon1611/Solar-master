@@ -15,82 +15,82 @@ void Get_Wifi_Command() {
       Serial.print("Recv Wifi Slave: ");
       Serial.println(InputString);
 #endif
-        switch (cmd) {
-          case setMovingSpeed:
-            MovingSpeed = InputString.toInt();
+      switch (cmd) {
+        case setMovingSpeed:
+          MovingSpeed = InputString.toInt();
 #ifdef DEBUGER
-            Serial.print("Set Moving Speed: ");
-            Serial.println(MovingSpeed);
+          Serial.print("Set Moving Speed: ");
+          Serial.println(MovingSpeed);
 #endif
-            break;
-          case setSpinnerSpeed:
+          break;
+        case setSpinnerSpeed:
 #ifdef DEBUGER
-            Serial.print("Set Moving Speed: ");
-            Serial.println(SpinnerSpeed);
+          Serial.print("Set Moving Speed: ");
+          Serial.println(SpinnerSpeed);
 #endif
-            break;
-          case setChargeThreshold:
+          break;
+        case setChargeThreshold:
 #ifdef DEBUGER
-            Serial.print("Set Moving Speed: ");
-            Serial.println(ChargingThreshold);
+          Serial.print("Set Moving Speed: ");
+          Serial.println(ChargingThreshold);
 #endif
-            break;
-          case setMaxPower:
+          break;
+        case setMaxPower:
 #ifdef DEBUGER
-            Serial.print("Set Moving Speed: ");
-            Serial.println(MaxPower);
+          Serial.print("Set Moving Speed: ");
+          Serial.println(MaxPower);
 #endif
-            break;
-          case setMinPower:
+          break;
+        case setMinPower:
 #ifdef DEBUGER
-            Serial.print("Set Moving Speed: ");
-            Serial.println(MinPower);
+          Serial.print("Set Moving Speed: ");
+          Serial.println(MinPower);
 #endif
-            break;
-          case IDError:
-            ContentIDError = InputString;
+          break;
+        case IDError:
+          ContentIDError = InputString;
 #ifdef DEBUGER
-            Serial.print("Server Error: ");
-            Serial.println(ContentIDError);
+          Serial.print("Server Error: ");
+          Serial.println(ContentIDError);
 #endif
-            break;
-          case ACKSERVERCmd:                            // giao tiep voi wifi
-            ContentACKSERVER = InputString;
-            wifiPayload.ACK_SERVER = true;
+          break;
+        case ACKSERVERCmd:                            // giao tiep voi wifi
+          ContentACKSERVER = InputString;
+          wifiPayload.ACK_SERVER = true;
 #ifdef DEBUGER
-            Serial.print("Server connect: ");
-            Serial.println(ContentACKSERVER);
+          Serial.print("Server connect: ");
+          Serial.println(ContentACKSERVER);
 #endif
-            break;
-          case setMode:
-            wifiPayload.Mode = InputString.toInt();
+          break;
+        case setMode:
+          wifiPayload.Mode = InputString.toInt();
 #ifdef DEBUGER
-            Serial.print("Set Mode: ");
-            Serial.println(wifiPayload.Mode);
+          Serial.print("Set Mode: ");
+          Serial.println(wifiPayload.Mode);
 #endif
-            break;
-          case setStop:
-            wifiPayload.Stop = InputString.toInt();
+          break;
+        case setStop:
+          wifiPayload.Stop = InputString.toInt();
 #ifdef DEBUGER
-            Serial.print("Set Stop: ");
-            Serial.println(wifiPayload.Stop);
+          Serial.print("Set Stop: ");
+          Serial.println(wifiPayload.Stop);
 #endif
-            break;
-          case setContinue:
-            wifiPayload.Continue = InputString.toInt();
+          break;
+        case setContinue:
+          wifiPayload.Continue = InputString.toInt();
 #ifdef DEBUGER
-            Serial.print("Set Continue: ");
-            Serial.println(wifiPayload.Continue);
+          Serial.print("Set Continue: ");
+          Serial.println(wifiPayload.Continue);
 #endif
+          break;
+        case NetworkError: {
+            wifiPayload.NetworkError = 1;
+            Serial.println(InputString);
             break;
-          case NetworkError: {
-              wifiPayload.NetworkError = 1;
-              Serial.println(InputString);
-              break;
-            }
-          default:
-            Serial.println("Unknown cmd!!!");
-        }
+          }
+        default:
+          Serial.println("Unknown cmd!!!");
+      }
       InputString = "";
       StringComplete = false;
 
@@ -113,9 +113,12 @@ void Get_Encoder_Command() {
         case setEncoder:
 #ifdef DEBUGER
           Serial.print("Set Encoder: ");
-          
+
           dataMachine.Encoder = InputString_EncoderSerial.toInt();
-          Serial.print(dataMachine.Encoder);
+          Serial.println(dataMachine.Encoder);
+          UpdatetoCAMERA(String(CapImg), String(1));
+          UpdatetoCAMERA(String(updateStringPanelParameter), String(0));
+          UpdatetoCAMERA(String(updateCollumnPanelParameter), String(dataMachine.Encoder));
 #endif
           break;
         default:
@@ -130,6 +133,34 @@ void Get_Encoder_Command() {
   }
 }
 
+void Get_CAMERA_Command() {
+  for (;;)
+  {
+    Get_Serial_CAMERA();
+    if (StringComplete_CAMERA) {
+#ifdef DEBUGER
+      Serial.print("Recv CAMERA Slave: ");
+      Serial.println(InputString_CAMERA);
+#endif
+      switch (cmd_CAMERA) {
+        case setEncoder:
+#ifdef DEBUGER
+          Serial.print("Set Encoder: ");
+          dataMachine.Encoder = InputString_EncoderSerial.toInt();
+          Serial.println(dataMachine.Encoder);
+#endif
+          break;
+        default:
+          Serial.println("Unknown cmd!!!");
+      }
+      InputString_CAMERA = "";
+      StringComplete_CAMERA = false;
+      xSemaphoreGive(sem_ReadCAMERA);
+    }
+
+    vTaskDelay((10L * configTICK_RATE_HZ) / 1000L);
+  }
+}
 
 void Get_Serial_Wifi() {
   if (WIFI.available())
@@ -165,6 +196,23 @@ void Get_Serial_Encoder() {
   }
 }
 
+void Get_Serial_CAMERA() {
+  if (CAMERA.available())
+  {
+    char inChar_CAMERA = (char)CAMERA.read();
+    if (inChar_CAMERA == Start) SerialRecv_CAMERA = true;
+    if (inChar_CAMERA == End)
+    {
+      SerialRecv_CAMERA = false;
+      serial_counter_CAMERA = 0;
+      StringComplete_CAMERA = true;
+    }
+    if (SerialRecv_CAMERA)  serial_counter_CAMERA++;
+    if (serial_counter_CAMERA == 2) cmd_CAMERA = inChar_CAMERA;
+    if (serial_counter_CAMERA > 2) InputString_CAMERA += inChar_CAMERA;
+  }
+}
+
 void RTC_Init() {
   rtc.begin();
 #ifdef SETTIME
@@ -188,4 +236,7 @@ void readCurrent()
 }
 void UpdatetoESP(String Command, String data) {
   WIFI.print(String(Start) + Command + data + String(End));
+}
+void UpdatetoCAMERA(String Command, String data) {
+  CAMERA.print(Command + data + "\r\n");
 }
