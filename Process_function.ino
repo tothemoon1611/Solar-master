@@ -116,9 +116,7 @@ void Get_Encoder_Command() {
 
           dataMachine.Encoder = InputString_EncoderSerial.toInt();
           Serial.println(dataMachine.Encoder);
-          UpdatetoCAMERA(String(CapImg), String(1));
-          UpdatetoCAMERA(String(updateStringPanelParameter), String(0));
-          UpdatetoCAMERA(String(updateCollumnPanelParameter), String(dataMachine.Encoder));
+          UpdatetoCAMERA(String("CapImg"), String(0), String(dataMachine.Encoder));
 #endif
           break;
         default:
@@ -237,6 +235,6 @@ void readCurrent()
 void UpdatetoESP(String Command, String data) {
   WIFI.print(String(Start) + Command + data + String(End));
 }
-void UpdatetoCAMERA(String Command, String data) {
-  CAMERA.print(Command + data + "\r\n");
+void UpdatetoCAMERA(String Command, String data1, String data2) {
+  CAMERA.println(Command + " " + data1 + " "+ data2 );
 }
