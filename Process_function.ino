@@ -23,37 +23,43 @@ void Get_Wifi_Command() {
           Serial.println(MovingSpeed);
 #endif
           break;
+//-----------------------------------------------------            
         case setSpinnerSpeed:
 #ifdef DEBUGER
           Serial.print("Set Moving Speed: ");
           Serial.println(SpinnerSpeed);
 #endif
           break;
+//-----------------------------------------------------            
         case setChargeThreshold:
 #ifdef DEBUGER
           Serial.print("Set Moving Speed: ");
           Serial.println(ChargingThreshold);
 #endif
           break;
+//-----------------------------------------------------         
         case setMaxPower:
 #ifdef DEBUGER
           Serial.print("Set Moving Speed: ");
           Serial.println(MaxPower);
 #endif
           break;
+//-----------------------------------------------------            
         case setMinPower:
 #ifdef DEBUGER
           Serial.print("Set Moving Speed: ");
           Serial.println(MinPower);
 #endif
           break;
-        case IDError:
+//-----------------------------------------------------            
+        case IDError:                                      
           ContentIDError = InputString;
 #ifdef DEBUGER
-          Serial.print("Server Error: ");
+          Serial.print("ID Error: ");
           Serial.println(ContentIDError);
 #endif
           break;
+//-----------------------------------------------------            
         case ACKSERVERCmd:                            // giao tiep voi wifi
           ContentACKSERVER = InputString;
           wifiPayload.ACK_SERVER = true;
@@ -62,6 +68,7 @@ void Get_Wifi_Command() {
           Serial.println(ContentACKSERVER);
 #endif
           break;
+//-----------------------------------------------------            
         case setMode:
           wifiPayload.Mode = InputString.toInt();
 #ifdef DEBUGER
@@ -69,6 +76,7 @@ void Get_Wifi_Command() {
           Serial.println(wifiPayload.Mode);
 #endif
           break;
+//-----------------------------------------------------            
         case setStop:
           wifiPayload.Stop = InputString.toInt();
 #ifdef DEBUGER
@@ -76,6 +84,7 @@ void Get_Wifi_Command() {
           Serial.println(wifiPayload.Stop);
 #endif
           break;
+//-----------------------------------------------------            
         case setContinue:
           wifiPayload.Continue = InputString.toInt();
 #ifdef DEBUGER
@@ -83,11 +92,29 @@ void Get_Wifi_Command() {
           Serial.println(wifiPayload.Continue);
 #endif
           break;
+//-----------------------------------------------------        
         case NetworkError: {
             wifiPayload.NetworkError = 1;
             Serial.println(InputString);
             break;
           }
+//-----------------------------------------------------            
+        case ServerError:                              // loi mat ket noi socket
+            wifiPayload.ServerStatus = false ;
+#ifdef DEBUGER
+          Serial.print("Socket Was Stopped !");
+          Serial.println(wifiPayload.ServerStatus);
+#endif
+          break;  
+//-----------------------------------------------------            
+        case ServerOK:
+            wifiPayload.ServerStatus = true ;
+#ifdef DEBUGER
+          Serial.print("Socket Reconnect OK !");
+          Serial.println(wifiPayload.ServerStatus);
+#endif
+          break;  
+//-----------------------------------------------------            
         default:
           Serial.println("Unknown cmd!!!");
       }
@@ -99,6 +126,73 @@ void Get_Wifi_Command() {
     vTaskDelay((10L * configTICK_RATE_HZ) / 1000L);
   }
 }
+
+void ERROR_Processing()
+{
+  lcd.clear() ;
+  bool outError = 0 ;
+  while(1) 
+    {
+      Motor_Run_Stop() ;
+      Motor_Cleaning_Stop() ;
+      Menu_WifiPayload() ;
+      bool Error = 0 ;
+      unsigned long WifiTimeout = millis() ;
+      while ( MenuWifi.ServerStatus != true )
+      {
+            Menu_WifiPayload() ;
+            lcd.setCursor(1, 1) ;
+            lcd.print("Disconnected to SV") ;
+            lcd.setCursor(1, 2) ;
+            lcd.print("Retrying... ") ;
+            if ( (unsigned long) (millis() - WifiTimeout) > 60000)    // neu qua 1 phut ma khong connect lai duoc thi ... 
+              {                
+                  lcd.clear() ; 
+                  lcd.setCursor(1,1) ; lcd.print("Reconnect failed !") ; 
+                  lcd.setCursor(4,2) ; lcd.print("retry... ?") ; 
+                  lcd.setCursor(0,3) ; lcd.print("<BACK>") ; lcd.setCursor(16,3) ; lcd.print("<OK>") ; 
+                  Keypad_Option() ;
+                  if (BreakPage == 1) {  BreakPage = 0 ; Error = 1;  break ; }
+                  if(OkPage == 1) { OkPage = 0; return ERROR_Processing() ; }
+              }
+            break ;
+            Key = keypad.getKey();
+            if ( ((int)keypad.getState() ==  PRESSED) )
+            {
+              if ( Key == BACK )
+              {
+                Error = 1 ;
+                break ;
+              }
+            }
+            digitalWrite(StaLedRED, HIGH);
+            vTaskDelay((200L * configTICK_RATE_HZ) / 1000L);
+            digitalWrite(StaLedRED, LOW);
+            vTaskDelay((200L * configTICK_RATE_HZ) / 1000L);
+      }
+      if ( Error == 0 ) {
+        lcd.clear() ;
+        lcd.setCursor(0, 2) ; lcd.print("Panel Position:") ; 
+        outError = 1 ;
+        digitalWrite(StaLedRED, LOW);
+        vTaskDelay((200L * configTICK_RATE_HZ) / 1000L);
+        digitalWrite(StaLedGREEN, HIGH);
+        vTaskDelay((200L * configTICK_RATE_HZ) / 1000L);
+      }
+      else {
+        lcd.clear() ; lcd.setCursor(1,1) ; lcd.print("Reconnect failed !") ;
+        Page = 1 ;                                                                                 
+        BreakPage = 0 ;                                                  
+        OkPage = 0 ;                                                    
+        pointer = 0 ;                                             
+        PointerMax = 4 ;
+        vTaskDelay((2000L * configTICK_RATE_HZ) / 1000L);
+        return Page_Processing() ;                                   
+      }
+     if(outError == 1) { outError = 0 ; break ; }  
+    }
+}
+
 
 void Get_Encoder_Command() {
   for (;;)
@@ -116,7 +210,9 @@ void Get_Encoder_Command() {
 
           dataMachine.Encoder = InputString_EncoderSerial.toInt();
           Serial.println(dataMachine.Encoder);
-          UpdatetoCAMERA(String("CapImg"), String(0), String(dataMachine.Encoder));
+          UpdatetoCAMERA(String("CapImg"), String(StrPanel), String(dataMachine.Encoder));
+          UpdatetoESP(String(updateStringPanelParameter),String(StrPanel));
+          UpdatetoESP(String(updateCollumnPanelParameter),String(dataMachine.Encoder));
 #endif
           break;
         default:
