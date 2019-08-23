@@ -153,14 +153,9 @@ void ERROR_Processing()
       unsigned long WifiTimeout = millis() ;
       Serial.println("Phat hien loi mat ket noi voi Socket !!! " ) ;
       vTaskDelay((1000L * configTICK_RATE_HZ) / 1000L);
-      while( wifiPayload.ServerStatus != true )  
+      while( wifiPayload.ServerStatus != true || MenuWifi.NetworkStatus != true )  
       {
             Serial.println("Dang Reconnect lai voi socket ... !  wifiPayload.ServerStatus =  " + (int)wifiPayload.ServerStatus ) ;
-            if ( xSemaphoreTake( sem_ReadWifi, ( TickType_t ) 0 ) )
-            {
-              MenuWifi.NetworkStatus = wifiPayload.NetworkStatus ;
-              MenuWifi.ServerStatus = wifiPayload.ServerStatus ;
-            }
             lcd.setCursor(1, 1) ;
             lcd.print("Disconnected to SV") ;
             lcd.setCursor(1, 2) ;

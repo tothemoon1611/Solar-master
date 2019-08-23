@@ -574,7 +574,7 @@ void Menu_WifiPayload()
       MenuWifi.Continue = 0;
       wifiPayload.Continue = 0 ;
     }
-    if (MenuWifi.ServerStatus == false) { xSemaphoreGive(sem_ProcessWifi); ERROR_Processing() ; }
+    if (MenuWifi.ServerStatus == false || MenuWifi.NetworkStatus == false ) { ERROR_Processing() ; }
     xSemaphoreGive(sem_ProcessWifi);
   }
 }
