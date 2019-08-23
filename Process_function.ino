@@ -94,10 +94,22 @@ void Get_Wifi_Command() {
           break;
 //-----------------------------------------------------        
         case NetworkError: {
-            wifiPayload.NetworkError = 1;
+            wifiPayload.NetworkStatus = false;
+#ifdef DEBUGER            
             Serial.println(InputString);
+#endif            
+            Net_SocStatus = false ; 
             break;
           }
+//-----------------------------------------------------        
+        case NetworkOK: {
+            wifiPayload.NetworkStatus = true;
+#ifdef DEBUGER            
+            Serial.println(InputString);
+#endif  
+            Net_SocStatus = true ; 
+            break;
+          }          
 //-----------------------------------------------------            
         case ServerError:                              // loi mat ket noi socket
             wifiPayload.ServerStatus = false ;
@@ -105,6 +117,7 @@ void Get_Wifi_Command() {
           Serial.print("Socket Was Stopped !");
           Serial.println(wifiPayload.ServerStatus);
 #endif
+          Net_SocStatus = false ; 
           break;  
 //-----------------------------------------------------            
         case ServerOK:
@@ -113,6 +126,7 @@ void Get_Wifi_Command() {
           Serial.print("Socket Reconnect OK !");
           Serial.println(wifiPayload.ServerStatus);
 #endif
+          Net_SocStatus = true ; 
           break;  
 //-----------------------------------------------------            
         default:
@@ -130,17 +144,23 @@ void Get_Wifi_Command() {
 void ERROR_Processing()
 {
   lcd.clear() ;
-  bool outError = 0 ;
+  digitalWrite(StaLedGREEN, LOW);
   while(1) 
     {
       Motor_Run_Stop() ;
       Motor_Cleaning_Stop() ;
-      Menu_WifiPayload() ;
       bool Error = 0 ;
       unsigned long WifiTimeout = millis() ;
-      while ( MenuWifi.ServerStatus != true )
+      Serial.println("Phat hien loi mat ket noi voi Socket !!! " ) ;
+      vTaskDelay((1000L * configTICK_RATE_HZ) / 1000L);
+      while( wifiPayload.ServerStatus != true )  
       {
-            Menu_WifiPayload() ;
+            Serial.println("Dang Reconnect lai voi socket ... !  wifiPayload.ServerStatus =  " + (int)wifiPayload.ServerStatus ) ;
+            if ( xSemaphoreTake( sem_ReadWifi, ( TickType_t ) 0 ) )
+            {
+              MenuWifi.NetworkStatus = wifiPayload.NetworkStatus ;
+              MenuWifi.ServerStatus = wifiPayload.ServerStatus ;
+            }
             lcd.setCursor(1, 1) ;
             lcd.print("Disconnected to SV") ;
             lcd.setCursor(1, 2) ;
@@ -155,7 +175,6 @@ void ERROR_Processing()
                   if (BreakPage == 1) {  BreakPage = 0 ; Error = 1;  break ; }
                   if(OkPage == 1) { OkPage = 0; return ERROR_Processing() ; }
               }
-            break ;
             Key = keypad.getKey();
             if ( ((int)keypad.getState() ==  PRESSED) )
             {
@@ -166,14 +185,15 @@ void ERROR_Processing()
               }
             }
             digitalWrite(StaLedRED, HIGH);
-            vTaskDelay((200L * configTICK_RATE_HZ) / 1000L);
+            vTaskDelay((250L * configTICK_RATE_HZ) / 1000L);
             digitalWrite(StaLedRED, LOW);
-            vTaskDelay((200L * configTICK_RATE_HZ) / 1000L);
+            vTaskDelay((250L * configTICK_RATE_HZ) / 1000L);
       }
+      Serial.println("Da xu ly xong ^^! Error = " + Error ) ;
+      vTaskDelay((1000L * configTICK_RATE_HZ) / 1000L);
       if ( Error == 0 ) {
         lcd.clear() ;
         lcd.setCursor(0, 2) ; lcd.print("Panel Position:") ; 
-        outError = 1 ;
         digitalWrite(StaLedRED, LOW);
         vTaskDelay((200L * configTICK_RATE_HZ) / 1000L);
         digitalWrite(StaLedGREEN, HIGH);
@@ -188,8 +208,8 @@ void ERROR_Processing()
         PointerMax = 4 ;
         vTaskDelay((2000L * configTICK_RATE_HZ) / 1000L);
         return Page_Processing() ;                                   
-      }
-     if(outError == 1) { outError = 0 ; break ; }  
+      }  
+     break ;
     }
 }
 

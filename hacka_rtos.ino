@@ -65,14 +65,15 @@ void setup() {
   Serial.begin(9600); // Monitor
   EncoderSerial.begin(9600); // cong giao tiep NodeMCU
   WIFI.begin(9600); // cong giao tiep NodeMCU 
-//  CAMERA.begin(9600); // cong giao tiep Raspberry
   SerialUSB.begin(9600); // Monitor
   PIO_Configure(PIOB, PIO_PERIPH_A, PIO_PB20A_TXD2 | PIO_PB21A_RXD2, PIO_DEFAULT);
   Serial4.begin(9600);
   Motor_Setup() ;
-  pinMode(A0, OUTPUT) ;
-  pinMode(9, OUTPUT) ;
-
+  pinMode(StaLedRED, OUTPUT) ;
+  pinMode(StaLedGREEN, OUTPUT) ;
+  pinMode(Speaker, OUTPUT) ;
+  digitalWrite(StaLedRED, LOW) ;
+  digitalWrite(StaLedGREEN, LOW) ;
 
   // initialize semaphore
   sem_ReadData = xSemaphoreCreateCounting(1, 0);

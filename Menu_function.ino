@@ -394,8 +394,6 @@ void Connect_Wifi()
   int i = 5;
   bool Check  = 0 ;
   unsigned long TimeConnect = millis() ;
-  //  Serial.println( "MenuWifi.ACK_NETWORK = ") ; Serial.println(MenuWifi.ACK_SERVER) ; Serial.println("xxx") ;
-  //  Serial.println( "wifiPayload.ACK_NETWORK = ") ; Serial.println(wifiPayload.ACK_SERVER) ; Serial.println("xxx") ;
   Menu_WifiPayload();
   while ( MenuWifi.ACK_SERVER != true )
   {
@@ -429,7 +427,7 @@ void Connect_Wifi()
     lcd.clear() ;
     lcd.setCursor(4, 2) ;
     lcd.print("Connect failed !") ;
-    for ( int i = 0; i < 3 ; i++ ) {
+    for ( int i = 0; i < 7 ; i++ ) {
       digitalWrite(StaLedRED, HIGH);
       vTaskDelay((200L * configTICK_RATE_HZ) / 1000L);
       digitalWrite(StaLedRED, LOW);
@@ -444,12 +442,13 @@ void Connect_Wifi()
     lcd.clear() ;
     lcd.setCursor(4, 2) ;
     lcd.print("Connected !") ;
-    for ( int i = 0; i < 3 ; i++ ) {
+    for ( int i = 0; i < 7 ; i++ ) {
       digitalWrite(StaLedGREEN, HIGH);
       vTaskDelay((200L * configTICK_RATE_HZ) / 1000L);
       digitalWrite(StaLedGREEN, LOW);
       vTaskDelay((200L * configTICK_RATE_HZ) / 1000L);
     }
+    digitalWrite(StaLedGREEN, HIGH);
     MenuWifi.ACK_SERVER = false ;
     wifiPayload.ACK_SERVER = false ;
     xSemaphoreGive(sem_ProcessWifi);
@@ -460,9 +459,6 @@ void Connect_Wifi()
 void Get_ID()
 {
   SDreadData(FileHardIDData) ;
-  //  if( TempData  != "") { lcd.clear() ; lcd.setCursor(0, 2) ; lcd.print("ID Existed !") ; vTaskDelay((2000L * configTICK_RATE_HZ) / 1000L); }
-  //  else
-  //    {
   lcd.clear() ;
   lcd.setCursor(0, 2) ;
   lcd.print("Start Getting ID...") ;       // bat dau ham khoi tao ID cho robot
@@ -489,33 +485,8 @@ void Get_ID()
   lcd.setCursor(0, 2) ;
   lcd.print("Getting ID Done!!!") ;
 
-
-  //  lcd.clear() ;
-  //  int i = 5;
-  //  while (1)
-  //  {
-  //    //if( (String)Timeout) { lcd.clear() ; lcd.setCursor(2,2); lcd.print("Connected Fail !") ; break ; }
-  //    lcd.setCursor(3, 1) ; lcd.print("Please wait ...") ; lcd.setCursor(i, 2) ; lcd.print(".") ; if ( i == 12) {
-  //      i = 5;
-  //      lcd.clear() ;
-  //    }
-  //    Key = keypad.getKey();
-  //    if ( ((int)keypad.getState() ==  PRESSED) )
-  //    {
-  //      vTaskDelay((50L * configTICK_RATE_HZ) / 1000L);
-  //      if ( Key == BACK )
-  //      {
-  //        break ;
-  //      }
-  //    }
-  //    i++ ;
-  //    Wait_Task() ;
-  //  }
-
-
 }
 
-//}
 
 //--CAC HAM THUC THI NHIEM VU---------//
 
@@ -594,7 +565,7 @@ void Menu_WifiPayload()
     MenuWifi.Mode = wifiPayload.Mode ;
     MenuWifi.Stop = wifiPayload.Stop ;
     MenuWifi.Continue = wifiPayload.Continue;
-    MenuWifi.NetworkError = wifiPayload.NetworkError;
+    MenuWifi.NetworkStatus = wifiPayload.NetworkStatus;
     MenuWifi.ServerStatus = wifiPayload.ServerStatus ;
     if (MenuWifi.Continue) {
       Run = !Run;

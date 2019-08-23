@@ -441,7 +441,7 @@ void Run_Mode() {
   }
 }
 
-void Menu_incPanelPos() 
+void Menu_incPanelPos()       // a Phuong code, toan sua :)))
 {
   if( PanPos != MenuSensor.Encoder)
     {  
@@ -459,24 +459,41 @@ void Menu_incPanelPos()
   }
 }
 
-void Menu_decPanelPos()
+//void Menu_decPanelPos()     // a Phuong code
+//{
+//  //lcd.setCursor(16, 2) ; lcd.print(MenuSensor.Encoder) ;
+//  if (  MenuSensor.MetalSensor == 0 && Sensor_Temp == 0) Sensor_Temp = 1 ;
+//  if (  MenuSensor.MetalSensor == 1 && Sensor_Temp == 1)
+//  {
+//    Sensor_Temp = 0;
+//    if (PanPos != 0) PanPos-- ;
+//    lcd.clear() ;
+//    lcd.setCursor(0, 2) ; lcd.print("Panel Position:") ;
+//    lcd.setCursor(16, 2) ; lcd.print(PanPos) ;
+//    //lcd.setCursor(16, 2) ; lcd.print(MenuSensor.Encoder) ;
+//    Serial.println(PanPos) ;
+//    UpdatetoESP(String(updateCollumnPanelParameter), String(PanPos));
+//    UpdatetoESP(String(updateStringPanelParameter), String(StrPanel));
+//  }
+//}
+
+void Menu_decPanelPos()     // toan code
 {
-  //lcd.setCursor(16, 2) ; lcd.print(MenuSensor.Encoder) ;
-  if (  MenuSensor.MetalSensor == 0 && Sensor_Temp == 0) Sensor_Temp = 1 ;
+  if( PanPos != MenuSensor.Encoder)
+    {  
+      PanPos = MenuSensor.Encoder ;
+      lcd.setCursor(16, 2) ; lcd.print(PanPos) ;
+      SDsaveData((String)PanPos, FilePanPosData) ;
+    }
+  if (  MenuSensor.MetalSensor == 0 && Sensor_Temp == 0) Sensor_Temp = 1  ;
   if (  MenuSensor.MetalSensor == 1 && Sensor_Temp == 1)
   {
-    Sensor_Temp = 0;
-    if (PanPos != 0) PanPos-- ;
-    lcd.clear() ;
-    lcd.setCursor(0, 2) ; lcd.print("Panel Position:") ;
-    lcd.setCursor(16, 2) ; lcd.print(PanPos) ;
-    //lcd.setCursor(16, 2) ; lcd.print(MenuSensor.Encoder) ;
-    Serial.println(PanPos) ;
+    Sensor_Temp = 0 ;
+    EncoderSerial.print(String(Start) + String(NextPanel) + String(End)) ; // IR phat hien tam pin moi
     UpdatetoESP(String(updateCollumnPanelParameter), String(PanPos));
     UpdatetoESP(String(updateStringPanelParameter), String(StrPanel));
   }
 }
-
 
 void Building_Map()
 {
@@ -529,8 +546,6 @@ void Motor_Setup()
   pinMode(DIR3, OUTPUT) ;
   pinMode(PWM4, OUTPUT) ;
   pinMode(PWM3, OUTPUT) ;
-  //  pinMode(ENA, OUTPUT) ;
-  //  pinMode(ENB, OUTPUT) ;
   digitalWrite(PWM4, HIGH) ;
   digitalWrite(PWM3, HIGH) ;
 }

@@ -46,10 +46,10 @@ const char AssignedIDCmd = 0x04;
 const char DataRecCmd = 0x05;
 const char TimeoutError = 0x30;
 const char IDError = 0x31;
-const char NetworkError = 0x32;
-const char NetworkOK = 0x33;
-const char ServerError = 0x34 ;
-const char ServerOK = 0x35 ;
+const char NetworkError = 0x32;    // NetworkStatus
+const char NetworkOK = 0x33;       // NetworkStatus 
+const char ServerError = 0x34 ;    // ServerStatus 
+const char ServerOK = 0x35 ;       // ServerStatus 
 
 const char setFixedID = 0x40;
 const char setMovingSpeed = 0x41;

@@ -1,6 +1,6 @@
 static void BlynkLed(void* arg) {
 
-  pinMode(LED_PIN, OUTPUT);
+  pinMode(StaLedYELLOW, OUTPUT);
 
   while (1) {
     // Turn LED on.
@@ -8,9 +8,9 @@ static void BlynkLed(void* arg) {
 //    vTaskDelay((2000L * configTICK_RATE_HZ) / 1000L);
 //    digitalWrite(LED_PIN, LOW);
 //    vTaskDelay((2000L * configTICK_RATE_HZ) / 1000L);
-    digitalWrite(StaLedGREEN, HIGH);
+    digitalWrite(StaLedYELLOW, HIGH);
     vTaskDelay((2000L * configTICK_RATE_HZ) / 1000L);
-    digitalWrite(StaLedGREEN, LOW);
+    digitalWrite(StaLedYELLOW, LOW);
     vTaskDelay((2000L * configTICK_RATE_HZ) / 1000L);
   }
 }
@@ -89,7 +89,8 @@ void Read_Sensor(void *pvParameters)
 void Serial_wifi(void *pvParameters)
 {
   Get_Wifi_Command();
-  //Get_Encoder_Command();
+  if ( Net_SocStatus == true )  digitalWrite(StaLedGREEN, HIGH) ;
+  else digitalWrite(StaLedGREEN, LOW) ;
 }
 void Serial_Encoder(void *pvParameters)
 {

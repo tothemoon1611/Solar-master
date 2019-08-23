@@ -34,7 +34,8 @@ struct WifiPayload
   int Mode = 0;
   bool Stop = false;
   bool Continue = false;
-  bool NetworkError = false;
+  
+  bool NetworkStatus = false;
   bool ServerStatus = true ;
 };
 
@@ -214,8 +215,12 @@ int error = 0;
 byte type = 0;
 byte vibrate = 0;
 
-#define StaLedGREEN A0 
+bool Net_SocStatus = false ;    // bien nay la cua den LedGREEN : bao trang thai ket noi toi server
+bool ErrorStatus = false ;      // bien nay la cua den LedRED : xem robot no dang bi loi gi hay khong
+  
+#define StaLedGREEN A2 
 #define StaLedRED A1
+#define StaLedYELLOW A0
 #define Speaker 9 
 
 
