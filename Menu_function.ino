@@ -495,11 +495,6 @@ void Hand_Control()
 
 }
 
-void Build_Map()
-{
-
-}
-
 void Automatic()
 {
 

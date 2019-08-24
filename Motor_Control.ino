@@ -225,6 +225,13 @@ void Server_SetMode()
         Code_Run_V2() ;
         MenuWifi.Mode = 0;
         wifiPayload.Mode = 0 ;
+        MenuWifi.Stop = 0;
+        wifiPayload.Stop = 0 ;
+        MenuWifi.Continue = 0;
+        wifiPayload.Continue = 0 ;
+        lcd.clear() ;
+        lcd.setCursor(1, 0) ;
+        lcd.print("Reset Mode") ;
       }
       if ( MenuWifi.Mode == 3 ) {
         lcd.clear() ;
@@ -238,7 +245,6 @@ void Server_SetMode()
         lcd.clear() ;
         lcd.setCursor(1, 0) ;
         lcd.print("Cleaning Mode... ") ;
-
         MenuWifi.Mode = 0;
         wifiPayload.Mode = 0 ;
       }
@@ -448,6 +454,7 @@ void Run_Mode() {
   }
 }
 
+
 void Menu_incPanelPos()       // a Phuong code, toan sua :)))
 {
   if ( PanPos != MenuSensor.Encoder)
@@ -600,10 +607,11 @@ void Motor_Left_Start()
 
 void Motor_Run_Stop()
 {
-  for (int i = 0; i < 255 ; i++)
+  while ( Accelerate < 255 ) 
   {
-    analogWrite(PWM4, i ) ;
-    vTaskDelay((1L * configTICK_RATE_HZ) / 1000L)  ;
+    Accelerate++ ;
+    analogWrite(PWM4, Accelerate ) ;
+    vTaskDelay((2L * configTICK_RATE_HZ) / 1000L);
   }
 }
 
@@ -625,9 +633,10 @@ void Motor_Cleaning_Start()
 
 void Motor_Cleaning_Stop()
 {
-  for (int j = 0; j < 255 ; j++)
+  while ( AccelerateCLE < 255 )
   {
-    analogWrite(PWM3, j ) ;
-    vTaskDelay((1L * configTICK_RATE_HZ) / 1000L)  ;
+    Accelerate++ ;
+    analogWrite(PWM3, Accelerate ) ;
+    vTaskDelay((2L * configTICK_RATE_HZ) / 1000L);
   }
 }

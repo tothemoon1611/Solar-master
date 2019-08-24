@@ -97,6 +97,7 @@ void Get_Wifi_Command() {
             wifiPayload.NetworkStatus = false;
 #ifdef DEBUGER            
             Serial.println(InputString);
+            Serial.println("Ket noi wifi that bai ! Dang kiem tra ... ");
 #endif            
             Net_SocStatus = false ; 
             break;
@@ -106,6 +107,7 @@ void Get_Wifi_Command() {
             wifiPayload.NetworkStatus = true;
 #ifdef DEBUGER            
             Serial.println(InputString);
+            Serial.println("Ket noi lai thanh cong ! ");
 #endif  
             Net_SocStatus = true ; 
             break;
@@ -151,9 +153,13 @@ void ERROR_Processing()
       Motor_Cleaning_Stop() ;
       bool Error = 0 ;
       unsigned long WifiTimeout = millis() ;
-      Serial.println("Phat hien loi mat ket noi voi Socket !!! " ) ;
+      if(wifiPayload.ServerStatus != true) { 
+      Serial.println("Phat hien loi mat ket noi voi Socket !!! " ) ; }
+      if(wifiPayload.NetworkStatus != true) { 
+      Serial.println("Phat hien loi mat ket noi voi Wifi !!! " ) ; }
       vTaskDelay((1000L * configTICK_RATE_HZ) / 1000L);
-      while( wifiPayload.ServerStatus != true || MenuWifi.NetworkStatus != true )  
+      EP:
+      while( wifiPayload.ServerStatus != true || wifiPayload.NetworkStatus != true )  
       {
             Serial.println("Dang Reconnect lai voi socket ... !  wifiPayload.ServerStatus =  " + (int)wifiPayload.ServerStatus ) ;
             lcd.setCursor(1, 1) ;
@@ -168,7 +174,7 @@ void ERROR_Processing()
                   lcd.setCursor(0,3) ; lcd.print("<BACK>") ; lcd.setCursor(16,3) ; lcd.print("<OK>") ; 
                   Keypad_Option() ;
                   if (BreakPage == 1) {  BreakPage = 0 ; Error = 1;  break ; }
-                  if(OkPage == 1) { OkPage = 0; return ERROR_Processing() ; }
+                  if(OkPage == 1) { OkPage = 0; goto EP  ; }
               }
             Key = keypad.getKey();
             if ( ((int)keypad.getState() ==  PRESSED) )
@@ -184,7 +190,7 @@ void ERROR_Processing()
             digitalWrite(StaLedRED, LOW);
             vTaskDelay((250L * configTICK_RATE_HZ) / 1000L);
       }
-      Serial.println("Da xu ly xong ^^! Error = " + Error ) ;
+      Serial.println("Da xu ly xong ! Error = " + (int)Error ) ;
       vTaskDelay((1000L * configTICK_RATE_HZ) / 1000L);
       if ( Error == 0 ) {
         lcd.clear() ;
@@ -338,8 +344,8 @@ void RTC_Init() {
   rtc.begin();
 #ifdef SETTIME
   rtc.setDOW(SATURDAY);     // Set Day-of-Week to SUNDAY
-  rtc.setTime(14, 29, 0);    // Set the time to 00:00:00 (24hr format)
-  rtc.setDate(17, 8, 2019);   // Set the date to January 1st, 2014
+  rtc.setTime(16, 28, 0);    // Set the time to 00:00:00 (24hr format)
+  rtc.setDate(24, 8, 2019);   // Set the date to January 1st, 2014
 #endif
   t = rtc.getTime();
 #ifdef DEBUGER
