@@ -395,6 +395,12 @@ void LCD_RobotID()
     lcd.setCursor(19, pointer);
     lcd.print("<") ;
   }
+  SDreadData(FileIDData) ;
+  lcd.setCursor(5,0) ; lcd.print(TempData) ; 
+  TempData = "" ;
+  SDreadData(FileHardIDData) ;
+  lcd.setCursor(5,1) ; lcd.print(TempData) ; 
+  TempData = "" ;
 }
 
 void LCD_MotorSetup()

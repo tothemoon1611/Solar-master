@@ -37,6 +37,8 @@ struct WifiPayload
   
   bool NetworkStatus = false;
   bool ServerStatus = true ;
+
+  String FixedIDMachine ;
 };
 
 bool Run = 0;
@@ -147,7 +149,8 @@ String PASSData ;
 String PORTData ;
 String IPAddData ;
 String EnerALert ;
-
+String FixedIDData ; 
+String HardIDData ;
 
 String FileSSIDData   = "SSIDData.txt" ;
 String FilePASSData   = "PASSData.txt" ;

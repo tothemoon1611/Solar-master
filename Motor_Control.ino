@@ -63,19 +63,19 @@ void Code_Run_V1()
             break ;
           }
         }
-        if ( MenuWifi.Stop)
+        if ( MenuWifi.Stop )
         {
-          out = 1 ;
-          while ( Accelerate < 256 || AccelerateCLE < 256) {
-            Accelerate++ ;
-            AccelerateCLE++ ;
-            analogWrite(PWM4, Accelerate) ;
-            analogWrite(PWM3, AccelerateCLE) ;
-            vTaskDelay((2L * configTICK_RATE_HZ) / 1000L)  ;
-          }
-          MenuWifi.Mode = 0;
-          wifiPayload.Mode = 0 ;
-          break ;
+          out = 1 ;  
+          Motor_Run_Stop() ;
+          Motor_Cleaning_Stop() ;     
+          MenuWifi.Mode = 0;         
+          wifiPayload.Mode = 0 ;     
+          Page = 1 ;                                                                                 
+          BreakPage = 0 ;                                                   
+          OkPage = 0 ;                                                    
+          pointer = 0 ;                                              
+          PointerMax = 4 ;      
+          Server_SetMode() ;    
         }
       }
     }
@@ -635,8 +635,8 @@ void Motor_Cleaning_Stop()
 {
   while ( AccelerateCLE < 255 )
   {
-    Accelerate++ ;
-    analogWrite(PWM3, Accelerate ) ;
+    AccelerateCLE++ ;
+    analogWrite(PWM3, AccelerateCLE ) ;
     vTaskDelay((2L * configTICK_RATE_HZ) / 1000L);
   }
 }

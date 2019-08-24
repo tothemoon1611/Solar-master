@@ -60,6 +60,16 @@ void Get_Wifi_Command() {
 #endif
           break;
 //-----------------------------------------------------            
+        case setFixedID:                                      
+          wifiPayload.FixedIDMachine  = InputString;
+#ifdef DEBUGER
+          Serial.print("Setting ID OK !!! ");
+          Serial.println(FixedIDData);
+          Serial.println(InputString);
+          //SDsaveData(FixedIDData,FileIDData) ;
+#endif
+          break;          
+//-----------------------------------------------------            
         case ACKSERVERCmd:                            // giao tiep voi wifi
           ContentACKSERVER = InputString;
           wifiPayload.ACK_SERVER = true;
@@ -130,6 +140,7 @@ void Get_Wifi_Command() {
 #endif
           Net_SocStatus = true ; 
           break;  
+          
 //-----------------------------------------------------            
         default:
           Serial.println("Unknown cmd!!!");
@@ -142,6 +153,7 @@ void Get_Wifi_Command() {
     vTaskDelay((10L * configTICK_RATE_HZ) / 1000L);
   }
 }
+
 
 void ERROR_Processing()
 {
@@ -158,7 +170,6 @@ void ERROR_Processing()
       if(wifiPayload.NetworkStatus != true) { 
       Serial.println("Phat hien loi mat ket noi voi Wifi !!! " ) ; }
       vTaskDelay((1000L * configTICK_RATE_HZ) / 1000L);
-      EP:
       while( wifiPayload.ServerStatus != true || wifiPayload.NetworkStatus != true )  
       {
             Serial.println("Dang Reconnect lai voi socket ... !  wifiPayload.ServerStatus =  " + (int)wifiPayload.ServerStatus ) ;
@@ -174,7 +185,7 @@ void ERROR_Processing()
                   lcd.setCursor(0,3) ; lcd.print("<BACK>") ; lcd.setCursor(16,3) ; lcd.print("<OK>") ; 
                   Keypad_Option() ;
                   if (BreakPage == 1) {  BreakPage = 0 ; Error = 1;  break ; }
-                  if(OkPage == 1) { OkPage = 0; goto EP  ; }
+                  if(OkPage == 1) { OkPage = 0; return ERROR_Processing() ; }
               }
             Key = keypad.getKey();
             if ( ((int)keypad.getState() ==  PRESSED) )
@@ -190,7 +201,7 @@ void ERROR_Processing()
             digitalWrite(StaLedRED, LOW);
             vTaskDelay((250L * configTICK_RATE_HZ) / 1000L);
       }
-      Serial.println("Da xu ly xong ! Error = " + (int)Error ) ;
+      Serial.println("Da xu ly xong ! Error = 0") ;
       vTaskDelay((1000L * configTICK_RATE_HZ) / 1000L);
       if ( Error == 0 ) {
         lcd.clear() ;

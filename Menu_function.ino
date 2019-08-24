@@ -1,4 +1,3 @@
-
 //---------------------------------CAC HAM THUC THI (FLAG) VA NHAP LIEU----------------------------------------------//
 //--NHAP LIEU----------//
 void Init_Communication() ;
@@ -458,47 +457,51 @@ void Connect_Wifi()
 
 void Get_ID()
 {
-  SDreadData(FileHardIDData) ;
-  lcd.clear() ;
-  lcd.setCursor(0, 2) ;
-  lcd.print("Start Getting ID...") ;       // bat dau ham khoi tao ID cho robot
-  vTaskDelay((2000L * configTICK_RATE_HZ) / 1000L) ;
-  String IDmin;
-  String IDhour;
-  String IDdate;
-  String IDmon;
-  if (t.min < 10) IDmin = String("0") + String(t.min);
-  else IDmin = String(t.min);
-  if (t.hour < 10) IDhour = String("0") + String(t.hour);
-  else IDhour = String(t.hour);
-  if (t.date < 10) IDdate = String("0") + String(t.date);
-  else IDdate = String(t.date);
-  if (t.mon < 10) IDmon = String("0") + String(t.mon);
-  else IDmon = String(t.mon);
-  String AssignedID = IDmin + IDhour + IDdate + IDmon + String(t.year);
-  Serial.println(AssignedID);
-  SDsaveData(AssignedID, FileHardIDData) ;
-
-  Serial.println(String(Start) + String(IDCmd) + AssignedID + String(End));
-  WIFI.print(String(Start) + String(IDCmd) + AssignedID + String(End));
-  lcd.clear() ;
-  lcd.setCursor(0, 2) ;
-  lcd.print("Getting ID Done!!!") ;
+  SDreadData(FileIDData) ;
+  if(TempData)
+    {
+      lcd.clear() ; 
+      lcd.setCursor(4,1); lcd.print("ID Was Init") ;
+      lcd.setCursor(3,2); lcd.print("ReInitialize ?") ;
+      lcd.setCursor(0,3); lcd.print("<BACK>          <OK>") ;
+      Keypad_Option() ;
+      if(OkPage == 1)
+        {
+          OkPage = 0 ;
+          lcd.clear() ;
+          lcd.setCursor(0, 2) ;
+          lcd.print("Start Getting ID...") ;       // bat dau ham khoi tao ID cho robot
+          vTaskDelay((2000L * configTICK_RATE_HZ) / 1000L) ;
+          String IDmin;
+          String IDhour;
+          String IDdate;
+          String IDmon;
+          if (t.min < 10) IDmin = String("0") + String(t.min);
+          else IDmin = String(t.min);
+          if (t.hour < 10) IDhour = String("0") + String(t.hour);
+          else IDhour = String(t.hour);
+          if (t.date < 10) IDdate = String("0") + String(t.date);
+          else IDdate = String(t.date);
+          if (t.mon < 10) IDmon = String("0") + String(t.mon);
+          else IDmon = String(t.mon);
+          String AssignedID = IDmin + IDhour + IDdate + IDmon + String(t.year);
+          Serial.println(AssignedID);
+          SDsaveData(AssignedID, FileHardIDData) ;
+        
+          Serial.println(String(Start) + String(IDCmd) + AssignedID + String(End));
+          WIFI.print(String(Start) + String(IDCmd) + AssignedID + String(End));
+          lcd.clear() ;
+          lcd.setCursor(0, 2) ;
+          lcd.print("Getting ID Done!!!") ;
+        }
+       if(BreakPage == 1) { BreakPage = 0 ; }  
+    }
+  
 
 }
 
 
 //--CAC HAM THUC THI NHIEM VU---------//
-
-void Hand_Control()
-{
-
-}
-
-void Automatic()
-{
-
-}
 
 void Init_Communication() {
   TempData = "" ;
@@ -560,8 +563,10 @@ void Menu_WifiPayload()
     MenuWifi.Mode = wifiPayload.Mode ;
     MenuWifi.Stop = wifiPayload.Stop ;
     MenuWifi.Continue = wifiPayload.Continue;
-    MenuWifi.NetworkStatus = wifiPayload.NetworkStatus;
+    MenuWifi.NetworkStatus = wifiPayload.NetworkStatus ;
     MenuWifi.ServerStatus = wifiPayload.ServerStatus ;
+    MenuWifi.FixedIDMachine = wifiPayload.FixedIDMachine ;
+    SDsaveData(wifiPayload.FixedIDMachine,FileIDData) ;
     if (MenuWifi.Continue) {
       Run = !Run;
       Serial.print("RUN: ");
