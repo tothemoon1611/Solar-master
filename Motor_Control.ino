@@ -53,11 +53,12 @@ void Code_Run_V1()
             out = 1 ;
             Wait_Task();
             while ( Accelerate < 256 || AccelerateCLE < 256) {
-            Accelerate++ ;
-            AccelerateCLE++ ;
-            analogWrite(PWM4, Accelerate) ;
-            analogWrite(PWM3, AccelerateCLE) ;
-            vTaskDelay((2L * configTICK_RATE_HZ) / 1000L)  ; }
+              Accelerate++ ;
+              AccelerateCLE++ ;
+              analogWrite(PWM4, Accelerate) ;
+              analogWrite(PWM3, AccelerateCLE) ;
+              vTaskDelay((2L * configTICK_RATE_HZ) / 1000L)  ;
+            }
             PanPos = 0 ;
             break ;
           }
@@ -66,11 +67,12 @@ void Code_Run_V1()
         {
           out = 1 ;
           while ( Accelerate < 256 || AccelerateCLE < 256) {
-          Accelerate++ ;
-          AccelerateCLE++ ;
-          analogWrite(PWM4, Accelerate) ;
-          analogWrite(PWM3, AccelerateCLE) ;
-          vTaskDelay((2L * configTICK_RATE_HZ) / 1000L)  ; }
+            Accelerate++ ;
+            AccelerateCLE++ ;
+            analogWrite(PWM4, Accelerate) ;
+            analogWrite(PWM3, AccelerateCLE) ;
+            vTaskDelay((2L * configTICK_RATE_HZ) / 1000L)  ;
+          }
           MenuWifi.Mode = 0;
           wifiPayload.Mode = 0 ;
           break ;
@@ -209,33 +211,38 @@ void Server_SetMode()
     lcd.setCursor(1, 1) ; lcd.print("Waiting for Command") ;
     while (1) {
       Menu_WifiPayload();
-      if ( MenuWifi.Mode == 2 ) {
+      if ( MenuWifi.Mode == 1 ) {
         lcd.clear() ;
         lcd.setCursor(1, 0) ;
         lcd.print("Building Map ...") ;
         MenuWifi.Mode = 0 ;
+        wifiPayload.Mode = 0 ;
       }
-      if ( MenuWifi.Mode == 3 ) {
+      if ( MenuWifi.Mode == 2) {
         lcd.clear() ;
         lcd.setCursor(1, 0) ;
-        lcd.print("Cleaning Mode... ") ;
+        lcd.print("Full Mode...") ;
         Code_Run_V2() ;
         MenuWifi.Mode = 0;
         wifiPayload.Mode = 0 ;
       }
-      if ( MenuWifi.Mode == 1) {
-        lcd.clear() ;
-        lcd.setCursor(1, 0) ;
-        lcd.print("Full Mode...") ;
-        MenuWifi.Mode = 0 ;
-      }
-      if ( MenuWifi.Mode == 4 ) {
+      if ( MenuWifi.Mode == 3 ) {
         lcd.clear() ;
         lcd.setCursor(1, 0) ;
         lcd.print("Monitor Mode...") ;
 
         MenuWifi.Mode = 0 ;
+        wifiPayload.Mode = 0 ;
       }
+      if ( MenuWifi.Mode == 4 ) {
+        lcd.clear() ;
+        lcd.setCursor(1, 0) ;
+        lcd.print("Cleaning Mode... ") ;
+
+        MenuWifi.Mode = 0;
+        wifiPayload.Mode = 0 ;
+      }
+
       Key = keypad.getKey();
       if ( ((int)keypad.getState() ==  PRESSED) )
       {
@@ -443,12 +450,12 @@ void Run_Mode() {
 
 void Menu_incPanelPos()       // a Phuong code, toan sua :)))
 {
-  if( PanPos != MenuSensor.Encoder)
-    {  
-      PanPos = MenuSensor.Encoder ;
-      lcd.setCursor(16, 2) ; lcd.print(PanPos) ;
-      SDsaveData((String)PanPos, FilePanPosData) ;
-    }
+  if ( PanPos != MenuSensor.Encoder)
+  {
+    PanPos = MenuSensor.Encoder ;
+    lcd.setCursor(16, 2) ; lcd.print(PanPos) ;
+    SDsaveData((String)PanPos, FilePanPosData) ;
+  }
   if (  MenuSensor.MetalSensor == 0 && Sensor_Temp == 0) Sensor_Temp = 1  ;
   if (  MenuSensor.MetalSensor == 1 && Sensor_Temp == 1)
   {
@@ -479,12 +486,12 @@ void Menu_incPanelPos()       // a Phuong code, toan sua :)))
 
 void Menu_decPanelPos()     // toan code
 {
-  if( PanPos != MenuSensor.Encoder)
-    {  
-      PanPos = MenuSensor.Encoder ;
-      lcd.setCursor(16, 2) ; lcd.print(PanPos) ;
-      SDsaveData((String)PanPos, FilePanPosData) ;
-    }
+  if ( PanPos != MenuSensor.Encoder)
+  {
+    PanPos = MenuSensor.Encoder ;
+    lcd.setCursor(16, 2) ; lcd.print(PanPos) ;
+    SDsaveData((String)PanPos, FilePanPosData) ;
+  }
   if (  MenuSensor.MetalSensor == 0 && Sensor_Temp == 0) Sensor_Temp = 1  ;
   if (  MenuSensor.MetalSensor == 1 && Sensor_Temp == 1)
   {
@@ -501,36 +508,45 @@ void Building_Map()
   PWMMovSpd = TempData ;
   TempData = "" ;
   Accelerate = 255 ;
-  EncoderSerial.print(String(Start) + String(ResetEncoder) + String(End)) ; // yeu cau reset encoder  
+  EncoderSerial.print(String(Start) + String(ResetEncoder) + String(End)) ; // yeu cau reset encoder
   MenuSensor.Encoder = 0  ;
   Menu_ReadSensor();
   PanPosMax = 0 ;
   lcd.setCursor(0, 2) ; lcd.print("Panel Position:") ;
   lcd.setCursor(16, 2) ; lcd.print(PanPos) ;
-  while( MenuSensor.LimitSW_2 != 0 )
-    {   
-      Motor_Right_Start() ;
-      Menu_incPanelPos() ;
-      Menu_ReadSensor();
-      Menu_WifiPayload();
-      PanPosMax = PanPos ;
+  while ( MenuSensor.LimitSW_2 != 0 )
+  {
+    Motor_Right_Start() ;
+    Menu_incPanelPos() ;
+    Menu_ReadSensor();
+    Menu_WifiPayload();
+    PanPosMax = PanPos ;
+    WIFI.print(PanPosMax) ;
+    Serial.println(PanPosMax) ;
+    vTaskDelay((1L * configTICK_RATE_HZ) / 1000L)  ;
+  }
+  Motor_Run_Stop() ;
+  Accelerate = 255 ;
+  while ( MenuSensor.LimitSW_1 != 0 )
+  {
+    Motor_Left_Start() ;
+    Menu_decPanelPos() ;
+    Menu_ReadSensor();
+    Menu_WifiPayload();
+    if ( PanPos == 9) {
+      lcd.clear() ;
+      lcd.setCursor(0, 2) ;
+      lcd.print("Panel Position:") ;
+      lcd.print(PanPos) ;
+    }
+    if (PanPos < 0 ) {
+      PanPosMax = PanPosMax - PanPos ;
       WIFI.print(PanPosMax) ;
       Serial.println(PanPosMax) ;
-      vTaskDelay((1L * configTICK_RATE_HZ) / 1000L)  ;
     }
+    vTaskDelay((1L * configTICK_RATE_HZ) / 1000L)  ;
+  }
   Motor_Run_Stop() ;
-  Accelerate = 255 ;  
-  while( MenuSensor.LimitSW_1 != 0 ) 
-    {
-      Motor_Left_Start() ;
-      Menu_decPanelPos() ; 
-      Menu_ReadSensor(); 
-      Menu_WifiPayload();
-      if( PanPos == 9) { lcd.clear() ; lcd.setCursor(0, 2) ; lcd.print("Panel Position:") ; lcd.print(PanPos) ;}
-      if(PanPos < 0 ) { PanPosMax = PanPosMax - PanPos ; WIFI.print(PanPosMax) ; Serial.println(PanPosMax) ;}
-      vTaskDelay((1L * configTICK_RATE_HZ) / 1000L)  ;
-    }
-  Motor_Run_Stop() ;  
 }
 
 //-------------------------Thiet Lap Ban Dau Cho Dong Co------------------------------------------------//
@@ -541,7 +557,7 @@ void Motor_Setup()
   pinMode(CheckWheel2, INPUT_PULLUP) ;   // duong-nau, am-xanh
   pinMode(CheckWheel1, INPUT_PULLUP) ;   // duong-nau, am-xanh
   pinMode(PausePin, INPUT_PULLUP) ;
-  
+
   pinMode(DIR4, OUTPUT) ;
   pinMode(DIR3, OUTPUT) ;
   pinMode(PWM4, OUTPUT) ;

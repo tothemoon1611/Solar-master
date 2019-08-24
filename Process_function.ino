@@ -252,12 +252,15 @@ void Get_CAMERA_Command() {
       Serial.println(InputString_CAMERA);
 #endif
       switch (cmd_CAMERA) {
-        case setEncoder:
+        case CapFinePan:
 #ifdef DEBUGER
-          Serial.print("Set Encoder: ");
-          dataMachine.Encoder = InputString_EncoderSerial.toInt();
-          Serial.println(dataMachine.Encoder);
+          Serial.print("Recv Fine Panel: ");
+          Serial.println(InputString_CAMERA);
 #endif
+          StrPanelFine = InputString.substring(0, InputString.indexOf(' ') - 1).toInt();
+          PanPosFine = InputString.substring(InputString.indexOf(' ') + 1, InputString.length()).toInt();
+          Serial.println(StrPanelFine);
+          Serial.println(PanPosFine);
           break;
         default:
           Serial.println("Unknown cmd!!!");
@@ -309,18 +312,27 @@ void Get_Serial_CAMERA() {
   if (CAMERA.available())
   {
     char inChar_CAMERA = (char)CAMERA.read();
-    if (inChar_CAMERA == Start) SerialRecv_CAMERA = true;
-    if (inChar_CAMERA == End)
-    {
-      SerialRecv_CAMERA = false;
-      serial_counter_CAMERA = 0;
-      StringComplete_CAMERA = true;
-    }
-    if (SerialRecv_CAMERA)  serial_counter_CAMERA++;
-    if (serial_counter_CAMERA == 2) cmd_CAMERA = inChar_CAMERA;
-    if (serial_counter_CAMERA > 2) InputString_CAMERA += inChar_CAMERA;
+    if (inChar_CAMERA == '\n') StringComplete_CAMERA = true;
+    else InputString_CAMERA += inChar_CAMERA;
   }
 }
+
+//void Get_Serial_CAMERA() {
+//  if (CAMERA.available())
+//  {
+//    char inChar_CAMERA = (char)CAMERA.read();
+//    if (inChar_CAMERA == Start) SerialRecv_CAMERA = true;
+//    if (inChar_CAMERA == End)
+//    {
+//      SerialRecv_CAMERA = false;
+//      serial_counter_CAMERA = 0;
+//      StringComplete_CAMERA = true;
+//    }
+//    if (SerialRecv_CAMERA)  serial_counter_CAMERA++;
+//    if (serial_counter_CAMERA == 2) cmd_CAMERA = inChar_CAMERA;
+//    if (serial_counter_CAMERA > 2) InputString_CAMERA += inChar_CAMERA;
+//  }
+//}
 
 void RTC_Init() {
   rtc.begin();

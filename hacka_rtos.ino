@@ -1,6 +1,6 @@
 #define WIFI Serial1
 #define SIM Serial2
-#define EncoderSerial Serial3 
+#define EncoderSerial Serial3
 #define CAMERA Serial4
 
 #define DEBUGER
@@ -64,7 +64,7 @@ void setup() {
 
   Serial.begin(9600); // Monitor
   EncoderSerial.begin(9600); // cong giao tiep NodeMCU
-  WIFI.begin(9600); // cong giao tiep NodeMCU 
+  WIFI.begin(9600); // cong giao tiep NodeMCU
   SerialUSB.begin(9600); // Monitor
   PIO_Configure(PIOB, PIO_PERIPH_A, PIO_PB20A_TXD2 | PIO_PB21A_RXD2, PIO_DEFAULT);
   Serial4.begin(9600);
@@ -86,9 +86,11 @@ void setup() {
 
   s2 = xTaskCreate(BlynkLed, NULL, configMINIMAL_STACK_SIZE, NULL, 1, NULL);
 
- xTaskCreate(Serial_wifi, NULL, configMINIMAL_STACK_SIZE, NULL, 1, NULL);
+  xTaskCreate(Serial_wifi, NULL, configMINIMAL_STACK_SIZE, NULL, 1, NULL);
 
   xTaskCreate(Serial_Encoder, NULL, configMINIMAL_STACK_SIZE, NULL, 1, NULL);
+
+  xTaskCreate(Serial_CAMERA, NULL, configMINIMAL_STACK_SIZE, NULL, 1, NULL);
 
   xTaskCreate(Robot_Init, NULL, configMINIMAL_STACK_SIZE + 200, NULL, 4, NULL);
 

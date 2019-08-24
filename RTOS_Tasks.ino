@@ -96,6 +96,11 @@ void Serial_Encoder(void *pvParameters)
 {
   Get_Encoder_Command();
 }
+
+void Serial_CAMERA(void *pvParameters)
+{
+  Get_CAMERA_Command();
+}
 //------------------------------------------------------------------------------
 /* Gui du lieu den Module Wifi*/
 void SDCard(void *pvParameters)

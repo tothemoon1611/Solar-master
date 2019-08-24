@@ -65,10 +65,11 @@ const char setMeasureMode = 0x53;
 const char setChargeMode = 0x54;
 const char setStop = 0x55;
 const char setContinue = 0x56;
-
 /*--------------------UPDATE TO CAMERA SLAVE ------------------------------*/
 const char CapImg = 0x08;
 const char StreamCmd = 0x09;
+const char CapFinePan = 0x25;
+const char CapErrorPan = 0x26;
 
 /*--------------------UPDATE ENCODER TO MASTER ------------------------------*/
 const char setEncoder = 0x60;
@@ -76,3 +77,6 @@ const char setEncoder = 0x60;
 //-------------------- UPDATE MASTER TO ENCODER----------------------------------// 
 const char ResetEncoder = 0x61 ;
 const char NextPanel = 0x62 ;
+
+
+//0x84+0x25+string' '+collumn+0x95

@@ -41,6 +41,11 @@ struct WifiPayload
 
 bool Run = 0;
 int StrPanel = 0;
+int StrPanelFine = 0;
+int PanPosFine = 0;
+int StrPanelError = 0;
+int PanPosError = 0;
+
 String SVSetMode = "" ;
 //DataStr DataStr = {"", "", 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , 0.00 , "" , ""};
 
