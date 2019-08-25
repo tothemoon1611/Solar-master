@@ -39,8 +39,9 @@ const char updateDirectionParameter = 0x17;
 const char updateCollumnPanelParameter = 0x18;
 const char updateStringPanelParameter = 0x19;
 
-const char updateLocationPanel = 0x20;
-const char updateStatusPanel = 0x21;
+const char updateCollumnPanelCamera = 0x20;
+const char updateStringPanelCamera = 0x21;
+const char updateStatusPanel = 0x22;
 /*--------------------UPDATE WIFI TO MASTER------------------------------*/
 const char AssignedIDCmd = 0x04;
 const char DataRecCmd = 0x05;

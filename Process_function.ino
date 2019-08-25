@@ -278,6 +278,9 @@ void Get_CAMERA_Command() {
           PanPosFine = InputString.substring(InputString.indexOf(' ') + 1, InputString.length()).toInt();
           Serial.println(StrPanelFine);
           Serial.println(PanPosFine);
+          UpdatetoESP(String(updateStatusPanel), String(1));
+          UpdatetoESP(String(updateStringPanelCamera), String(StrPanelFine));
+          UpdatetoESP(String(updateCollumnPanelCamera), String(PanPosFine));
           break;
         default:
           Serial.println("Unknown cmd!!!");

@@ -577,6 +577,8 @@ void Motor_Setup()
 //--------------------------------------------Dieu Khien Dong Co------------------------------------------------//
 void Motor_Right_Start()
 {
+  UpdatetoESP(String(updateStatusParameter), String(1));
+  UpdatetoESP(String(updateDirectionParameter), String(1));
   digitalWrite(DIR4, HIGH) ;
   if (Accelerate > (255 - (int)(PWMMovSpd.toInt())) )
   {
@@ -592,6 +594,8 @@ void Motor_Right_Start()
 
 void Motor_Left_Start()
 {
+  UpdatetoESP(String(updateStatusParameter), String(1));
+  UpdatetoESP(String(updateDirectionParameter), String(-1));
   digitalWrite(DIR4, LOW) ;
   if (Accelerate > 255 - (int)(PWMMovSpd.toInt()) )
   {
@@ -607,6 +611,7 @@ void Motor_Left_Start()
 
 void Motor_Run_Stop()
 {
+  UpdatetoESP(String(updateStatusParameter), String(0));
   while ( Accelerate < 255 ) 
   {
     Accelerate++ ;
