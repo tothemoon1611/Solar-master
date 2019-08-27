@@ -1,5 +1,12 @@
 
 //---------------------------------------HIEN THI, NHAP LIEU---------------------------------------------------------------//
+void LCD_Page_0_Display() 
+{
+  t = rtc.getTime(); 
+  lcd.setCursor(0,0) ;lcd.print(String(t.date) + "/" + String(t.mon) + "/" + String(t.year) + " " + String(t.hour)+ ":" + String(t.min));
+  
+}
+
 void LCD_Page_1_Display()
 {
   lcd.clear() ;

@@ -178,7 +178,7 @@ String PWMCleSpd ;
 unsigned int PanPos = 0 ;
 bool  StartBut  = 0 ;
 
-#define MetalSensorPin 43
+#define IRSensor 43
 #define CheckWheel1 47
 #define CheckWheel2 49
 
@@ -227,9 +227,10 @@ bool Net_SocStatus = false ;    // bien nay la cua den LedGREEN : bao trang thai
 bool ErrorStatus = false ;      // bien nay la cua den LedRED : xem robot no dang bi loi gi hay khong
   
 #define StaLedGREEN A2 
-#define StaLedRED A1
+#define StaLedRED A4
 #define StaLedYELLOW A0
-#define Speaker 9 
+#define Speaker A1
 
 
 #define PausePin 39
+#define StopPin 41
