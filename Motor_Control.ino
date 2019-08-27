@@ -3,42 +3,59 @@ int PanPosTemp = 0 ;
 unsigned int PanPosMax = 0 ;
 
 int Accelerate = 255 ;                // Bien tang toc cho dong co chay
-int AccelerateCLE = 255 ;             // Bien tang toc cho dong co lau chui      
+int AccelerateCLE = 255 ;             // Bien tang toc cho dong co lau chui
 
 bool out = 0 ;
 
 
-void Exit_Mode() 
+void Exit_Mode_Offline()
 {
-    Key = keypad.getKey();
-    if ( ((int)keypad.getState() ==  PRESSED) )
+  Key = keypad.getKey();
+  if ( ((int)keypad.getState() ==  PRESSED) )
+  {
+    if ( Key == BACK )
     {
-      if ( Key == BACK )
-      {
-        out = 1 ;
-        Motor_Run_Stop() ;
-        Motor_Cleaning_Stop() ;
-        PanPos = 0 ;
-      }
-    }
-   if ( MenuWifi.Stop )
-    {
-      out = 1 ; 
+      out = 1 ;
       Motor_Run_Stop() ;
-      Motor_Cleaning_Stop() ;     
-      MenuWifi.Mode = 0;         
-      wifiPayload.Mode = 0 ;     
-      Page = 1 ;                                                                                 
-      BreakPage = 0 ;                                                   
-      OkPage = 0 ;                                                    
-      pointer = 0 ;                                              
-      PointerMax = 4 ;      
-      Server_SetMode() ;    
-    } 
+      Motor_Cleaning_Stop() ;
+      PanPos = 0 ;
+    }
+  }
+}
+
+void Exit_Mode_Online()
+{
+  Key = keypad.getKey();
+  if ( ((int)keypad.getState() ==  PRESSED) )
+  {
+    if ( Key == BACK )
+    {
+      out = 1 ;
+      Motor_Run_Stop() ;
+      Motor_Cleaning_Stop() ;
+      PanPos = 0 ;
+    }
+  }
+  if ( MenuWifi.Stop )
+  {
+    out = 1 ;
+    Motor_Run_Stop() ;
+    Motor_Cleaning_Stop() ;
+    PanPos = 0 ;
+    MenuWifi.Mode = 0;
+    wifiPayload.Mode = 0 ;
+    MenuWifi.Stop = 0;
+    wifiPayload.Stop = 0 ;
+    //    Page = 1 ;
+    //    BreakPage = 0 ;
+    //    OkPage = 0 ;
+    //    pointer = 0 ;
+    //    PointerMax = 4 ;
+  }
 }
 
 
-void Code_Run_V1()
+void Code_Run_Offline()
 {
   SDreadData(FilePWMMovData) ;
   PWMMovSpd = TempData ;
@@ -46,50 +63,52 @@ void Code_Run_V1()
   SDreadData(FilePWMCleData) ;
   PWMCleSpd = TempData ;
   TempData = "" ;
-  bool out = 0 ;
+  out = 0 ;
   lcd.setCursor(0, 2) ; lcd.print("Panel Position:") ;
   lcd.setCursor(16, 2) ; lcd.print(PanPos) ;
   while (!out)
   {
-      Motor_Right_Start() ;
-      Menu_ReadSensor();
-      Menu_WifiPayload();
-      Menu_incPanelPos();
-      
-      if ( MenuSensor.LimitSW_2 == 0)
+    Motor_Right_Start() ;
+    Menu_ReadSensor();
+    Menu_incPanelPos();
+
+    if ( MenuSensor.LimitSW_2 == 0)
+    {
+      Motor_Run_Stop() ;
+      Accelerate = 255 ;
+      AccelerateCLE = 255 ;
+      lcd.setCursor(0, 2) ; lcd.print("Panel Position:") ;
+      while ( MenuSensor.LimitSW_1 == 1 )
       {
+        Motor_Cleaning_Start() ;
+        Motor_Left_Start() ;
+        Menu_ReadSensor();
+        Menu_decPanelPos();
+
+        if (MenuSensor.LimitSW_1 == 0 )
+        {
+          out = 1 ;
           Motor_Run_Stop() ;
+          Motor_Cleaning_Stop() ;
           Accelerate = 255 ;
-          AccelerateCLE = 255 ;
-          lcd.setCursor(0, 2) ; lcd.print("Panel Position:") ;
-          while ( MenuSensor.LimitSW_1 == 1 )
-          {
-              Motor_Cleaning_Start() ;
-              Motor_Left_Start() ;
-              Menu_ReadSensor();
-              Menu_WifiPayload();
-              Menu_decPanelPos();
-      
-              if (MenuSensor.LimitSW_1 == 0 ) 
-                {
-                  out = 1 ;
-                  Motor_Run_Stop() ;
-                  Motor_Cleaning_Stop() ;
-                  Accelerate = 255 ;
-                  break ;
-                }
-              Exit_Mode() ;
-              if(out == 1) { break ; }  
-          }
+          break ;
+        }
+        Exit_Mode_Offline() ;
+        if (out == 1) {
+          break ;
+        }
       }
-     Exit_Mode() ;
-     if(out == 1) { out = 0 ; break ; }  
+    }
+    Exit_Mode_Offline() ;
+    if (out == 1) {
+      break ;
+    }
   }
 }
 
 //-------------------------------------WORK MODE 2-------------------------------//
 
-void Code_Run_V2()
+void Code_Run_FullMode()
 {
   SDreadData(FilePWMMovData) ;
   PWMMovSpd = TempData ;
@@ -103,7 +122,6 @@ void Code_Run_V2()
   while (!out)
   {
     Motor_Right_Start() ;
-    Motor_Cleaning_Start() ;
     Menu_ReadSensor();
     Menu_WifiPayload();
     Menu_incPanelPos();
@@ -112,9 +130,12 @@ void Code_Run_V2()
     if ( MenuSensor.LimitSW_2 == 0)
     {
       Motor_Run_Stop() ;
-      Motor_Cleaning_Stop() ;
+      Accelerate = 255 ;
+      AccelerateCLE = 255 ;
+      lcd.setCursor(0, 2) ; lcd.print("Panel Position:") ;
       while ( MenuSensor.LimitSW_1 == 1)
       {
+        Motor_Cleaning_Start() ;
         Motor_Left_Start() ;
         Menu_ReadSensor();
         Menu_WifiPayload();
@@ -124,66 +145,34 @@ void Code_Run_V2()
         if (MenuSensor.LimitSW_1 == 0 ) {
           out = 1 ;
           Motor_Run_Stop() ;
-          break ;
-        }
-        Key = keypad.getKey();
-        if ( ((int)keypad.getState() ==  PRESSED) )
-        {
-          if ( Key == BACK )
-          {
-            out = 1 ;
-            Wait_Task();
-            Motor_Run_Stop() ;
-            Motor_Cleaning_Stop() ;
-            PanPos = 0 ;
-            break ;
-          }
-        }
-        if ( MenuWifi.Stop)
-        {
-          out = 1 ;
-          Motor_Run_Stop() ;
           Motor_Cleaning_Stop() ;
-          MenuWifi.Mode = 0;
-          wifiPayload.Mode = 0 ;
+          Accelerate = 255 ;
+          break ;
+        }
+        Exit_Mode_Online() ;
+        if (out == 1) {
           break ;
         }
       }
     }
-    Key = keypad.getKey();
-    if ( ((int)keypad.getState() ==  PRESSED) )
-    {
-      if ( Key == BACK )
-      {
-        out = 1 ;
-        Motor_Run_Stop() ;
-        Motor_Cleaning_Stop() ;
-        PanPos = 0 ;
-        break ;
-      }
-    }
-    if ( MenuWifi.Stop)
-    {
-      out = 1 ;
-      MenuWifi.Mode = 0;
-      wifiPayload.Mode = 0 ;
-      Motor_Run_Stop() ;
-      Motor_Cleaning_Stop() ;
+    Exit_Mode_Online();
+    if (out == 1) {
       break ;
     }
-
-    //Wait_Task() ;
   }
 }
+
 
 // --- CHE DO NHAN LENH DIEU KHIEN TU SERVER --- //
 void Server_SetMode()
 {
   lcd.clear() ;
   lcd.setCursor(1, 1) ; lcd.print("Excute From Center") ;
-  lcd.setCursor(0,3) ; lcd.print("<BACK>          <OK>") ;
-  Keypad_Option() ;                                       // co chua vong lap ngay tai day 
-  if (BreakPage == 1) { BreakPage = 0 ; }
+  lcd.setCursor(0, 3) ; lcd.print("<BACK>          <OK>") ;
+  Keypad_Option() ;                                       // co chua vong lap ngay tai day
+  if (BreakPage == 1) {
+    BreakPage = 0 ;
+  }
   if (OkPage == 1)
   {
     MenuWifi.Mode = 0 ;
@@ -195,17 +184,18 @@ void Server_SetMode()
       Menu_WifiPayload();
       if ( MenuWifi.Mode == 1 ) {
         lcd.clear() ;
-        lcd.setCursor(1, 0) ;
+        lcd.setCursor(1, 1) ;
         lcd.print("Building Map ...") ;
+        Building_Map() ;
         MenuWifi.Mode = 0 ;
         wifiPayload.Mode = 0 ;
-        Building_Map() ;
+
       }
       if ( MenuWifi.Mode == 2) {
         lcd.clear() ;
-        lcd.setCursor(1, 0) ;
+        lcd.setCursor(1, 1) ;
         lcd.print("Full Mode...") ;
-        Code_Run_V1() ;
+        Code_Run_FullMode() ;
         MenuWifi.Mode = 0;
         wifiPayload.Mode = 0 ;
         MenuWifi.Stop = 0;
@@ -218,7 +208,7 @@ void Server_SetMode()
       }
       if ( MenuWifi.Mode == 3 ) {
         lcd.clear() ;
-        lcd.setCursor(1, 0) ;
+        lcd.setCursor(1, 1) ;
         lcd.print("Monitor Mode...") ;
 
         MenuWifi.Mode = 0 ;
@@ -226,13 +216,13 @@ void Server_SetMode()
       }
       if ( MenuWifi.Mode == 4 ) {
         lcd.clear() ;
-        lcd.setCursor(1, 0) ;
+        lcd.setCursor(1, 1) ;
         lcd.print("Cleaning Mode... ") ;
-        Code_Run_V2() ;
+        Code_Run_FullMode() ;
         MenuWifi.Mode = 0;
         wifiPayload.Mode = 0 ;
       }
-      Exit_Mode() ;
+      Exit_Mode_Offline() ;
       Wait_Task() ;
     }
   }
@@ -488,8 +478,10 @@ void Building_Map()
     PanPosMax = PanPos ;
     WIFI.print(PanPosMax) ;
     Serial.println(PanPosMax) ;
-    Exit_Mode() ;
-    if(out == 1) { break ;}
+    Exit_Mode_Online() ;
+    if (out == 1) {
+      break ;
+    }
   }
   Motor_Run_Stop() ;
   Accelerate = 255 ;
@@ -499,21 +491,24 @@ void Building_Map()
     Menu_decPanelPos() ;
     Menu_ReadSensor();
     Menu_WifiPayload();
-    if ( PanPos == 9) 
-      {
-        lcd.clear() ;
-        lcd.setCursor(0, 2) ;
-        lcd.print("Panel Position:") ;
-        lcd.print(PanPos) ;
-      }
-    if (PanPos < 0 ) 
-      {
-        PanPosMax = PanPosMax - PanPos ;
-        WIFI.print(PanPosMax) ;
-        Serial.println(PanPosMax) ;
-      }
-    Exit_Mode() ; 
-    if( out == 1) { out = 0 ; break ; } 
+    if ( PanPos == 9)
+    {
+      lcd.clear() ;
+      lcd.setCursor(0, 2) ;
+      lcd.print("Panel Position:") ;
+      lcd.print(PanPos) ;
+    }
+    if (PanPos < 0 )
+    {
+      PanPosMax = PanPosMax - PanPos ;
+      WIFI.print(PanPosMax) ;
+      Serial.println(PanPosMax) ;
+    }
+    Exit_Mode_Online() ;
+    if ( out == 1) {
+      out = 0 ;
+      break ;
+    }
     vTaskDelay((1L * configTICK_RATE_HZ) / 1000L)  ;
   }
   Motor_Run_Stop() ;
@@ -576,7 +571,7 @@ void Motor_Left_Start()
 void Motor_Run_Stop()
 {
   UpdatetoESP(String(updateStatusParameter), String(0));
-  while ( Accelerate < 255 ) 
+  while ( Accelerate < 255 )
   {
     Accelerate++ ;
     analogWrite(PWM4, Accelerate ) ;
