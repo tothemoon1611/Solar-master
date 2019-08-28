@@ -16,10 +16,10 @@
 //#define PS2_CMD        51  //15
 //#define PS2_SEL        49  //16
 //#define PS2_CLK        47  //17
-#define dat        42  //14    
-#define cmd        40  //15
-#define att        46  //16
-#define clk        44  //17
+#define dat        46  //14    
+#define cmd        44  //15
+#define att        42  //16
+#define clk        40  //17
 
 static byte enter_config[]={0x01,0x43,0x00,0x01,0x00};
 static byte set_mode[]={0x01,0x44,0x00,0x01,0x03,0x00,0x00,0x00,0x00};

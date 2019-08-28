@@ -29,7 +29,7 @@ void Energy_Alert()
       TempData = "" ;
       break ;
     }
-    if (BreakPage == 1)
+    if (BreakPage == 1) 
     {
       BreakPage = 0 ;
       break ;

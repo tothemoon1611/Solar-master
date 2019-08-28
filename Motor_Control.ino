@@ -49,6 +49,9 @@ void Exit_Mode_Offline()
 
 void Code_Run_Offline()
 {
+  EncoderSerial.print(String(Start) + String(ResetEncoder) + String(End)) ; // yeu cau reset encoder
+  MenuSensor.Encoder = 0  ;
+  Menu_ReadSensor();
   SDreadData(FilePWMMovData) ;
   PWMMovSpd = TempData ;
   TempData = "" ;
@@ -91,10 +94,57 @@ void Code_Run_Offline()
   }
 }
 
+void Code_Run_OfflineV3() 
+{
+  EncoderSerial.print(String(Start) + String(ResetEncoder) + String(End)) ; // yeu cau reset encoder
+  MenuSensor.Encoder = 0  ;
+  Menu_ReadSensor();
+  SDreadData(FilePWMMovData) ;
+  PWMMovSpd = TempData ;
+  TempData = "" ;
+  SDreadData(FilePWMCleData) ;
+  PWMCleSpd = TempData ;
+  TempData = "" ;
+  out = false ;
+  lcd.setCursor(0, 2) ; lcd.print("Panel Position:") ;
+  lcd.setCursor(16, 2) ; lcd.print(PanPos) ;
+  while (out == false)
+  {
+    Motor_Cleaning_Start() ;
+    Menu_ReadSensor() ;
+    Menu_incPanelPos();
+
+    if ( MenuSensor.LimitSW_2 == 0)
+    {
+      lcd.setCursor(0, 2) ; lcd.print("Panel Position:") ;
+      while ( MenuSensor.LimitSW_1 == 1)
+      {
+        Motor_Cleaning_Start() ;
+     
+        Menu_ReadSensor();
+        Menu_decPanelPos();
+
+        if (MenuSensor.LimitSW_1 == 0 ) {
+          out = true ;
+          Motor_Cleaning_Stop() ;
+          Accelerate = 255 ;
+          break ;
+        }
+        Exit_Mode_Offline() ;
+        if( out == true) { break ; }
+      }
+    }
+    Exit_Mode_Offline() ;
+    if( out == true) { break ; }
+  }
+}
 //-------------------------------------WORK MODE 2-------------------------------//
 
 void Code_Run_Online()
 {
+  EncoderSerial.print(String(Start) + String(ResetEncoder) + String(End)) ; // yeu cau reset encoder
+  MenuSensor.Encoder = 0  ;
+  Menu_ReadSensor();
   SDreadData(FilePWMMovData) ;
   PWMMovSpd = TempData ;
   TempData = "" ;
@@ -155,6 +205,9 @@ void Server_SetMode()
   }
   if (OkPage == 1)
   {
+    EncoderSerial.print(String(Start) + String(ResetEncoder) + String(End)) ; // yeu cau reset encoder
+    MenuSensor.Encoder = 0  ;
+    Menu_ReadSensor();
     MenuWifi.Mode = 0 ;
     wifiPayload.Mode = 0 ;
     OkPage = 0 ;
@@ -218,6 +271,9 @@ void Server_SetMode()
 //-----------------DIEU KHIEN BANG GAMEPAD ----------------------//
 void Gamepad_Control()
 {
+  EncoderSerial.print(String(Start) + String(ResetEncoder) + String(End)) ; // yeu cau reset encoder
+  MenuSensor.Encoder = 0  ;
+  Menu_ReadSensor();
   Motor_Setup() ;
   vTaskDelay((300L * configTICK_RATE_HZ) / 1000L)  ;   //added delay to give wireless ps2 module some time to startup, before configuring it
 
@@ -447,6 +503,7 @@ void Menu_decPanelPos()     // toan code
 {
   if ( PanPos != MenuSensor.Encoder)
   {
+    if( Panpos == 9 ) { lcd.clear() ; }
     PanPos = MenuSensor.Encoder ;
     lcd.setCursor(16, 2) ; lcd.print(PanPos) ;
     SDsaveData((String)PanPos, FilePanPosData) ;
@@ -515,7 +572,8 @@ void Motor_Setup()
   pinMode(MetalSensorPin, INPUT_PULLUP) ;   // duong-nau, am-xanh
   pinMode(CheckWheel2, INPUT_PULLUP) ;   // duong-nau, am-xanh
   pinMode(CheckWheel1, INPUT_PULLUP) ;   // duong-nau, am-xanh
-  pinMode(PausePin, INPUT_PULLUP) ;
+  pinMode(StartPin, INPUT_PULLUP) ;
+  pinMode(StopPin, INPUT_PULLUP) ;
 
   pinMode(DIR4, OUTPUT) ;
   pinMode(DIR3, OUTPUT) ;
