@@ -1,5 +1,5 @@
-void Get_Wifi_Command() 
-{
+void Get_Wifi_Command() {
+
   int MovingSpeed = 0;
   int ChargingThreshold = 0;
   int SpinnerSpeed = 0;
@@ -16,22 +16,20 @@ void Get_Wifi_Command()
       Serial.println(InputString);
 #endif
       switch (cmd) {
-        case setMovingSpeed: {
+        case setMovingSpeed:
           MovingSpeed = InputString.toInt();
 #ifdef DEBUGER
           Serial.print("Set Moving Speed: ");
           Serial.println(MovingSpeed);
 #endif
           break;
-          }
 //-----------------------------------------------------            
-        case setSpinnerSpeed: {
+        case setSpinnerSpeed:
 #ifdef DEBUGER
           Serial.print("Set Moving Speed: ");
           Serial.println(SpinnerSpeed);
 #endif
           break;
-          } 
 //-----------------------------------------------------            
         case setChargeThreshold:
 #ifdef DEBUGER
@@ -40,32 +38,29 @@ void Get_Wifi_Command()
 #endif
           break;
 //-----------------------------------------------------         
-        case setMaxPower: {
+        case setMaxPower:
 #ifdef DEBUGER
           Serial.print("Set Moving Speed: ");
           Serial.println(MaxPower);
 #endif
           break;
-          }
 //-----------------------------------------------------            
-        case setMinPower: { 
+        case setMinPower:
 #ifdef DEBUGER
           Serial.print("Set Moving Speed: ");
           Serial.println(MinPower);
 #endif
           break;
-          }
 //-----------------------------------------------------            
-        case IDError: {                                      
+        case IDError:                                      
           ContentIDError = InputString;
 #ifdef DEBUGER
           Serial.print("ID Error: ");
           Serial.println(ContentIDError);
 #endif
           break;
-          }
 //-----------------------------------------------------            
-        case setFixedID: {                                     
+        case setFixedID:                                      
           wifiPayload.FixedIDMachine  = InputString;
 #ifdef DEBUGER
           Serial.print("Setting ID OK !!! ");
@@ -73,10 +68,9 @@ void Get_Wifi_Command()
           Serial.println(InputString);
           //SDsaveData(FixedIDData,FileIDData) ;
 #endif
-          break;    
-          }      
+          break;          
 //-----------------------------------------------------            
-        case ACKSERVERCmd: {                            // giao tiep voi wifi
+        case ACKSERVERCmd:                            // giao tiep voi wifi
           ContentACKSERVER = InputString;
           wifiPayload.ACK_SERVER = true;
 #ifdef DEBUGER
@@ -84,34 +78,30 @@ void Get_Wifi_Command()
           Serial.println(ContentACKSERVER);
 #endif
           break;
-          }
 //-----------------------------------------------------            
-        case setMode: {
+        case setMode:
           wifiPayload.Mode = InputString.toInt();
 #ifdef DEBUGER
           Serial.print("Set Mode: ");
           Serial.println(wifiPayload.Mode);
 #endif
           break;
-          }
 //-----------------------------------------------------            
-        case setStop: {
+        case setStop:
           wifiPayload.Stop = InputString.toInt();
 #ifdef DEBUGER
           Serial.print("Set Stop: ");
           Serial.println(wifiPayload.Stop);
 #endif
-          break; 
-          }
+          break;
 //-----------------------------------------------------            
-        case setContinue: {
+        case setContinue:
           wifiPayload.Continue = InputString.toInt();
 #ifdef DEBUGER
           Serial.print("Set Continue: ");
           Serial.println(wifiPayload.Continue);
 #endif
-          break; 
-          }
+          break;
 //-----------------------------------------------------        
         case NetworkError: {
             wifiPayload.NetworkStatus = false;
@@ -133,7 +123,7 @@ void Get_Wifi_Command()
             break;
           }          
 //-----------------------------------------------------            
-        case ServerError: {                              // loi mat ket noi socket
+        case ServerError:                              // loi mat ket noi socket
             wifiPayload.ServerStatus = false ;
 #ifdef DEBUGER
           Serial.print("Socket Was Stopped !");
@@ -141,9 +131,8 @@ void Get_Wifi_Command()
 #endif
           Net_SocStatus = false ; 
           break;  
-        }
 //-----------------------------------------------------            
-        case ServerOK:{
+        case ServerOK:
             wifiPayload.ServerStatus = true ;
 #ifdef DEBUGER
           Serial.print("Socket Reconnect OK !");
@@ -151,7 +140,7 @@ void Get_Wifi_Command()
 #endif
           Net_SocStatus = true ; 
           break;  
-        }
+          
 //-----------------------------------------------------            
         default:
           Serial.println("Unknown cmd!!!");

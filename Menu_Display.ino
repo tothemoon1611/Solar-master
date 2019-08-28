@@ -1,12 +1,5 @@
 
 //---------------------------------------HIEN THI, NHAP LIEU---------------------------------------------------------------//
-void LCD_Page_0_Display() 
-{
-  t = rtc.getTime(); 
-  lcd.setCursor(0,0) ;lcd.print(String(t.date) + "/" + String(t.mon) + "/" + String(t.year) + " " + String(t.hour)+ ":" + String(t.min));
-  
-}
-
 void LCD_Page_1_Display()
 {
   lcd.clear() ;
@@ -99,7 +92,7 @@ void LCD_Page_4_Display()
 
     if (( Page_Pointer[1] == 1 ) && ( Page_Pointer[2] == 2 ) && ( Page_Pointer[3] == 2 )) {  }
 
-    if (( Page_Pointer[1] == 1 ) && ( Page_Pointer[2] == 3 ) && ( Page_Pointer[3] == 0 )) { Code_Run_Offline() ;   }
+    if (( Page_Pointer[1] == 1 ) && ( Page_Pointer[2] == 3 ) && ( Page_Pointer[3] == 0 )) { Code_Run_Offline() ;  }
     if (( Page_Pointer[1] == 1 ) && ( Page_Pointer[2] == 3 ) && ( Page_Pointer[3] == 1 )) {  }
     if (( Page_Pointer[1] == 1 ) && ( Page_Pointer[2] == 3 ) && ( Page_Pointer[3] == 2 )) {  }
     if (( Page_Pointer[1] == 1 ) && ( Page_Pointer[2] == 3 ) && ( Page_Pointer[3] == 3 )) {  }
