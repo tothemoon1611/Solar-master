@@ -25,7 +25,7 @@ void Robot_Init(void *pvParameters) {
   xSemaphoreGive( sem_ProcessWifi);
   vTaskDelay((1000L * configTICK_RATE_HZ) / 1000L);
   Init_Communication();
-
+  
   for (;;)
   {
     vTaskDelay((1000L * configTICK_RATE_HZ) / 1000L);

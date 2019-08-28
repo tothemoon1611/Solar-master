@@ -29,6 +29,14 @@ void Exit_Mode_Online()
       Motor_Run_Stop() ;
       Motor_Cleaning_Stop() ;
     }
+    if( digitalRead(StopPin) == 0 )
+      {
+        Motor_Run_Stop() ;
+        Motor_Cleaning_Stop() ;
+        lcd.clear() ;
+        lcd.setCursor(4,2) ; lcd.print("Resume... ?") ;
+        while(digitalRead(StartPin) != 0) { Wait_Task() ; } 
+      }
 }
 
 void Exit_Mode_Offline() 
@@ -44,6 +52,14 @@ void Exit_Mode_Offline()
         PanPos = 0 ;
       }
     }
+    if( digitalRead(StopPin) == 0 )
+      {
+        Motor_Run_Stop() ;
+        Motor_Cleaning_Stop() ;
+        lcd.clear() ;
+        lcd.setCursor(4,2) ; lcd.print("Resume... ?") ;
+        while(digitalRead(StartPin) != 0) { Wait_Task() ; } 
+      }
 }
 
 
@@ -268,6 +284,53 @@ void Server_SetMode()
 }
 
 
+void Building_Map()
+{
+  SDreadData(FilePWMMovData) ;
+  PWMMovSpd = TempData ;
+  TempData = "" ;
+  Accelerate = 255 ;
+  EncoderSerial.print(String(Start) + String(ResetEncoder) + String(End)) ; // yeu cau reset encoder
+  MenuSensor.Encoder = 0  ;
+  Menu_ReadSensor();
+  PanPosMax = 0 ;
+  lcd.setCursor(0, 2) ; lcd.print("Panel Position:") ;
+  lcd.setCursor(16, 2) ; lcd.print(PanPos) ;
+  while ( MenuSensor.LimitSW_2 != 0 )
+  {
+    Motor_Right_Start() ;
+    Menu_incPanelPos() ;
+    Menu_ReadSensor();
+    Menu_WifiPayload();
+    PanPosMax = PanPos ;
+    WIFI.print(PanPosMax) ;
+    lcd.setCursor(16, 2) ; lcd.print(PanPosMax) ;
+    Serial.println(PanPosMax) ;
+    vTaskDelay((1L * configTICK_RATE_HZ) / 1000L)  ;
+  }
+  Motor_Run_Stop() ;
+  Accelerate = 255 ;
+  bool Direct = false ; 
+  while ( MenuSensor.LimitSW_1 != 0 )
+  {
+    Motor_Left_Start() ;
+    Menu_decPanelPos() ;
+    Menu_ReadSensor() ;
+    Menu_WifiPayload();
+    if (PanPos == 0 ) { Direct = true ; } 
+    if( Direct == true && PanPos != PanPosMax ) {
+      PanPosMax = PanPosMax + PanPos ;
+      WIFI.print(PanPosMax) ;
+      lcd.setCursor(16, 2) ; lcd.print(PanPosMax) ; 
+      Serial.println(PanPosMax) ;
+    }
+    vTaskDelay((1L * configTICK_RATE_HZ) / 1000L)  ;
+  }
+  Motor_Run_Stop() ;
+  Direct = false ;
+}
+
+
 //-----------------DIEU KHIEN BANG GAMEPAD ----------------------//
 void Gamepad_Control()
 {
@@ -431,22 +494,16 @@ void Gamepad_Control()
     analogWrite(PWM4, Accelerate) ;
     Key = keypad.getKey();
     if ( ((int)keypad.getState() ==  PRESSED) )
-    {
-      if ( Key == BACK )
       {
-        while ( Accelerate < 256 || AccelerateCLE < 256) {
-          Accelerate++ ;
-          AccelerateCLE++ ;
-          analogWrite(PWM4, Accelerate) ;
-          analogWrite(PWM3, AccelerateCLE) ;
-          vTaskDelay((2L * configTICK_RATE_HZ) / 1000L)  ;
-        }
-        Motor_Cleaning_Stop() ;
-        break ;
-      }
+        if ( Key == BACK )
+        {
+          Motor_Run_Stop() ;
+          Motor_Cleaning_Stop() ;
+          break ;
+         }
+       }
     }
     vTaskDelay((1L * configTICK_RATE_HZ) / 1000L)  ;
-  }
 }
 
 
@@ -503,7 +560,7 @@ void Menu_decPanelPos()     // toan code
 {
   if ( PanPos != MenuSensor.Encoder)
   {
-    if( Panpos == 9 ) { lcd.clear() ; }
+    if( PanPos == 9 ) { lcd.clear() ; }
     PanPos = MenuSensor.Encoder ;
     lcd.setCursor(16, 2) ; lcd.print(PanPos) ;
     SDsaveData((String)PanPos, FilePanPosData) ;
@@ -516,53 +573,6 @@ void Menu_decPanelPos()     // toan code
     UpdatetoESP(String(updateCollumnPanelParameter), String(PanPos));
     UpdatetoESP(String(updateStringPanelParameter), String(StrPanel));
   }
-}
-
-void Building_Map()
-{
-  SDreadData(FilePWMMovData) ;
-  PWMMovSpd = TempData ;
-  TempData = "" ;
-  Accelerate = 255 ;
-  EncoderSerial.print(String(Start) + String(ResetEncoder) + String(End)) ; // yeu cau reset encoder
-  MenuSensor.Encoder = 0  ;
-  Menu_ReadSensor();
-  PanPosMax = 0 ;
-  lcd.setCursor(0, 2) ; lcd.print("Panel Position:") ;
-  lcd.setCursor(16, 2) ; lcd.print(PanPos) ;
-  while ( MenuSensor.LimitSW_2 != 0 )
-  {
-    Motor_Right_Start() ;
-    Menu_incPanelPos() ;
-    Menu_ReadSensor();
-    Menu_WifiPayload();
-    PanPosMax = PanPos ;
-    WIFI.print(PanPosMax) ;
-    Serial.println(PanPosMax) ;
-    vTaskDelay((1L * configTICK_RATE_HZ) / 1000L)  ;
-  }
-  Motor_Run_Stop() ;
-  Accelerate = 255 ;
-  while ( MenuSensor.LimitSW_1 != 0 )
-  {
-    Motor_Left_Start() ;
-    Menu_decPanelPos() ;
-    Menu_ReadSensor();
-    Menu_WifiPayload();
-    if ( PanPos == 9) {
-      lcd.clear() ;
-      lcd.setCursor(0, 2) ;
-      lcd.print("Panel Position:") ;
-      lcd.print(PanPos) ;
-    }
-    if (PanPos < 0 ) {
-      PanPosMax = PanPosMax - PanPos ;
-      WIFI.print(PanPosMax) ;
-      Serial.println(PanPosMax) ;
-    }
-    vTaskDelay((1L * configTICK_RATE_HZ) / 1000L)  ;
-  }
-  Motor_Run_Stop() ;
 }
 
 //-------------------------Thiet Lap Ban Dau Cho Dong Co------------------------------------------------//
@@ -633,7 +643,7 @@ void Motor_Run_Stop()
 
 void Motor_Cleaning_Start()
 {
-  digitalWrite(DIR3, HIGH) ;
+  digitalWrite(DIR3, LOW) ;
   if (AccelerateCLE > 255 - (int)(PWMCleSpd.toInt()) )
   {
     AccelerateCLE--;
