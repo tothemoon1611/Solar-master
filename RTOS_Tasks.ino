@@ -70,8 +70,8 @@ void Read_Sensor(void *pvParameters)
     }
     if ( xSemaphoreTake( sem_ProcessData, ( TickType_t ) 0 ) )
     {
-      dataMachine.IRSensorR = digitalRead(MetalSensorPinR);
-      dataMachine.IRSensorL = digitalRead(MetalSensorPinL);
+      dataMachine.IRSensorR = digitalRead(IRSensorPinR);
+      dataMachine.IRSensorL = digitalRead(IRSensorPinL);
       dataMachine.LimitSW_1 = digitalRead(CheckWheel1);
       dataMachine.LimitSW_2 = digitalRead(CheckWheel2);
 //      Serial.println(dataMachine.LimitSW_1);

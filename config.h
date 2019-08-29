@@ -179,8 +179,8 @@ String PWMCleSpd ;
 unsigned int PanPos = 0 ;
 bool  StartBut  = 0 ;
 
-#define IRSensorPin 43
-#define IRSensorPin 45
+#define IRSensorPinR 43
+#define IRSensorPinL 45
 #define CheckWheel1 47
 #define CheckWheel2 49
 
