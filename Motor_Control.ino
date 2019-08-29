@@ -344,7 +344,8 @@ void Gamepad_Control()
 
   //setup pins and settings: GamePad(clock, command, attention, data, Pressures?, Rumble?) check for error
   error = ps2x.config_gamepad(pressures, rumble);
-
+  lcd.setCursor(0,1) ;
+  lcd.print("Connecting to PS2...") ;
   if (error == 0) {
     Serial.print("Found Controller, configured successful ");
     Serial.print("pressures = ");
@@ -507,10 +508,10 @@ void Gamepad_Control()
 }
 
 
-
 //---------------------------------------------------------------------------------------------------
 
-void Run_Mode() {
+void Run_Mode() 
+{
   while (Run) {
     Menu_WifiPayload();
     Motor_Run_Stop() ;
@@ -528,8 +529,8 @@ void Menu_incPanelPos()       // a Phuong code, toan sua :)))
     lcd.setCursor(16, 2) ; lcd.print(PanPos) ;
     SDsaveData((String)PanPos, FilePanPosData) ;
   }
-  if (  MenuSensor.MetalSensor == 0 && Sensor_Temp == 0) Sensor_Temp = 1  ;
-  if (  MenuSensor.MetalSensor == 1 && Sensor_Temp == 1)
+  if (  MenuSensor.IRSensorR == 0 && Sensor_Temp == 0) Sensor_Temp = 1  ;
+  if (  MenuSensor.IRSensorR == 1 && Sensor_Temp == 1)
   {
     Sensor_Temp = 0 ;
     EncoderSerial.print(String(Start) + String(NextPanel) + String(End)) ; // IR phat hien tam pin moi
@@ -565,8 +566,8 @@ void Menu_decPanelPos()     // toan code
     lcd.setCursor(16, 2) ; lcd.print(PanPos) ;
     SDsaveData((String)PanPos, FilePanPosData) ;
   }
-  if (  MenuSensor.MetalSensor == 0 && Sensor_Temp == 0) Sensor_Temp = 1  ;
-  if (  MenuSensor.MetalSensor == 1 && Sensor_Temp == 1)
+  if (  MenuSensor.IRSensorR == 0 && Sensor_Temp == 0) Sensor_Temp = 1  ;
+  if (  MenuSensor.IRSensorR == 1 && Sensor_Temp == 1)
   {
     Sensor_Temp = 0 ;
     EncoderSerial.print(String(Start) + String(NextPanel) + String(End)) ; // IR phat hien tam pin moi
@@ -579,7 +580,8 @@ void Menu_decPanelPos()     // toan code
 
 void Motor_Setup()
 {
-  pinMode(MetalSensorPin, INPUT_PULLUP) ;   // duong-nau, am-xanh
+  pinMode(IRSensorPinR, INPUT_PULLUP) ;   // duong-nau, am-xanh
+  pinMode(IRSensorPinL, INPUT_PULLUP) ;   // duong-nau, am-xanh
   pinMode(CheckWheel2, INPUT_PULLUP) ;   // duong-nau, am-xanh
   pinMode(CheckWheel1, INPUT_PULLUP) ;   // duong-nau, am-xanh
   pinMode(StartPin, INPUT_PULLUP) ;
@@ -634,9 +636,9 @@ void Motor_Run_Stop()
   UpdatetoESP(String(updateStatusParameter), String(0));
   while ( Accelerate < 255 ) 
   {
-    Accelerate++ ;
+    Accelerate = Accelerate + 2 ;
     analogWrite(PWM4, Accelerate ) ;
-    vTaskDelay((2L * configTICK_RATE_HZ) / 1000L);
+    vTaskDelay((1L * configTICK_RATE_HZ) / 1000L);
   }
 }
 
@@ -660,8 +662,8 @@ void Motor_Cleaning_Stop()
 {
   while ( AccelerateCLE < 255 )
   {
-    AccelerateCLE++ ;
+    AccelerateCLE = AccelerateCLE + 2 ;
     analogWrite(PWM3, AccelerateCLE ) ;
-    vTaskDelay((2L * configTICK_RATE_HZ) / 1000L);
+    vTaskDelay((1L * configTICK_RATE_HZ) / 1000L);
   }
 }

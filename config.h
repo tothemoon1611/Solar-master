@@ -19,7 +19,8 @@ struct Status
 
 struct DataMachine
 {
-  bool MetalSensor ;
+  bool IRSensorR ;
+  bool IRSensorL ; 
   bool LimitSW_1 ;
   bool LimitSW_2 ;
   float VoltageBattery ;
@@ -178,7 +179,8 @@ String PWMCleSpd ;
 unsigned int PanPos = 0 ;
 bool  StartBut  = 0 ;
 
-#define MetalSensorPin 43
+#define IRSensorPin 43
+#define IRSensorPin 45
 #define CheckWheel1 47
 #define CheckWheel2 49
 

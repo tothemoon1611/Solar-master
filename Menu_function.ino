@@ -540,7 +540,7 @@ void Init_Communication() {
 void Menu_ReadSensor() {
   if ( xSemaphoreTake( sem_ReadData, ( TickType_t ) 0 ) )
   {
-    MenuSensor.MetalSensor = dataMachine.MetalSensor;
+    MenuSensor.IRSensorR = dataMachine.IRSensorR;
     MenuSensor.LimitSW_1 = dataMachine.LimitSW_1;
     MenuSensor.LimitSW_2 = dataMachine.LimitSW_2;
     MenuSensor.VoltageBattery = dataMachine.VoltageBattery;
