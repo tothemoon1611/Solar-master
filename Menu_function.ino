@@ -534,6 +534,7 @@ void Init_Communication() {
   WIFI.print(String(Start) + String(WifiPort) + TempData + String(End)) ;
   vTaskDelay((500L * configTICK_RATE_HZ) / 1000L);
   TempData = "" ;
+
 }
 
 

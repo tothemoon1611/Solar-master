@@ -43,8 +43,8 @@ struct WifiPayload
 };
 
 bool Run = 0;
-int StrPanel = 0;
-int StrPanelFine = 0;
+int StrPanel = 1;
+int StrPanelFine = 1;
 int PanPosFine = 0;
 int StrPanelError = 0;
 int PanPosError = 0;

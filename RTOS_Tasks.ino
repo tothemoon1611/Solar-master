@@ -93,6 +93,8 @@ void Serial_wifi(void *pvParameters)
   if ( Net_SocStatus == true )  digitalWrite(StaLedGREEN, HIGH) ;
   else digitalWrite(StaLedGREEN, LOW) ;
 }
+
+
 void Serial_Encoder(void *pvParameters)
 {
   Get_Encoder_Command();

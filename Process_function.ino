@@ -76,6 +76,8 @@ void Get_Wifi_Command() {
 #ifdef DEBUGER
           Serial.print("Server connect: ");
           Serial.println(ContentACKSERVER);
+          Net_SocStatus = true ;
+          digitalWrite(StaLedGREEN, HIGH) ;     // toan pha code luc 8h5- PM 29/8
 #endif
           break;
 //-----------------------------------------------------            
@@ -110,6 +112,7 @@ void Get_Wifi_Command() {
             Serial.println("Ket noi wifi that bai ! Dang kiem tra ... ");
 #endif            
             Net_SocStatus = false ; 
+            digitalWrite(StaLedGREEN, LOW) ;     // toan pha code luc 8h5- PM 29/8
             break;
           }
 //-----------------------------------------------------        
@@ -120,6 +123,7 @@ void Get_Wifi_Command() {
             Serial.println("Ket noi lai thanh cong ! ");
 #endif  
             Net_SocStatus = true ; 
+            digitalWrite(StaLedGREEN, HIGH) ;     // toan pha code luc 8h5- PM 29/8
             break;
           }          
 //-----------------------------------------------------            
@@ -130,6 +134,7 @@ void Get_Wifi_Command() {
           Serial.println(wifiPayload.ServerStatus);
 #endif
           Net_SocStatus = false ; 
+          digitalWrite(StaLedGREEN, LOW) ;     // toan pha code luc 8h5- PM 29/8
           break;  
 //-----------------------------------------------------            
         case ServerOK:
@@ -139,6 +144,7 @@ void Get_Wifi_Command() {
           Serial.println(wifiPayload.ServerStatus);
 #endif
           Net_SocStatus = true ; 
+          digitalWrite(StaLedGREEN, HIGH) ;     // toan pha code luc 8h5- PM 29/8
           break;  
           
 //-----------------------------------------------------            
