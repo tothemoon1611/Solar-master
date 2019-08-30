@@ -83,22 +83,24 @@ void Code_Run_Offline()
   lcd.setCursor(16, 2) ; lcd.print(PanPos) ;
   while (out == false)
   {
-    Motor_Right_Start() ;
+    Motor_Left_Start() ;
+    Motor_CleaningR_Start() ; 
     Menu_ReadSensor() ;
     Menu_incPanelPos();
 
-    if ( MenuSensor.LimitSW_2 == 0)
+    if ( MenuSensor.LimitSW_1 == 0)
     {
       Motor_Run_Stop() ;
+      Motor_Cleaning_Stop() ;
       lcd.setCursor(0, 2) ; lcd.print("Panel Position:") ;
-      while ( MenuSensor.LimitSW_1 == 1)
+      while ( MenuSensor.LimitSW_2 == 1)
       {
-        Motor_Cleaning_Start() ;
-        Motor_Left_Start() ;
+        Motor_CleaningL_Start() ;
+        Motor_Right_Start() ;
         Menu_ReadSensor();
         Menu_decPanelPos();
 
-        if (MenuSensor.LimitSW_1 == 0 ) {
+        if (MenuSensor.LimitSW_2 == 0 ) {
           out = true ;
           Motor_Run_Stop() ;
           Motor_Cleaning_Stop() ;
@@ -140,28 +142,30 @@ void Code_Run_Online()
   lcd.setCursor(16, 2) ; lcd.print(PanPos) ;
   while (out == false)
   {
-    Motor_Right_Start() ;
+    Motor_Left_Start() ;
+    Motor_CleaningR_Start() ;
     Menu_ReadSensor();
     Menu_WifiPayload();
     Menu_incPanelPos();
     Run_Mode();
 
-    if ( MenuSensor.LimitSW_2 == 0)
+    if ( MenuSensor.LimitSW_1 == 0)
     {
       UpdatetoESP(String(updateStatusParameter), String(1));
       UpdatetoESP(String(updateDirectionParameter), String(-1));
       Motor_Run_Stop() ;
+      Motor_Cleaning_Stop() ;
       lcd.setCursor(0, 2) ; lcd.print("Panel Position:") ;
-      while ( MenuSensor.LimitSW_1 == 1)
+      while ( MenuSensor.LimitSW_2 == 1)
       {
-        Motor_Left_Start() ;
-        Motor_Cleaning_Start() ;
+        Motor_Right_Start() ;
+        Motor_CleaningL_Start() ;
         Menu_ReadSensor();
         Menu_WifiPayload();
         Menu_decPanelPos();
         Run_Mode();
 
-        if (MenuSensor.LimitSW_1 == 0 ) {
+        if (MenuSensor.LimitSW_2 == 0 ) {
           UpdatetoESP(String(updateStatusParameter), String(0));
           out = true ;
           Motor_Run_Stop() ;
@@ -199,9 +203,9 @@ void Building_Map()
   UpdatetoESP(String(updateDirectionParameter), String(1));
   lcd.setCursor(0, 2) ; lcd.print("Panel Position:") ;
   lcd.setCursor(16, 2) ; lcd.print(PanPos) ;
-  while ( MenuSensor.LimitSW_2 != 0 )
+  while ( MenuSensor.LimitSW_1 != 0 )
   {
-    Motor_Right_Start() ;
+    Motor_Left_Start() ;
     Menu_incPanelPos() ;
     Menu_ReadSensor();
     Menu_WifiPayload();
@@ -214,12 +218,61 @@ void Building_Map()
   Motor_Run_Stop() ;
   Accelerate = 255 ;
   bool Direct = false ;
-  while ( MenuSensor.LimitSW_1 != 0 )
+  while ( MenuSensor.LimitSW_2 != 0 )
   {
-    Motor_Left_Start() ;
+    Motor_Right_Start() ;
     Menu_decPanelPos() ;
     Menu_ReadSensor() ;
     Menu_WifiPayload();
+    //    if (PanPos == 0 ) { Direct = true ; }
+    //    if( Direct == true && PanPos != PanPosMax ) {
+    //      PanPosMax = PanPosMax + PanPos ;
+    //      WIFI.print(PanPosMax) ;
+    //      lcd.setCursor(16, 2) ; lcd.print(PanPosMax) ;
+    //      Serial.println(PanPosMax) ;
+    //    }
+    vTaskDelay((1L * configTICK_RATE_HZ) / 1000L)  ;
+  }
+  Motor_Run_Stop() ;
+  Direct = false ;
+}
+
+
+
+void Building_Map_Offline()    // Toan code them luc 19h35 30/8
+{
+  SDreadData(FilePWMMovData) ;
+  PWMMovSpd = TempData ;
+  TempData = "" ;
+  Accelerate = 255 ;
+  EncoderSerial.print(String(Start) + String(ResetEncoder) + String(End)) ; // yeu cau reset encoder
+  MenuSensor.Encoder = 0  ;
+  Menu_ReadSensor();
+  PanPosMax = 0 ;
+  UpdatetoESP(String(updateCollumnPanelParameter), String(PanPos));
+  UpdatetoESP(String(updateStringPanelParameter), String(StrPanel));
+  UpdatetoESP(String(updateDirectionParameter), String(1));
+  lcd.setCursor(0, 2) ; lcd.print("Panel Position:") ;
+  lcd.setCursor(16, 2) ; lcd.print(PanPos) ;
+  while ( MenuSensor.LimitSW_1 != 0 )
+  {
+    Motor_Left_Start() ;
+    Menu_incPanelPos() ;
+    Menu_ReadSensor();
+    PanPosMax = PanPos ;
+    //    WIFI.print(PanPosMax) ;
+    //    lcd.setCursor(16, 2) ; lcd.print(PanPosMax) ;
+    //    Serial.println(PanPosMax) ;
+    vTaskDelay((1L * configTICK_RATE_HZ) / 1000L)  ;
+  }
+  Motor_Run_Stop() ;
+  Accelerate = 255 ;
+  bool Direct = false ;
+  while ( MenuSensor.LimitSW_2 != 0 )
+  {
+    Motor_Right_Start() ;
+    Menu_decPanelPos() ;
+    Menu_ReadSensor() ;
     //    if (PanPos == 0 ) { Direct = true ; }
     //    if( Direct == true && PanPos != PanPosMax ) {
     //      PanPosMax = PanPosMax + PanPos ;
@@ -246,11 +299,12 @@ void Server_SetMode()
   }
   if (OkPage == 1)
   {
+    Menu_WifiPayload() ;
     EncoderSerial.print(String(Start) + String(ResetEncoder) + String(End)) ; // yeu cau reset encoder
     MenuSensor.Encoder = 0  ;
-    Menu_ReadSensor();
     MenuWifi.Mode = 0 ;
     wifiPayload.Mode = 0 ;
+    Menu_ReadSensor();
     OkPage = 0 ;
     lcd.clear() ;
     lcd.setCursor(1, 1) ; lcd.print("Waiting for Command") ;
@@ -436,7 +490,7 @@ void Gamepad_Control()
         vTaskDelay((20L * configTICK_RATE_HZ) / 1000L)  ;
         if (CleTrigger == 0) {
           while ( AccelerateCLE > 0) {
-            Motor_Cleaning_Start() ;
+            Motor_CleaningL_Start() ;
             CleTrigger = 1 ;
             AccelerateCLE-- ;
             vTaskDelay((1L * configTICK_RATE_HZ) / 1000L)  ;
@@ -511,14 +565,14 @@ void Menu_incPanelPos()       // a Phuong code, toan sua :)))
     SDsaveData((String)PanPos, FilePanPosData);
     UpdatetoESP(String(updateDirectionParameter), String(1));
   }
-  if (  MenuSensor.IRSensorR == 0 && Sensor_Temp == 0) Sensor_Temp = 1  ;
-  if (  MenuSensor.IRSensorR == 1 && Sensor_Temp == 1)
-  {
-    Sensor_Temp = 0 ;
-    EncoderSerial.print(String(Start) + String(NextPanel) + String(End)) ; // IR phat hien tam pin moi
-    //    UpdatetoESP(String(updateCollumnPanelParameter), String(PanPos));
-    //    UpdatetoESP(String(updateStringPanelParameter), String(StrPanel));
-  }
+//  if (  MenuSensor.IRSensorR == 0 && Sensor_Temp == 0) Sensor_Temp = 1  ;
+//  if (  MenuSensor.IRSensorR == 1 && Sensor_Temp == 1)
+//  {
+//    Sensor_Temp = 0 ;
+//    EncoderSerial.print(String(Start) + String(NextPanel) + String(End)) ; // IR phat hien tam pin moi
+//        UpdatetoESP(String(updateCollumnPanelParameter), String(PanPos));
+//        UpdatetoESP(String(updateStringPanelParameter), String(StrPanel));
+//  }
 }
 
 //void Menu_decPanelPos()     // a Phuong code
@@ -551,14 +605,14 @@ void Menu_decPanelPos()     // toan code
     SDsaveData((String)PanPos, FilePanPosData) ;
     UpdatetoESP(String(updateDirectionParameter), String(-1));
   }
-  if (  MenuSensor.IRSensorR == 0 && Sensor_Temp == 0) Sensor_Temp = 1  ;
-  if (  MenuSensor.IRSensorR == 1 && Sensor_Temp == 1)
-  {
-    Sensor_Temp = 0 ;
-    EncoderSerial.print(String(Start) + String(NextPanel) + String(End)) ; // IR phat hien tam pin moi
-    //    UpdatetoESP(String(updateCollumnPanelParameter), String(PanPos));
-    //    UpdatetoESP(String(updateStringPanelParameter), String(StrPanel));
-  }
+//  if (  MenuSensor.IRSensorR == 0 && Sensor_Temp == 0) Sensor_Temp = 1  ;
+//  if (  MenuSensor.IRSensorR == 1 && Sensor_Temp == 1)
+//  {
+//    Sensor_Temp = 0 ;
+//    EncoderSerial.print(String(Start) + String(NextPanel) + String(End)) ; // IR phat hien tam pin moi
+//        UpdatetoESP(String(updateCollumnPanelParameter), String(PanPos));
+//        UpdatetoESP(String(updateStringPanelParameter), String(StrPanel));
+//  }
 }
 
 //-------------------------Thiet Lap Ban Dau Cho Dong Co------------------------------------------------//
@@ -624,7 +678,7 @@ void Motor_Run_Stop()
 }
 
 
-void Motor_Cleaning_Start()
+void Motor_CleaningL_Start()
 {
   digitalWrite(DIR3, HIGH) ;
   if (AccelerateCLE > 255 - (int)(PWMCleSpd.toInt()) )
@@ -638,6 +692,20 @@ void Motor_Cleaning_Start()
   vTaskDelay((1L * configTICK_RATE_HZ) / 1000L)  ;
 }
 
+
+void Motor_CleaningR_Start()
+{
+  digitalWrite(DIR3, LOW) ;
+  if (AccelerateCLE > 255 - (int)(PWMCleSpd.toInt()) )
+  {
+    AccelerateCLE--;
+    if (AccelerateCLE < 255 - (int)(PWMCleSpd.toInt()) ) {
+      AccelerateCLE = 255 - (int)(PWMCleSpd.toInt()) ;
+    }
+  }
+  analogWrite(PWM3, AccelerateCLE) ;
+  vTaskDelay((1L * configTICK_RATE_HZ) / 1000L)  ;
+}
 
 void Motor_Cleaning_Stop()
 {

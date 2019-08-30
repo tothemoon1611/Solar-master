@@ -76,7 +76,6 @@ void Get_Wifi_Command() {
 #ifdef DEBUGER
           Serial.print("Server connect: ");
           Serial.println(ContentACKSERVER);
-          Net_SocStatus = true ;
           digitalWrite(StaLedGREEN, HIGH) ;     // toan pha code luc 8h5- PM 29/8
 #endif
           break;
@@ -111,7 +110,7 @@ void Get_Wifi_Command() {
             Serial.println(InputString);
             Serial.println("Ket noi wifi that bai ! Dang kiem tra ... ");
 #endif            
-            Net_SocStatus = false ; 
+            
             digitalWrite(StaLedGREEN, LOW) ;     // toan pha code luc 8h5- PM 29/8
             break;
           }
@@ -122,8 +121,8 @@ void Get_Wifi_Command() {
             Serial.println(InputString);
             Serial.println("Ket noi lai thanh cong ! ");
 #endif  
-            Net_SocStatus = true ; 
-            digitalWrite(StaLedGREEN, HIGH) ;     // toan pha code luc 8h5- PM 29/8
+            
+//            digitalWrite(StaLedGREEN, HIGH) ;     // toan pha code luc 8h5- PM 29/8
             break;
           }          
 //-----------------------------------------------------            
@@ -133,7 +132,7 @@ void Get_Wifi_Command() {
           Serial.print("Socket Was Stopped !");
           Serial.println(wifiPayload.ServerStatus);
 #endif
-          Net_SocStatus = false ; 
+          
           digitalWrite(StaLedGREEN, LOW) ;     // toan pha code luc 8h5- PM 29/8
           break;  
 //-----------------------------------------------------            
@@ -143,7 +142,7 @@ void Get_Wifi_Command() {
           Serial.print("Socket Reconnect OK !");
           Serial.println(wifiPayload.ServerStatus);
 #endif
-          Net_SocStatus = true ; 
+          
           digitalWrite(StaLedGREEN, HIGH) ;     // toan pha code luc 8h5- PM 29/8
           break;  
           
@@ -219,13 +218,14 @@ void ERROR_Processing()
       }
       else {
         lcd.clear() ; lcd.setCursor(1,1) ; lcd.print("Reconnect failed !") ;
+        Page_Pointer[Page] = 0 ;
         Page = 1 ;                                                                                 
         BreakPage = 0 ;                                                  
         OkPage = 0 ;                                                    
         pointer = 0 ;                                             
-        PointerMax = 4 ;
+        PointerMax = 4 ;                                       
         vTaskDelay((2000L * configTICK_RATE_HZ) / 1000L);
-        return Page_Processing() ;                                   
+        while(1) { lcd.setCursor(0,3); lcd.print("Press 'RESET' pls..."); vTaskDelay((200L * configTICK_RATE_HZ) / 1000L); }
       }  
      break ;
     }

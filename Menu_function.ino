@@ -153,7 +153,6 @@ void Set_PWM()
   {
     lcd.clear() ;
     lcd.setCursor(0, 0) ; lcd.print(">Set PWM:") ;
-    lcd.setCursor(19, 0) ; lcd.print("%") ;
     if (( Page_Pointer[1] == 0 ) && ( Page_Pointer[2] == 1 ) && ( Page_Pointer[3] == 0 )) {
       SDreadData(FilePWMMovData) ;  // hien thi gia tri PWM cua dong co moving da luu truoc do
       lcd.setCursor(15, 0) ;
@@ -346,8 +345,8 @@ void Network_Config()
     }
 
     lcd.clear()  ;
-    lcd.setCursor(4, 1) ; lcd.print("[ Config  ]") ;
-    lcd.setCursor(4, 2) ; lcd.print("[ SIGN IN ]") ;
+    lcd.setCursor(4, 1) ; lcd.print("[ CONFIG  ]") ;
+    lcd.setCursor(4, 2) ; lcd.print("[ CONNECT ]") ;
     lcd.setCursor(2, pointer) ; lcd.print(">") ;
     lcd.setCursor(17, pointer) ; lcd.print("<") ;
     Keypad_Option() ;
@@ -361,6 +360,7 @@ void Network_Config()
       if ( pointer == 1 ) {
         PointerMax =  4 ;
         SSID_Config() ;
+        pointer = 0 ;
       }
       if ( pointer == 2 )
       {
@@ -393,10 +393,38 @@ void Connect_Wifi()
   int i = 5;
   bool Check  = 0 ;
   unsigned long TimeConnect = millis() ;
-  Menu_WifiPayload();
+//  Menu_WifiPayload();
+  if ( xSemaphoreTake( sem_ReadWifi, ( TickType_t ) 0 ) )     // toan them luc 10h58 30/8
+        {
+            MenuWifi.ACK_SERVER = wifiPayload.ACK_SERVER ;
+            MenuWifi.ACK_NETWORK = wifiPayload.ACK_NETWORK ;
+            MenuWifi.Mode = wifiPayload.Mode ;
+            MenuWifi.Stop = wifiPayload.Stop ;
+            MenuWifi.Continue = wifiPayload.Continue;
+            MenuWifi.NetworkStatus = wifiPayload.NetworkStatus ;
+            MenuWifi.ServerStatus = wifiPayload.ServerStatus ;
+            MenuWifi.FixedIDMachine = wifiPayload.FixedIDMachine ;
+            SDsaveData(wifiPayload.FixedIDMachine,FileIDData) ;
+    
+            xSemaphoreGive(sem_ProcessWifi);
+        }
   while ( MenuWifi.ACK_SERVER != true )
   {
-    Menu_WifiPayload();
+    //  Menu_WifiPayload();
+    if ( xSemaphoreTake( sem_ReadWifi, ( TickType_t ) 0 ) )  // toan them luc 10h58 30/8
+      {
+        MenuWifi.ACK_SERVER = wifiPayload.ACK_SERVER ;
+        MenuWifi.ACK_NETWORK = wifiPayload.ACK_NETWORK ;
+        MenuWifi.Mode = wifiPayload.Mode ;
+        MenuWifi.Stop = wifiPayload.Stop ;
+        MenuWifi.Continue = wifiPayload.Continue;
+        MenuWifi.NetworkStatus = wifiPayload.NetworkStatus ;
+        MenuWifi.ServerStatus = wifiPayload.ServerStatus ;
+        MenuWifi.FixedIDMachine = wifiPayload.FixedIDMachine ;
+        SDsaveData(wifiPayload.FixedIDMachine,FileIDData) ;
+
+        xSemaphoreGive(sem_ProcessWifi);
+      }
     lcd.setCursor(3, 1) ; lcd.print("Please wait ...") ; lcd.setCursor(i, 2) ; lcd.print(".") ; if ( i == 12) {
       Init_Communication();
       i = 3;
@@ -432,6 +460,7 @@ void Connect_Wifi()
       digitalWrite(StaLedRED, LOW);
       vTaskDelay((200L * configTICK_RATE_HZ) / 1000L);
     }
+    digitalWrite(StaLedGREEN, LOW);
     MenuWifi.ACK_SERVER = false ;
     wifiPayload.ACK_SERVER = false ;
     xSemaphoreGive(sem_ProcessWifi);
@@ -575,7 +604,7 @@ void Menu_WifiPayload()
       MenuWifi.Continue = 0;
       wifiPayload.Continue = 0 ;
     }
-    if (MenuWifi.ServerStatus == false || MenuWifi.NetworkStatus == false ) { ERROR_Processing() ; }
+    if (MenuWifi.ServerStatus == false || MenuWifi.NetworkStatus == false || MenuWifi.ACK_SERVER == false ) { ERROR_Processing() ; }
     xSemaphoreGive(sem_ProcessWifi);
   }
 }

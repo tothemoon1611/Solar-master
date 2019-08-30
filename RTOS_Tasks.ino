@@ -90,8 +90,6 @@ void Read_Sensor(void *pvParameters)
 void Serial_wifi(void *pvParameters)
 {
   Get_Wifi_Command();
-  if ( Net_SocStatus == true )  digitalWrite(StaLedGREEN, HIGH) ;
-  else digitalWrite(StaLedGREEN, LOW) ;
 }
 
 

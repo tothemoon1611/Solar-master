@@ -75,7 +75,7 @@ char* LCDChargingSetup[] = {"1.Energy Alert" } ;            // For Parameters Se
 char* LCDHandControl[] = {"Update Later..."} ;                                                                // Ngay tai tai day ket noi voi tay dieu khien
 char* LCDCameraTest[] = {"Update Later..."} ;
 char* LCDCommuTest[] = {"Update Later..."} ;
-char* LCDWorkTest[] = {"1.W_Test 1", "2.W_Test 2", "3.W_Test 3", "4.W_Test 4"} ;                               // For Testing Mode ->Auto Testing
+char* LCDWorkTest[] = {"Test 1: Run off", "Test 2: Build map", "Test 3", "Test 4"} ;                               // For Testing Mode ->Auto Testing
 
 
 //--PAGE 4--//
@@ -225,7 +225,7 @@ int error = 0;
 byte type = 0;
 byte vibrate = 0;
 
-bool Net_SocStatus = false ;    // bien nay la cua den LedGREEN : bao trang thai ket noi toi server
+
 bool ErrorStatus = false ;      // bien nay la cua den LedRED : xem robot no dang bi loi gi hay khong
   
 #define StaLedGREEN A2 
