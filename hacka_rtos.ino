@@ -28,6 +28,7 @@ Time  t;
 
 // The LED is attached to pin 13 on Arduino.
 const uint8_t LED_PIN = 13;
+
 // Declare a semaphore handle.
 SemaphoreHandle_t sem_ReadData;
 SemaphoreHandle_t sem_ProcessData;
