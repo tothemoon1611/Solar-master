@@ -38,6 +38,9 @@ void Exit_Mode_Online()
     while (digitalRead(StartPin) != 0) {
       Wait_Task() ;
     }
+    Menu_ReadSensor();
+    lcd.setCursor(0, 2) ; lcd.print("Panel Position:") ;
+    lcd.setCursor(16, 2) ; lcd.print(PanPos) ;
   }
 }
 
@@ -63,61 +66,51 @@ void Exit_Mode_Offline()
     while (digitalRead(StartPin) != 0) {
       Wait_Task() ;
     }
+    Menu_ReadSensor();
+    lcd.setCursor(0, 2) ; lcd.print("Panel Position:") ;
+    lcd.setCursor(16, 2) ; lcd.print(PanPos) ;
   }
 }
 
 
 void Code_Run_Offline()
 {
-  EncoderSerial.print(String(Start) + String(ResetEncoder) + String(End)) ; // yeu cau reset encoder
-  MenuSensor.Encoder = 0  ;
-  Menu_ReadSensor();
-  SDreadData(FilePWMMovData) ;
-  PWMMovSpd = TempData ;
-  TempData = "" ;
-  SDreadData(FilePWMCleData) ;
-  PWMCleSpd = TempData ;
-  TempData = "" ;
-  out = false ;
-  lcd.setCursor(0, 2) ; lcd.print("Panel Position:") ;
-  lcd.setCursor(16, 2) ; lcd.print(PanPos) ;
-  while (out == false)
-  {
-    Motor_Left_Start() ;
-    Motor_CleaningR_Start() ; 
-    Menu_ReadSensor() ;
-    Menu_incPanelPos();
-
-    if ( MenuSensor.LimitSW_1 == 0)
+    EncoderSerial.print(String(Start) + String(ResetEncoder) + String(End)) ; // yeu cau reset encoder
+    MenuSensor.Encoder = 0  ;
+    Menu_ReadSensor();
+    SDreadData(FilePWMMovData) ;
+    PWMMovSpd = TempData ;
+    TempData = "" ;
+    SDreadData(FilePWMCleData) ;
+    PWMCleSpd = TempData ;
+    TempData = "" ;
+    out = false ;
+    lcd.setCursor(0, 2) ; lcd.print("Panel Position:") ;
+    lcd.setCursor(16, 2) ; lcd.print(PanPos) ;
+    while ( MenuSensor.LimitSW_1 != 0 )
     {
-      Motor_Run_Stop() ;
-      Motor_Cleaning_Stop() ;
-      lcd.setCursor(0, 2) ; lcd.print("Panel Position:") ;
-      while ( MenuSensor.LimitSW_2 == 1)
-      {
-        Motor_CleaningL_Start() ;
-        Motor_Right_Start() ;
-        Menu_ReadSensor();
-        Menu_decPanelPos();
-
-        if (MenuSensor.LimitSW_2 == 0 ) {
-          out = true ;
-          Motor_Run_Stop() ;
-          Motor_Cleaning_Stop() ;
-          Accelerate = 255 ;
-          break ;
-        }
-        Exit_Mode_Offline() ;
-        if ( out == true) {
-          break ;
-        }
-      }
+      Motor_Left_Start() ;
+      Motor_CleaningR_Start() ;
+      Menu_incPanelPos() ;
+      Menu_ReadSensor();
+      vTaskDelay((1L * configTICK_RATE_HZ) / 1000L)  ;
+      Exit_Mode_Offline() ;
+      if ( out == true) { break ; } 
     }
-    Exit_Mode_Offline() ;
-    if ( out == true) {
-      break ;
+    Motor_Run_Stop() ;
+    Motor_Cleaning_Stop() ;
+    while ( MenuSensor.LimitSW_2 != 0 )
+    {
+      Exit_Mode_Offline() ;
+      if ( out == true) { break ; } 
+      Motor_Right_Start() ;
+      Motor_CleaningL_Start() ;
+      Menu_decPanelPos() ;
+      Menu_ReadSensor() ;
+      vTaskDelay((1L * configTICK_RATE_HZ) / 1000L)  ;
     }
-  }
+    Motor_Run_Stop() ;
+    Motor_Cleaning_Stop() ; 
 }
 
 //-------------------------------------WORK MODE 2-------------------------------//
@@ -140,51 +133,34 @@ void Code_Run_Online()
   UpdatetoESP(String(updateDirectionParameter), String(1));
   lcd.setCursor(0, 2) ; lcd.print("Panel Position:") ;
   lcd.setCursor(16, 2) ; lcd.print(PanPos) ;
-  while (out == false)
-  {
-    Motor_Left_Start() ;
-    Motor_CleaningR_Start() ;
-    Menu_ReadSensor();
-    Menu_WifiPayload();
-    Menu_incPanelPos();
-    Run_Mode();
-
-    if ( MenuSensor.LimitSW_1 == 0)
+  while ( MenuSensor.LimitSW_1 != 0 )
     {
-      UpdatetoESP(String(updateStatusParameter), String(1));
-      UpdatetoESP(String(updateDirectionParameter), String(-1));
-      Motor_Run_Stop() ;
-      Motor_Cleaning_Stop() ;
-      lcd.setCursor(0, 2) ; lcd.print("Panel Position:") ;
-      while ( MenuSensor.LimitSW_2 == 1)
-      {
-        Motor_Right_Start() ;
-        Motor_CleaningL_Start() ;
-        Menu_ReadSensor();
-        Menu_WifiPayload();
-        Menu_decPanelPos();
-        Run_Mode();
-
-        if (MenuSensor.LimitSW_2 == 0 ) {
-          UpdatetoESP(String(updateStatusParameter), String(0));
-          out = true ;
-          Motor_Run_Stop() ;
-          Motor_Cleaning_Stop() ;
-          break ;
-        }
-        Exit_Mode_Online() ;
-        if ( out == true) {
-          break ;
-        }
-      }
+      Motor_Left_Start() ;
+      Motor_CleaningR_Start() ;
+      Menu_ReadSensor();
+      Menu_WifiPayload();
+      Menu_incPanelPos();
+      Run_Mode();
+      vTaskDelay((1L * configTICK_RATE_HZ) / 1000L)  ;
+      Exit_Mode_Online() ;
+      if ( out == true) { break ; } 
     }
-    Exit_Mode_Online() ;
-    if ( out == true) {
-      break ;
+    Motor_Run_Stop() ;
+    Motor_Cleaning_Stop() ;
+    while ( MenuSensor.LimitSW_2 != 0 )
+    {
+      Exit_Mode_Online() ;
+      if ( out == true) { break ; } 
+      Motor_Left_Start() ;
+      Motor_CleaningR_Start() ;
+      Menu_ReadSensor();
+      Menu_WifiPayload();
+      Menu_incPanelPos();
+      Run_Mode();
+      vTaskDelay((1L * configTICK_RATE_HZ) / 1000L)  ;
     }
-
-    //Wait_Task() ;
-  }
+    Motor_Run_Stop() ;
+    Motor_Cleaning_Stop() ; 
 }
 
 
@@ -198,6 +174,7 @@ void Building_Map()
   MenuSensor.Encoder = 0  ;
   Menu_ReadSensor();
   PanPosMax = 0 ;
+  out = false ;
   UpdatetoESP(String(updateCollumnPanelParameter), String(PanPos));
   UpdatetoESP(String(updateStringPanelParameter), String(StrPanel));
   UpdatetoESP(String(updateDirectionParameter), String(1));
@@ -213,6 +190,8 @@ void Building_Map()
     //    WIFI.print(PanPosMax) ;
     //    lcd.setCursor(16, 2) ; lcd.print(PanPosMax) ;
     //    Serial.println(PanPosMax) ;
+    Exit_Mode_Online() ;
+    if ( out == true) { break ; } 
     vTaskDelay((1L * configTICK_RATE_HZ) / 1000L)  ;
   }
   Motor_Run_Stop() ;
@@ -231,6 +210,8 @@ void Building_Map()
     //      lcd.setCursor(16, 2) ; lcd.print(PanPosMax) ;
     //      Serial.println(PanPosMax) ;
     //    }
+    Exit_Mode_Online() ;
+    if ( out == true) { break ; } 
     vTaskDelay((1L * configTICK_RATE_HZ) / 1000L)  ;
   }
   Motor_Run_Stop() ;
@@ -249,6 +230,7 @@ void Building_Map_Offline()    // Toan code them luc 19h35 30/8
   MenuSensor.Encoder = 0  ;
   Menu_ReadSensor();
   PanPosMax = 0 ;
+  out = false ;
   UpdatetoESP(String(updateCollumnPanelParameter), String(PanPos));
   UpdatetoESP(String(updateStringPanelParameter), String(StrPanel));
   UpdatetoESP(String(updateDirectionParameter), String(1));
@@ -263,6 +245,8 @@ void Building_Map_Offline()    // Toan code them luc 19h35 30/8
     //    WIFI.print(PanPosMax) ;
     //    lcd.setCursor(16, 2) ; lcd.print(PanPosMax) ;
     //    Serial.println(PanPosMax) ;
+    Exit_Mode_Offline() ;
+    if ( out == true) { break ; } 
     vTaskDelay((1L * configTICK_RATE_HZ) / 1000L)  ;
   }
   Motor_Run_Stop() ;
@@ -280,6 +264,8 @@ void Building_Map_Offline()    // Toan code them luc 19h35 30/8
     //      lcd.setCursor(16, 2) ; lcd.print(PanPosMax) ;
     //      Serial.println(PanPosMax) ;
     //    }
+    Exit_Mode_Offline() ;
+    if ( out == true) { break ; } 
     vTaskDelay((1L * configTICK_RATE_HZ) / 1000L)  ;
   }
   Motor_Run_Stop() ;
