@@ -27,9 +27,9 @@ void Robot_Init(void *pvParameters) {
   Init_Communication();
   
   for (;;)
-  {
-    vTaskDelay((1000L * configTICK_RATE_HZ) / 1000L);
-  }
+    {
+      vTaskDelay((1000L * configTICK_RATE_HZ) / 1000L);
+    }
 }
 
 

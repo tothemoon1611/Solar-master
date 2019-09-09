@@ -538,6 +538,8 @@ void Init_Communication() {
   Serial.print(String(Start) + String(IDCmd) + TempData + String(End));
   WIFI.print(String(Start) + String(IDCmd) + TempData + String(End));
   vTaskDelay((500L * configTICK_RATE_HZ) / 1000L);
+  UpdatetoCAMERA(String("RaspID"),String(" "),TempData);
+  vTaskDelay((500L * configTICK_RATE_HZ) / 1000L);
   TempData = "" ;
 
   SDreadData(FileSSIDData) ;
@@ -571,6 +573,7 @@ void Menu_ReadSensor() {
   if ( xSemaphoreTake( sem_ReadData, ( TickType_t ) 0 ) )
   {
     MenuSensor.IRSensorR = dataMachine.IRSensorR;
+//    lcd.setCursor(18,0) ; lcd.print((int)MenuSensor.IRSensorR++) ; 
     MenuSensor.LimitSW_1 = dataMachine.LimitSW_1;
     MenuSensor.LimitSW_2 = dataMachine.LimitSW_2;
     MenuSensor.VoltageBattery = dataMachine.VoltageBattery;

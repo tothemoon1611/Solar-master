@@ -176,7 +176,7 @@ String PWMCleSpd ;
 
 //-------------------------------------Control Motor-------------------------------------//
 
-unsigned int PanPos = 0 ;
+unsigned int PanPos = 1 ;
 bool  StartBut  = 0 ;
 
 #define IRSensorPinR 43
