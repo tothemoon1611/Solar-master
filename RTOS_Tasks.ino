@@ -40,49 +40,48 @@ void Read_Sensor(void *pvParameters)
   analogReadResolution(10);
   unsigned long last_time;
   for (;;)
-  {
-    analogReadResolution(10);
-    float Vbat   = float(analogRead(A6)) * (3.3 / 1023.0) * (11.2 / 1.2);
-    float instantCurrent = (((float)analogRead(A7)*5.3 - 512*5)  /1023 / (66.0 / 1000)); //ACS712 Measuring Current of Battery
-    //        if(abs(Vbat)<100) {
-    //          Serial.print("Voltage: ");
-    //          Serial.println(analogRead(A0));
-    //         WIFI.print(String(Start) + String(updateVoltageBattery) + (int)Vbat + String(End));
-    //        }
-    //        if(abs(instantCurrent)<100) {
-    //          Serial.print("Current: ");
-    //          Serial.println(instantCurrent);
-    //         WIFI.print(String(Start) + String(updateCurrentBattery) +abs((int)instantCurrent) + String(End));
-    //        }
-    if ( (unsigned long) (millis() - last_time) > 1000)
     {
-
-      // WIFI.print(String(Start) + String(updateVoltageBattery) + (int)Vbat + String(End));
-      WIFI.print(String(Start) + String(updateVoltageBattery));
-      WIFI.print(Vbat, 2);
-      WIFI.print(String(End));
-      WIFI.print(String(Start) + String(updateCurrentBattery));
-      WIFI.print(instantCurrent, 2);
-      WIFI.print(String(End));
-
-
-      last_time = millis();
+      analogReadResolution(10);
+      float Vbat   = float(analogRead(A6)) * (3.3 / 1023.0) * (11.2 / 1.2);
+      float instantCurrent = (((float)512*5 - analogRead(A7)*5.3)  /1023 / (66.0 / 1000)); //ACS712 Measuring Current of Battery
+      //        if(abs(Vbat)<100) {
+      //          Serial.print("Voltage: ");
+      //          Serial.println(analogRead(A0));
+      //         WIFI.print(String(Start) + String(updateVoltageBattery) + (int)Vbat + String(End));
+      //        }
+      //        if(abs(instantCurrent)<100) {
+      //          Serial.print("Current: ");
+      //          Serial.println(instantCurrent);
+      //         WIFI.print(String(Start) + String(updateCurrentBattery) +abs((int)instantCurrent) + String(End));
+      //        }
+      if ( (unsigned long) (millis() - last_time) > 1000)
+      {
+  
+        // WIFI.print(String(Start) + String(updateVoltageBattery) + (int)Vbat + String(End));
+        WIFI.print(String(Start) + String(updateVoltageBattery));
+        WIFI.print(Vbat, 2);
+        WIFI.print(String(End));
+        WIFI.print(String(Start) + String(updateCurrentBattery));
+        WIFI.print(instantCurrent, 2);
+        WIFI.print(String(End));
+  
+  
+        last_time = millis();
+      }
+      if ( xSemaphoreTake( sem_ProcessData, ( TickType_t ) 0 ) )
+      {
+        dataMachine.IRSensorR = digitalRead(IRSensorPinR);
+        dataMachine.IRSensorL = digitalRead(IRSensorPinL);
+        dataMachine.LimitSW_1 = digitalRead(CheckWheel1);
+        dataMachine.LimitSW_2 = digitalRead(CheckWheel2);
+  //      Serial.println(dataMachine.LimitSW_1);
+  //      Serial.println(dataMachine.LimitSW_2);
+        dataMachine.VoltageBattery = Vbat;
+        dataMachine.CurrentBattery = instantCurrent;
+        xSemaphoreGive(sem_ReadData);
+      }
+      vTaskDelay((100L * configTICK_RATE_HZ) / 1000L);
     }
-    if ( xSemaphoreTake( sem_ProcessData, ( TickType_t ) 0 ) )
-    {
-      dataMachine.IRSensorR = digitalRead(IRSensorPinR);
-      dataMachine.IRSensorL = digitalRead(IRSensorPinL);
-      dataMachine.LimitSW_1 = digitalRead(CheckWheel1);
-      dataMachine.LimitSW_2 = digitalRead(CheckWheel2);
-//      Serial.println(dataMachine.LimitSW_1);
-//      Serial.println(dataMachine.LimitSW_2);
-      dataMachine.VoltageBattery = Vbat;
-      dataMachine.CurrentBattery = instantCurrent;
-      xSemaphoreGive(sem_ReadData);
-    }
-    vTaskDelay((100L * configTICK_RATE_HZ) / 1000L);
-  }
-
 }
 
 //------------------------------------------------------------------------------

@@ -77,6 +77,8 @@ void Exit_Mode_Offline()
 
 void Code_Run_Offline()
 {
+    //lcd.clear() ; lcd.setCursor() ; lcd.print("Input String: ") ;
+    
     EncoderSerial.print(String(Start) + String(ResetEncoder) + String(End)) ; // yeu cau reset encoder
     MenuSensor.Encoder = 0  ;
     Menu_ReadSensor();
@@ -410,9 +412,17 @@ void Gamepad_Control()
   }
   bool RightRun = true ;
   bool LeftRun = true ;
-  bool CleTrigger = 0 ;
+  bool StopCle = false ;
+  bool RightCle = true ;
+  bool LeftCle = true ;
   Accelerate = 255 ;
   AccelerateCLE = 255 ;
+  SDreadData(FilePWMMovData) ;
+  PWMMovSpd = TempData ;
+  TempData = "" ;
+  SDreadData(FilePWMCleData) ;
+  PWMCleSpd = TempData ;
+  TempData = "" ;
   while (1)
   {
     Menu_ReadSensor() ;
@@ -424,11 +434,11 @@ void Gamepad_Control()
       Serial.println("Start is being held");
     if (ps2x.Button(PSB_SELECT))
       Serial.println("Select is being held");
-    if (ps2x.Button(PSB_PAD_RIGHT)) {
+    if ( (ps2x.Button(PSB_PAD_RIGHT)) && (MenuSensor.LimitSW_2 != 0) ) {
       vTaskDelay((10L * configTICK_RATE_HZ) / 1000L)  ;
       Serial.print("Right held this hard: ");
       Serial.println(ps2x.Analog(PSAB_PAD_RIGHT), DEC);
-      if ( (LeftRun == true) && (MenuSensor.LimitSW_1 != 0)) {
+      if ( LeftRun == true ) {
         while ( Accelerate < 256) {
           Accelerate++ ;  // ham lai, de dao chieu quay
           analogWrite(PWM4, Accelerate) ;
@@ -439,14 +449,14 @@ void Gamepad_Control()
       if (Accelerate < 0) {
         Accelerate = 0 ;
       }
-      digitalWrite(DIR4, HIGH) ;
+      digitalWrite(DIR4, LOW) ;
       RightRun = true ; LeftRun = false ;
     }
-    if (ps2x.Button(PSB_PAD_LEFT)) {
+    if ( (ps2x.Button(PSB_PAD_LEFT)) && (MenuSensor.LimitSW_1 != 0) ) {
       vTaskDelay((10L * configTICK_RATE_HZ) / 1000L)  ;
       Serial.print("LEFT held this hard: ");
       Serial.println(ps2x.Analog(PSAB_PAD_LEFT), DEC);
-      if ( (RightRun == true) && (MenuSensor.LimitSW_2 != 0) ) {
+      if (RightRun == true) {
         while ( Accelerate < 256) {
           Accelerate++ ;  // ham lai de dao chieu quay
           analogWrite(PWM4, Accelerate) ;
@@ -457,7 +467,7 @@ void Gamepad_Control()
       if (Accelerate < 0) {
         Accelerate = 0 ;
       }
-      digitalWrite(DIR4, LOW) ;
+      digitalWrite(DIR4, HIGH) ;
       RightRun = false ; LeftRun = true ;
     }
 
@@ -472,61 +482,43 @@ void Gamepad_Control()
       if (ps2x.Button(PSB_R2))
         Serial.println("R2 pressed");
       if (ps2x.Button(PSB_TRIANGLE)) // kich hoat dong co lau chui
+        Serial.println("Triangle pressed");
+    }
+    if (ps2x.ButtonPressed(PSB_CIRCLE))              //will be TRUE if button was JUST pressed
       {
         vTaskDelay((20L * configTICK_RATE_HZ) / 1000L)  ;
-        if (CleTrigger == 0) {
-          while ( AccelerateCLE > 0) {
-            Motor_CleaningL_Start() ;
-            CleTrigger = 1 ;
-            AccelerateCLE-- ;
-            vTaskDelay((1L * configTICK_RATE_HZ) / 1000L)  ;
+        lcd.clear() ; lcd.setCursor(0,0) ; lcd.print("Push to Right") ; 
+        if( LeftCle == true || StopCle == true ) 
+          {
+            Motor_Cleaning_Stop() ; 
+            while ( AccelerateCLE > 255 - (int)(PWMCleSpd.toInt()) ) { Motor_CleaningL_Start() ; }
+            LeftCle = false ; RightCle = true ; StopCle = false ;            
           }
-        }
         else {
-          Motor_Cleaning_Stop() ;
-          AccelerateCLE = 255 ;
-          CleTrigger = 0 ;
-        }
-        Serial.println("Triangle pressed");
-
+//            while ( AccelerateCLE > 255 - (int)(PWMCleSpd.toInt()) ) { Motor_CleaningL_Start() ; }
+            LeftCle = false ; RightCle = true ; StopCle = true ;   
+              Motor_Cleaning_Stop() ; 
+          }
       }
-    }
-//      if (ps2x.Button(PSB_CIRCLE))              //will be TRUE if button was JUST pressed
-//      {
-//        vTaskDelay((20L * configTICK_RATE_HZ) / 1000L)  ;
-//        Motor_Cleaning_Stop() ;
-//        if (CleTrigger == 0) {
-//          while ( AccelerateCLE > 0) {
-//            Motor_CleaningL_Start() ;
-//          }
-//          CleTrigger = 1 ; 
-//        }
-//        else {
-//          Motor_Cleaning_Stop() ;
-//          AccelerateCLE = 255 ;
-//          CleTrigger = 0 ;
-//        }
-//        Serial.println("Circle just pressed");
-//      }
-//    if (ps2x.NewButtonState(PSB_CROSS))              //will be TRUE if button was JUST pressed OR released
-//      Serial.println("X just changed");
-//    if (ps2x.Button(PSB_SQUARE))             //will be TRUE if button was JUST released
-//      {
-//        vTaskDelay((20L * configTICK_RATE_HZ) / 1000L)  ;
-//        Motor_Cleaning_Stop() ;
-//        if (CleTrigger == 0) {
-//          while ( AccelerateCLE > 0) {
-//            Motor_CleaningR_Start() ;
-//          }
-//          CleTrigger = 1 ; 
-//        }
-//        else {
-//          Motor_Cleaning_Stop() ;
-//          AccelerateCLE = 255 ;
-//          CleTrigger = 0 ;
-//        }
-//        Serial.println("Square just pressed");
-//      }
+  
+    if (ps2x.ButtonReleased(PSB_SQUARE))             //will be TRUE if button was JUST released
+      {
+        vTaskDelay((20L * configTICK_RATE_HZ) / 1000L)  ;
+        lcd.clear() ; lcd.setCursor(0,0) ; lcd.print("Push to Left") ; 
+        if( RightCle == true || StopCle == true ) 
+          {
+            Motor_Cleaning_Stop() ; 
+            while ( AccelerateCLE > 255 - (int)(PWMCleSpd.toInt()) ) { Motor_CleaningR_Start() ; }
+            LeftCle = true ; RightCle = false ; StopCle = false ;           
+          }
+        else {
+//            while ( AccelerateCLE > 255 - (int)(PWMCleSpd.toInt()) ) { Motor_CleaningR_Start() ; }
+            LeftCle = true ; RightCle = false ; StopCle = true ;  
+              Motor_Cleaning_Stop() ; 
+          }
+      }
+    if (ps2x.NewButtonState(PSB_CROSS))              //will be TRUE if button was JUST pressed OR released
+      Serial.println("X just changed");  
     if (ps2x.Button(PSB_L3) || ps2x.Button(PSB_R3)) { //print stick values if either is TRUE
       Serial.print("Stick Values:");
       Serial.print(ps2x.Analog(PSS_LY), DEC); //Left stick, Y axis. Other options: LX, RY, RX
@@ -650,7 +642,7 @@ void Motor_Setup()
 
 
 //--------------------------------------------Dieu Khien Dong Co------------------------------------------------//
-void Motor_Right_Start()
+void Motor_Left_Start()
 {
   digitalWrite(DIR4, HIGH) ;
   if (Accelerate > (255 - (int)(PWMMovSpd.toInt())) )
@@ -665,7 +657,7 @@ void Motor_Right_Start()
 }
 
 
-void Motor_Left_Start()
+void Motor_Right_Start()
 {
 
   digitalWrite(DIR4, LOW) ;
@@ -692,7 +684,7 @@ void Motor_Run_Stop()
 }
 
 
-void Motor_CleaningL_Start()
+void Motor_CleaningR_Start()
 {
   digitalWrite(DIR3, HIGH) ;
   if (AccelerateCLE > 255 - (int)(PWMCleSpd.toInt()) )
@@ -707,7 +699,7 @@ void Motor_CleaningL_Start()
 }
 
 
-void Motor_CleaningR_Start()
+void Motor_CleaningL_Start()
 {
   digitalWrite(DIR3, LOW) ;
   if (AccelerateCLE > 255 - (int)(PWMCleSpd.toInt()) )
