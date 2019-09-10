@@ -191,6 +191,7 @@ void Building_Map()
     Menu_incPanelPos() ;
     Menu_ReadSensor();
     Menu_WifiPayload();
+    Run_Mode();
     PanPosMax = PanPos ;
     //    WIFI.print(PanPosMax) ;
     //    lcd.setCursor(16, 2) ; lcd.print(PanPosMax) ;
@@ -208,6 +209,7 @@ void Building_Map()
     Menu_decPanelPos() ;
     Menu_ReadSensor() ;
     Menu_WifiPayload();
+    Run_Mode();
     //    if (PanPos == 0 ) { Direct = true ; }
     //    if( Direct == true && PanPos != PanPosMax ) {
     //      PanPosMax = PanPosMax + PanPos ;
