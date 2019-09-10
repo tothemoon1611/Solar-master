@@ -163,6 +163,7 @@ String FileEAlertData = "EAlert.txt" ;
 String FilePWMMovData = "PWMMov.txt" ;
 String FilePWMCleData = "PWMCle.txt" ;
 String FilePanPosData = "PanPos.txt" ;
+String FileStrPanelData = "StrPanel.txt" ;
 
 String PIDKpMovSpd ;
 String PIDKiMovSpd ;
@@ -188,6 +189,8 @@ bool  StartBut  = 0 ;
 #define DIR3 26
 #define PWM4 11
 #define PWM3 10
+
+bool OnlineMode = false ; 
 //-----------------------------------Serial-------------------------------------------------
 bool SerialRecv = false;
 int serial_counter = 0;

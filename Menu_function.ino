@@ -29,7 +29,7 @@ void Energy_Alert()
       TempData = "" ;
       break ;
     }
-    if (BreakPage == 1) 
+    if (BreakPage == 1)
     {
       BreakPage = 0 ;
       break ;
@@ -393,38 +393,38 @@ void Connect_Wifi()
   int i = 5;
   bool Check  = 0 ;
   unsigned long TimeConnect = millis() ;
-//  Menu_WifiPayload();
+  //  Menu_WifiPayload();
   if ( xSemaphoreTake( sem_ReadWifi, ( TickType_t ) 0 ) )     // toan them luc 10h58 30/8
-        {
-            MenuWifi.ACK_SERVER = wifiPayload.ACK_SERVER ;
-            MenuWifi.ACK_NETWORK = wifiPayload.ACK_NETWORK ;
-            MenuWifi.Mode = wifiPayload.Mode ;
-            MenuWifi.Stop = wifiPayload.Stop ;
-            MenuWifi.Continue = wifiPayload.Continue;
-            MenuWifi.NetworkStatus = wifiPayload.NetworkStatus ;
-            MenuWifi.ServerStatus = wifiPayload.ServerStatus ;
-            MenuWifi.FixedIDMachine = wifiPayload.FixedIDMachine ;
-            SDsaveData(wifiPayload.FixedIDMachine,FileIDData) ;
-    
-            xSemaphoreGive(sem_ProcessWifi);
-        }
+  {
+    MenuWifi.ACK_SERVER = wifiPayload.ACK_SERVER ;
+    MenuWifi.ACK_NETWORK = wifiPayload.ACK_NETWORK ;
+    MenuWifi.Mode = wifiPayload.Mode ;
+    MenuWifi.Stop = wifiPayload.Stop ;
+    MenuWifi.Continue = wifiPayload.Continue;
+    MenuWifi.NetworkStatus = wifiPayload.NetworkStatus ;
+    MenuWifi.ServerStatus = wifiPayload.ServerStatus ;
+    MenuWifi.FixedIDMachine = wifiPayload.FixedIDMachine ;
+    SDsaveData(wifiPayload.FixedIDMachine, FileIDData) ;
+
+    xSemaphoreGive(sem_ProcessWifi);
+  }
   while ( MenuWifi.ACK_SERVER != true )
   {
     //  Menu_WifiPayload();
     if ( xSemaphoreTake( sem_ReadWifi, ( TickType_t ) 0 ) )  // toan them luc 10h58 30/8
-      {
-        MenuWifi.ACK_SERVER = wifiPayload.ACK_SERVER ;
-        MenuWifi.ACK_NETWORK = wifiPayload.ACK_NETWORK ;
-        MenuWifi.Mode = wifiPayload.Mode ;
-        MenuWifi.Stop = wifiPayload.Stop ;
-        MenuWifi.Continue = wifiPayload.Continue;
-        MenuWifi.NetworkStatus = wifiPayload.NetworkStatus ;
-        MenuWifi.ServerStatus = wifiPayload.ServerStatus ;
-        MenuWifi.FixedIDMachine = wifiPayload.FixedIDMachine ;
-        SDsaveData(wifiPayload.FixedIDMachine,FileIDData) ;
+    {
+      MenuWifi.ACK_SERVER = wifiPayload.ACK_SERVER ;
+      MenuWifi.ACK_NETWORK = wifiPayload.ACK_NETWORK ;
+      MenuWifi.Mode = wifiPayload.Mode ;
+      MenuWifi.Stop = wifiPayload.Stop ;
+      MenuWifi.Continue = wifiPayload.Continue;
+      MenuWifi.NetworkStatus = wifiPayload.NetworkStatus ;
+      MenuWifi.ServerStatus = wifiPayload.ServerStatus ;
+      MenuWifi.FixedIDMachine = wifiPayload.FixedIDMachine ;
+      SDsaveData(wifiPayload.FixedIDMachine, FileIDData) ;
 
-        xSemaphoreGive(sem_ProcessWifi);
-      }
+      xSemaphoreGive(sem_ProcessWifi);
+    }
     lcd.setCursor(3, 1) ; lcd.print("Please wait ...") ; lcd.setCursor(i, 2) ; lcd.print(".") ; if ( i == 12) {
       Init_Communication();
       i = 3;
@@ -487,46 +487,58 @@ void Connect_Wifi()
 void Get_ID()
 {
   SDreadData(FileIDData) ;
-  if(TempData)
+  if (TempData)
+  {
+    lcd.clear() ;
+    lcd.setCursor(4, 1); lcd.print("ID Was Init") ;
+    lcd.setCursor(3, 2); lcd.print("ReInitialize ?") ;
+    lcd.setCursor(0, 3); lcd.print("<BACK>          <OK>") ;
+    Keypad_Option() ;
+    if (OkPage == 1)
     {
-      lcd.clear() ; 
-      lcd.setCursor(4,1); lcd.print("ID Was Init") ;
-      lcd.setCursor(3,2); lcd.print("ReInitialize ?") ;
-      lcd.setCursor(0,3); lcd.print("<BACK>          <OK>") ;
-      Keypad_Option() ;
-      if(OkPage == 1)
-        {
-          OkPage = 0 ;
-          lcd.clear() ;
-          lcd.setCursor(0, 2) ;
-          lcd.print("Start Getting ID...") ;       // bat dau ham khoi tao ID cho robot
-          vTaskDelay((2000L * configTICK_RATE_HZ) / 1000L) ;
-          String IDmin;
-          String IDhour;
-          String IDdate;
-          String IDmon;
-          if (t.min < 10) IDmin = String("0") + String(t.min);
-          else IDmin = String(t.min);
-          if (t.hour < 10) IDhour = String("0") + String(t.hour);
-          else IDhour = String(t.hour);
-          if (t.date < 10) IDdate = String("0") + String(t.date);
-          else IDdate = String(t.date);
-          if (t.mon < 10) IDmon = String("0") + String(t.mon);
-          else IDmon = String(t.mon);
-          String AssignedID = IDmin + IDhour + IDdate + IDmon + String(t.year);
-          Serial.println(AssignedID);
-          SDsaveData(AssignedID, FileHardIDData) ;
-        
-          Serial.println(String(Start) + String(IDCmd) + AssignedID + String(End));
-          WIFI.print(String(Start) + String(IDCmd) + AssignedID + String(End));
-          lcd.clear() ;
-          lcd.setCursor(0, 2) ;
-          lcd.print("Getting ID Done!!!") ;
-        }
-       if(BreakPage == 1) { BreakPage = 0 ; }  
-    }
-  
+      OkPage = 0 ;
+      lcd.clear() ;
+      lcd.setCursor(0, 2) ;
+      lcd.print("Start Getting ID...") ;       // bat dau ham khoi tao ID cho robot
+      vTaskDelay((2000L * configTICK_RATE_HZ) / 1000L) ;
+      String IDmin;
+      String IDhour;
+      String IDdate;
+      String IDmon;
+      if (t.min < 10) IDmin = String("0") + String(t.min);
+      else IDmin = String(t.min);
+      if (t.hour < 10) IDhour = String("0") + String(t.hour);
+      else IDhour = String(t.hour);
+      if (t.date < 10) IDdate = String("0") + String(t.date);
+      else IDdate = String(t.date);
+      if (t.mon < 10) IDmon = String("0") + String(t.mon);
+      else IDmon = String(t.mon);
+      String AssignedID = IDmin + IDhour + IDdate + IDmon + String(t.year);
+      Serial.println(AssignedID);
+      SDsaveData(AssignedID, FileHardIDData) ;
 
+      Serial.println(String(Start) + String(IDCmd) + AssignedID + String(End));
+      WIFI.print(String(Start) + String(IDCmd) + AssignedID + String(End));
+      lcd.clear() ;
+      lcd.setCursor(0, 2) ;
+      lcd.print("Getting ID Done!!!") ;
+    }
+    if (BreakPage == 1) {
+      BreakPage = 0 ;
+    }
+  }
+
+
+}
+
+
+void Input_String()
+{
+  lcd.clear() ; lcd.setCursor(2, 1) ; lcd.print("Input String:") ;
+  lcd.setCursor(0, 3) ; lcd.print("<-                ->") ;
+  Keypad_Set_Value() ;
+  StrPanel = TempData.toInt() ;
+  SDsaveData((String)(StrPanel), FileStrPanelData) ;
 }
 
 
@@ -534,38 +546,56 @@ void Get_ID()
 
 void Init_Communication() {
   TempData = "" ;
+  String InitID = "";
+  String Initssid = "";
+  String InitPass = "";
+  String InitIP = "";
+  String InitPORT = "";
   SDreadData(FileHardIDData) ;
-  Serial.print(String(Start) + String(IDCmd) + TempData + String(End));
-  WIFI.print(String(Start) + String(IDCmd) + TempData + String(End));
-  vTaskDelay((500L * configTICK_RATE_HZ) / 1000L);
-  UpdatetoCAMERA(String("RaspID"),String(" "),TempData);
-  vTaskDelay((500L * configTICK_RATE_HZ) / 1000L);
+  vTaskDelay((50L * configTICK_RATE_HZ) / 1000L);
+  InitID = TempData;
   TempData = "" ;
-
   SDreadData(FileSSIDData) ;
-  Serial.println(String(Start) + String(WifiSSID) + TempData + String(End)) ;
-  WIFI.print(String(Start) + String(WifiSSID) + TempData + String(End)) ;
-  vTaskDelay((500L * configTICK_RATE_HZ) / 1000L);
+  vTaskDelay((50L * configTICK_RATE_HZ) / 1000L);
+  Initssid = TempData;
   TempData = "" ;
-
   SDreadData(FilePASSData) ;
-  Serial.println(String(Start) + String(WifiPass) + TempData + String(End)) ;
-  WIFI.print(String(Start) + String(WifiPass) + TempData + String(End)) ;
-  vTaskDelay((500L * configTICK_RATE_HZ) / 1000L);
+  vTaskDelay((50L * configTICK_RATE_HZ) / 1000L);
+  InitPass = TempData;
   TempData = "" ;
-
   SDreadData(FileIPAddData) ;
-  Serial.println(String(Start) + String(WifiIP) + TempData + String(End)) ;
-  WIFI.print(String(Start) + String(WifiIP) + TempData + String(End)) ;
-  vTaskDelay((500L * configTICK_RATE_HZ) / 1000L);
+  vTaskDelay((50L * configTICK_RATE_HZ) / 1000L);
+  InitIP = TempData;
   TempData = "" ;
-
   SDreadData(FilePORTData) ;
-  Serial.println(String(Start) + String(WifiPort) + TempData + String(End)) ;
-  WIFI.print(String(Start) + String(WifiPort) + TempData + String(End)) ;
-  vTaskDelay((500L * configTICK_RATE_HZ) / 1000L);
+  vTaskDelay((50L * configTICK_RATE_HZ) / 1000L);
+  InitPORT = TempData;
   TempData = "" ;
 
+  vTaskDelay((50L * configTICK_RATE_HZ) / 1000L);
+  CAMERA.print(String("RaspID") + String(" ") + InitID + String(" ") + Initssid + String(" ") + InitPass + String(" ") + InitIP + String(" ") + InitPORT);
+  vTaskDelay((50L * configTICK_RATE_HZ) / 1000L);
+  
+  Serial.print(String(Start) + String(IDCmd) + InitID + String(End));
+  WIFI.print(String(Start) + String(IDCmd) + InitID + String(End));
+  vTaskDelay((500L * configTICK_RATE_HZ) / 1000L);
+
+  Serial.println(String(Start) + String(WifiSSID) + Initssid + String(End)) ;
+  WIFI.print(String(Start) + String(WifiSSID) + Initssid + String(End)) ;
+  vTaskDelay((500L * configTICK_RATE_HZ) / 1000L);
+  
+  Serial.println(String(Start) + String(WifiPass) + InitPass + String(End)) ;
+  WIFI.print(String(Start) + String(WifiPass) + InitPass + String(End)) ;
+  vTaskDelay((500L * configTICK_RATE_HZ) / 1000L);
+  
+  Serial.println(String(Start) + String(WifiPort) + InitPORT + String(End)) ;
+  WIFI.print(String(Start) + String(WifiPort) + InitPORT + String(End)) ;
+  
+  vTaskDelay((500L * configTICK_RATE_HZ) / 1000L);
+  Serial.println(String(Start) + String(WifiIP) + InitIP + String(End)) ;
+  WIFI.print(String(Start) + String(WifiIP) + InitIP + String(End)) ;
+
+  vTaskDelay((100L * configTICK_RATE_HZ) / 1000L);
 }
 
 
@@ -573,7 +603,7 @@ void Menu_ReadSensor() {
   if ( xSemaphoreTake( sem_ReadData, ( TickType_t ) 0 ) )
   {
     MenuSensor.IRSensorR = dataMachine.IRSensorR;
-//    lcd.setCursor(18,0) ; lcd.print((int)MenuSensor.IRSensorR++) ; 
+    //    lcd.setCursor(18,0) ; lcd.print((int)MenuSensor.IRSensorR++) ;
     MenuSensor.LimitSW_1 = dataMachine.LimitSW_1;
     MenuSensor.LimitSW_2 = dataMachine.LimitSW_2;
     MenuSensor.VoltageBattery = dataMachine.VoltageBattery;
@@ -599,7 +629,7 @@ void Menu_WifiPayload()
     MenuWifi.NetworkStatus = wifiPayload.NetworkStatus ;
     MenuWifi.ServerStatus = wifiPayload.ServerStatus ;
     MenuWifi.FixedIDMachine = wifiPayload.FixedIDMachine ;
-    SDsaveData(wifiPayload.FixedIDMachine,FileIDData) ;
+    SDsaveData(wifiPayload.FixedIDMachine, FileIDData) ;
     if (MenuWifi.Continue) {
       Run = !Run;
       Serial.print("RUN: ");
@@ -607,7 +637,9 @@ void Menu_WifiPayload()
       MenuWifi.Continue = 0;
       wifiPayload.Continue = 0 ;
     }
-    if (MenuWifi.ServerStatus == false || MenuWifi.NetworkStatus == false || MenuWifi.ACK_SERVER == false ) { ERROR_Processing() ; }
+    if (MenuWifi.ServerStatus == false || MenuWifi.NetworkStatus == false || MenuWifi.ACK_SERVER == false ) {
+      ERROR_Processing() ;
+    }
     xSemaphoreGive(sem_ProcessWifi);
   }
 }
