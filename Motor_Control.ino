@@ -309,8 +309,15 @@ void Server_SetMode()
         lcd.setCursor(1, 0) ;
         lcd.print("Building Map ...") ;
         Building_Map() ;
-        MenuWifi.Mode = 0 ;
+        MenuWifi.Mode = 0;
         wifiPayload.Mode = 0 ;
+        MenuWifi.Stop = 0;
+        wifiPayload.Stop = 0 ;
+        MenuWifi.Continue = 0;
+        wifiPayload.Continue = 0 ;
+        lcd.clear() ;
+        lcd.setCursor(1, 0) ;
+        lcd.print("Reset Mode") ;
       }
       if ( MenuWifi.Mode == 2) {
         lcd.clear() ;
@@ -564,6 +571,7 @@ void Run_Mode()
     Menu_WifiPayload();
     Motor_Run_Stop() ;
     Motor_Cleaning_Stop() ;
+    Serial.print("Stopping");
     Wait_Task();
   }
 }
