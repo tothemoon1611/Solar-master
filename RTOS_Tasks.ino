@@ -43,7 +43,7 @@ void Read_Sensor(void *pvParameters)
     {
       analogReadResolution(10);
       float Vbat   = float(analogRead(A6)) * (3.3 / 1023.0) * (11.2 / 1.2);
-      float instantCurrent = (((float)512*5 - analogRead(A7)*5.3)  /1023 / (66.0 / 1000)); //ACS712 Measuring Current of Battery
+      float instantCurrent = abs(((float)512*5 - analogRead(A7)*5.3)  /1023 / (66.0 / 1000)); //ACS712 Measuring Current of Battery
       //        if(abs(Vbat)<100) {
       //          Serial.print("Voltage: ");
       //          Serial.println(analogRead(A0));

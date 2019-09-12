@@ -92,7 +92,7 @@ void LCD_Page_4_Display()
 
     if (( Page_Pointer[1] == 1 ) && ( Page_Pointer[2] == 2 ) && ( Page_Pointer[3] == 2 )) {  }
 
-    if (( Page_Pointer[1] == 1 ) && ( Page_Pointer[2] == 3 ) && ( Page_Pointer[3] == 0 )) { Code_Run_Offline() ;  }
+    if (( Page_Pointer[1] == 1 ) && ( Page_Pointer[2] == 3 ) && ( Page_Pointer[3] == 0 )) { Code_Run_Offline() ; }
     if (( Page_Pointer[1] == 1 ) && ( Page_Pointer[2] == 3 ) && ( Page_Pointer[3] == 1 )) { Building_Map_Offline() ; }
     if (( Page_Pointer[1] == 1 ) && ( Page_Pointer[2] == 3 ) && ( Page_Pointer[3] == 2 )) {  }
     if (( Page_Pointer[1] == 1 ) && ( Page_Pointer[2] == 3 ) && ( Page_Pointer[3] == 3 )) {  }

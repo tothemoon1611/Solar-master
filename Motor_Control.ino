@@ -8,8 +8,7 @@ int Accelerate = 255 ;
 int AccelerateCLE = 255 ;
 int DelaySpeed = 1 ;
 
-bool out = false ;
-
+unsigned int TimeOutStr = 0 ;
 void Exit_Mode_Online()
 {
   Key = keypad.getKey();
@@ -77,9 +76,8 @@ void Exit_Mode_Offline()
 
 void Code_Run_Offline()
 {
-    
     EncoderSerial.print(String(Start) + String(ResetEncoder) + String(End)) ; // yeu cau reset encoder
-    MenuSensor.Encoder = 0  ;
+    MenuSensor.Encoder = 0 ;
     Menu_ReadSensor();
     SDreadData(FilePWMMovData) ;
     PWMMovSpd = TempData ;
@@ -88,13 +86,15 @@ void Code_Run_Offline()
     PWMCleSpd = TempData ;
     TempData = "" ;
     out = false ;
+    Input_String() ;
+    TimeOutStr = 0 ;
     lcd.clear();
     lcd.setCursor(0, 2) ; lcd.print("Panel Position:") ;
     lcd.setCursor(16, 2) ; lcd.print(PanPos) ;
     while ( MenuSensor.LimitSW_2 != 0 )
     {
       Motor_Right_Start() ;
-      Motor_CleaningL_Start() ;
+      Motor_CleaningR_Start() ;
       Menu_incPanelPos() ;
       Menu_ReadSensor();
       vTaskDelay((1L * configTICK_RATE_HZ) / 1000L)  ;
@@ -103,18 +103,20 @@ void Code_Run_Offline()
     }
     Motor_Run_Stop() ;
     Motor_Cleaning_Stop() ;
+    TimeOutStr = 0 ;
     while ( MenuSensor.LimitSW_1 != 0 )
     {
       Exit_Mode_Offline() ;
       if ( out == true) { break ; } 
       Motor_Left_Start() ;
-      Motor_CleaningR_Start() ;
+      Motor_CleaningL_Start() ;
       Menu_decPanelPos() ;
       Menu_ReadSensor() ;
       vTaskDelay((1L * configTICK_RATE_HZ) / 1000L)  ;
     }
     Motor_Run_Stop() ;
     Motor_Cleaning_Stop() ; 
+    TimeOutStr = 0 ;
 }
 
 //-------------------------------------WORK MODE 2-------------------------------//
@@ -138,10 +140,12 @@ void Code_Run_Online()
   lcd.clear();
   lcd.setCursor(0, 2) ; lcd.print("Panel Position:") ;
   lcd.setCursor(16, 2) ; lcd.print(PanPos) ;
+  TimeOutStr = 0 ;
   while ( MenuSensor.LimitSW_2 != 0 )
     {
       Motor_Right_Start() ;
-      Motor_CleaningL_Start() ;
+      Motor_CleaningR_Start() ;
+      UpdatetoESP(String(updateStatusParameter), String(1));
       Menu_ReadSensor();
       Menu_WifiPayload();
       Menu_incPanelPos();
@@ -150,14 +154,17 @@ void Code_Run_Online()
       Exit_Mode_Online() ;
       if ( out == true) { break ; } 
     }
+    TimeOutStr = 0 ;
     Motor_Run_Stop() ;
     Motor_Cleaning_Stop() ;
+    UpdatetoESP(String(updateStatusParameter), String(0));
     while ( MenuSensor.LimitSW_1 != 0 )
       {
         Exit_Mode_Online() ;
         if ( out == true) { break ; } 
         Motor_Left_Start() ;
-        Motor_CleaningR_Start() ;
+        Motor_CleaningL_Start() ;
+        UpdatetoESP(String(updateStatusParameter), String(1));
         Menu_ReadSensor();
         Menu_WifiPayload();
         Menu_incPanelPos();
@@ -166,7 +173,10 @@ void Code_Run_Online()
       }
     Motor_Run_Stop() ;
     Motor_Cleaning_Stop() ; 
+    UpdatetoESP(String(updateStatusParameter), String(0));
+    TimeOutStr = 0 ;
 }
+
 
 void Building_Map()
 {
@@ -179,6 +189,7 @@ void Building_Map()
   Menu_ReadSensor();
   PanPosMax = 0 ;
   out = false ;
+  TimeOutStr = 0 ;
   UpdatetoESP(String(updateCollumnPanelParameter), String(PanPos));
   UpdatetoESP(String(updateStringPanelParameter), String(StrPanel));
   UpdatetoESP(String(updateDirectionParameter), String(1));
@@ -201,7 +212,9 @@ void Building_Map()
     vTaskDelay((1L * configTICK_RATE_HZ) / 1000L)  ;
   }
   Motor_Run_Stop() ;
+  UpdatetoESP(String(updateStatusParameter), String(0));
   Accelerate = 255 ;
+  TimeOutStr = 0 ;
   bool Direct = false ;
   while ( MenuSensor.LimitSW_1 != 0 )
   {
@@ -222,7 +235,9 @@ void Building_Map()
     vTaskDelay((1L * configTICK_RATE_HZ) / 1000L)  ;
   }
   Motor_Run_Stop() ;
+  UpdatetoESP(String(updateStatusParameter), String(0));
   Direct = false ;
+  TimeOutStr = 0 ;
 }
 
 void Building_Map_Offline()    // Toan code them luc 19h35 30/8
@@ -236,53 +251,47 @@ void Building_Map_Offline()    // Toan code them luc 19h35 30/8
   Menu_ReadSensor();
   PanPosMax = 0 ;
   out = false ;
+  Input_String() ;
   UpdatetoESP(String(updateCollumnPanelParameter), String(PanPos));
   UpdatetoESP(String(updateStringPanelParameter), String(StrPanel));
   UpdatetoESP(String(updateDirectionParameter), String(1));
   lcd.clear();
   lcd.setCursor(0, 2) ; lcd.print("Panel Position:") ;
   lcd.setCursor(16, 2) ; lcd.print(PanPos) ;
+  TimeOutStr = 0 ;
   while ( MenuSensor.LimitSW_2 != 0 )
   {
+    Exit_Mode_Offline() ;
+    if ( out == true) { break ; } 
     Motor_Right_Start() ;
     Menu_incPanelPos() ;
     Menu_ReadSensor();
     PanPosMax = PanPos ;
-    if(OnlineMode) Menu_WifiPayload();
-    //    WIFI.print(PanPosMax) ;
-    //    lcd.setCursor(16, 2) ; lcd.print(PanPosMax) ;
-    //    Serial.println(PanPosMax) ;
-    Exit_Mode_Offline() ;
-    if ( out == true) { break ; } 
     vTaskDelay((1L * configTICK_RATE_HZ) / 1000L)  ;
   }
   Motor_Run_Stop() ;
   Accelerate = 255 ;
   bool Direct = false ;
+  TimeOutStr = 0 ;
   while ( MenuSensor.LimitSW_1 != 0 )
   {
+    Exit_Mode_Offline() ;
+    if ( out == true) { break ; } 
     Motor_Left_Start() ;
     Menu_decPanelPos() ;
     Menu_ReadSensor() ;
-    if(OnlineMode) Menu_WifiPayload();
-    //    if (PanPos == 0 ) { Direct = true ; }
-    //    if( Direct == true && PanPos != PanPosMax ) {
-    //      PanPosMax = PanPosMax + PanPos ;
-    //      WIFI.print(PanPosMax) ;
-    //      lcd.setCursor(16, 2) ; lcd.print(PanPosMax) ;
-    //      Serial.println(PanPosMax) ;
-    //    }
-    Exit_Mode_Offline() ;
-    if ( out == true) { break ; } 
     vTaskDelay((1L * configTICK_RATE_HZ) / 1000L)  ;
   }
   Motor_Run_Stop() ;
+  Accelerate = 255 ;
   Direct = false ;
+  TimeOutStr = 0 ;
 }
 
 // --- CHE DO NHAN LENH DIEU KHIEN TU SERVER --- //
 void Server_SetMode()
 {
+  Input_String() ;
   lcd.clear() ;
   lcd.setCursor(1, 1) ; lcd.print("Excute From Center") ;
   lcd.setCursor(0, 3) ; lcd.print("<BACK>") ;
@@ -459,7 +468,7 @@ void Gamepad_Control()
           vTaskDelay((2L * configTICK_RATE_HZ) / 1000L)  ;
         }
       }
-      Accelerate = Accelerate - 10 ;  // thoi gian tang toc
+      Accelerate = Accelerate - 20 ;  // thoi gian tang toc
       if (Accelerate < 0) {
         Accelerate = 0 ;
       }
@@ -477,7 +486,7 @@ void Gamepad_Control()
           vTaskDelay((2L * configTICK_RATE_HZ) / 1000L)  ;
         }
       }
-      Accelerate = Accelerate - 10 ;   // thoi gian tang toc
+      Accelerate = Accelerate - 20 ;   // thoi gian tang toc
       if (Accelerate < 0) {
         Accelerate = 0 ;
       }
@@ -543,7 +552,7 @@ void Gamepad_Control()
       Serial.print(",");
       Serial.println(ps2x.Analog(PSS_RX), DEC);
     }
-    Accelerate++ ;
+    Accelerate = Accelerate + 7 ;
     if (Accelerate > 255 ) {
       Accelerate = 255 ;
     }
@@ -571,11 +580,16 @@ void Run_Mode()
     Menu_WifiPayload();
     Motor_Run_Stop() ;
     Motor_Cleaning_Stop() ;
+    UpdatetoESP(String(updateStatusParameter), String(0));
     Serial.print("Stopping");
+    
+    if (MenuWifi.Stop) {
+      Run = 0;
+      break;
+    }
     Wait_Task();
   }
 }
-
 
 void Menu_incPanelPos()       // a Phuong code, toan sua :)))
 {
@@ -595,24 +609,6 @@ void Menu_incPanelPos()       // a Phuong code, toan sua :)))
 //        UpdatetoESP(String(updateStringPanelParameter), String(StrPanel));
 //  }
 }
-
-//void Menu_decPanelPos()     // a Phuong code
-//{
-//  //lcd.setCursor(16, 2) ; lcd.print(MenuSensor.Encoder) ;
-//  if (  MenuSensor.MetalSensor == 0 && Sensor_Temp == 0) Sensor_Temp = 1 ;
-//  if (  MenuSensor.MetalSensor == 1 && Sensor_Temp == 1)
-//  {
-//    Sensor_Temp = 0;
-//    if (PanPos != 0) PanPos-- ;
-//    lcd.clear() ;
-//    lcd.setCursor(0, 2) ; lcd.print("Panel Position:") ;
-//    lcd.setCursor(16, 2) ; lcd.print(PanPos) ;
-//    //lcd.setCursor(16, 2) ; lcd.print(MenuSensor.Encoder) ;
-//    Serial.println(PanPos) ;
-//    UpdatetoESP(String(updateCollumnPanelParameter), String(PanPos));
-//    UpdatetoESP(String(updateStringPanelParameter), String(StrPanel));
-//  }
-//}
 
 void Menu_decPanelPos()     // toan code
 {
@@ -667,7 +663,26 @@ void Motor_Left_Start()
       Accelerate = 255 - (int)(PWMMovSpd.toInt()) ;
     }
   }
-  analogWrite(PWM4, Accelerate) ;
+  if(MenuSensor.IRSensorR == 1)
+    {
+      vTaskDelay((1L * configTICK_RATE_HZ) / 1000L)  ;
+      if( TimeOutStr > 80 ) analogWrite(PWM4, 175) ;        // Giam toc khi IR phat hien end string
+      TimeOutStr++ ;
+      if( TimeOutStr > 290 && MenuSensor.LimitSW_1 != 0)  // gioi han time hong ngoai ngay tai day :(285) 
+        {
+          Motor_Run_Stop() ; 
+          Motor_Cleaning_Stop() ;
+          lcd.setCursor(2,3) ; lcd.print("LimitSW1 Error !") ;
+//          UpdatetoESP(String(), String());         // update to ESP loi limit switch tai day 
+          bool Err = false ;
+          while(digitalRead(StartPin) != 0) { digitalWrite(StaLedRED, Err) ; vTaskDelay((200L * configTICK_RATE_HZ) / 1000L)  ; Err = !Err ; } 
+          digitalWrite(StaLedRED, LOW) ;
+          Accelerate = 255 ;
+          TimeOutStr = 0 ;
+//          MenuSensor.LimitSW_1 = 0 ;
+        }
+    }
+  else analogWrite(PWM4, Accelerate) ;  
   vTaskDelay((1L * configTICK_RATE_HZ) / 1000L)  ;
 }
 
@@ -683,7 +698,26 @@ void Motor_Right_Start()
       Accelerate = 255 - (int)(PWMMovSpd.toInt()) ;
     }
   }
-  analogWrite(PWM4, Accelerate) ;
+  if(MenuSensor.IRSensorL == 1)
+  {
+    vTaskDelay((1L * configTICK_RATE_HZ) / 1000L)  ;
+    if( TimeOutStr > 80 ) analogWrite(PWM4, 175) ;    // Giam toc khi IR phat hien end string
+    TimeOutStr++ ;
+    if( TimeOutStr > 300 && MenuSensor.LimitSW_2 != 0)  // gioi han time hong ngoai ngay tai day :(270) 
+      {
+        Motor_Run_Stop() ; 
+        Motor_Cleaning_Stop() ;
+        lcd.setCursor(2,3) ; lcd.print("LimitSW2 Error !") ;
+//        UpdatetoESP(String(), String());         // update to ESP loi limit switch tai day 
+        bool Err = false ;
+        while(digitalRead(StartPin) != 0) { digitalWrite(StaLedRED, Err) ; vTaskDelay((200L * configTICK_RATE_HZ) / 1000L)  ; Err = !Err ; } 
+        digitalWrite(StaLedRED, LOW) ;
+        TimeOutStr = 0 ;
+        Accelerate = 255 ;
+//        MenuSensor.LimitSW_2 = 0 ;
+      }
+  }
+  else analogWrite(PWM4, Accelerate) ;  
   vTaskDelay((1L * configTICK_RATE_HZ) / 1000L)  ;
 }
 

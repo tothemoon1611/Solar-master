@@ -90,6 +90,7 @@ bool BreakPage = 0 ;                                                  // Co tac 
 bool OkPage = 0 ;                                                     // Co tac dung khi nhan nut OK
 unsigned int pointer  ;                                              // Vi tri cua con tro trong menu
 unsigned int PointerMax = 4 ;
+bool out = false ;
 
 float Value = 0 ;                                                     // Gia tri ban dau cua Encoder
 int State ;                                                           // Co tac dung cho Encoder

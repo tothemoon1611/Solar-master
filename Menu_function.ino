@@ -225,6 +225,7 @@ void Set_PID_orPWM()
       Set_PID() ;
     }
     if (BreakPage == 1) {
+      BreakPage = 0 ;    // Toan them luc 7h30 12/9
       break ;
     }
     vTaskDelay((10L * configTICK_RATE_HZ) / 1000L) ;
@@ -532,13 +533,21 @@ void Get_ID()
 }
 
 
-void Input_String()
+void Input_String() 
 {
   lcd.clear() ; lcd.setCursor(2, 1) ; lcd.print("Input String:") ;
   lcd.setCursor(0, 3) ; lcd.print("<-                ->") ;
+  TempData = "";
   Keypad_Set_Value() ;
+  if( BreakPage == 1 )
+    {
+      BreakPage = 0; 
+      out = true ;
+    }
+  else out = false ;  
   StrPanel = TempData.toInt() ;
   SDsaveData((String)(StrPanel), FileStrPanelData) ;
+  TempData = "";
 }
 
 
@@ -603,6 +612,7 @@ void Menu_ReadSensor() {
   if ( xSemaphoreTake( sem_ReadData, ( TickType_t ) 0 ) )
   {
     MenuSensor.IRSensorR = dataMachine.IRSensorR;
+    MenuSensor.IRSensorL = dataMachine.IRSensorL;
     //    lcd.setCursor(18,0) ; lcd.print((int)MenuSensor.IRSensorR++) ;
     MenuSensor.LimitSW_1 = dataMachine.LimitSW_1;
     MenuSensor.LimitSW_2 = dataMachine.LimitSW_2;
